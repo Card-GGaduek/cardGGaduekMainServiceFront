@@ -1,0 +1,62 @@
+<template>
+  <nav class="bottom-nav bg-white border-top d-flex justify-content-around align-items-center">
+    <RouterLink to="/booking" class="nav-item text-center">
+      <img src="@/assets/nav-icons/wallet.png" alt="예약" class="nav-icon" />
+      <div class="small">혜택까득</div>
+    </RouterLink>
+    <RouterLink to="/map" class="nav-item text-center">
+      <img src="@/assets/nav-icons/maps-and-flags.png" alt="혜택지도" class="nav-icon" />
+      <div class="small">혜택지도</div>
+    </RouterLink>
+    <RouterLink to="/" class="nav-item text-center">
+      <img src="@/assets/nav-icons/home.png" alt="홈" class="nav-icon" />
+      <div class="small">홈</div>
+    </RouterLink>
+    <RouterLink to="/analysis" class="nav-item text-center">
+      <img src="@/assets/nav-icons/result.png" alt="지출 분석" class="nav-icon" />
+      <div class="small">지출 분석</div>
+    </RouterLink>
+    <RouterLink to="/mypage" class="nav-item text-center">
+      <img src="@/assets/nav-icons/user.png" alt="마이페이지" class="nav-icon" />
+      <div class="small">마이페이지</div>
+    </RouterLink>
+  </nav>
+</template>
+
+<script setup>
+// 별도 스크립트 없음
+</script>
+
+<style scoped>
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  z-index: 1000;
+  background-color: #fff;
+  border-top: 1px solid #dee2e6;
+}
+
+.nav-item {
+  flex: 1;
+  padding: 8px 0;
+  color: #333;
+  text-decoration: none;
+}
+
+.nav-item:hover {
+  background-color: #f8f9fa;
+}
+
+.nav-icon {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 4px;
+}
+
+.small {
+  font-size: 12px;
+}
+</style>
