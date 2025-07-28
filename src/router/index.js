@@ -6,6 +6,7 @@ import MyPage from '@/pages/mypage/MyPage.vue'
 import AnalysisPage from '@/pages/analysis/AnalysisPage.vue'
 import NotFoundPage from '@/pages/common/NotFoundPage.vue'
 import PaymentPage from "@/pages/payment/PaymentPage.vue";
+import QRPage from '@/pages/payment/QRPage.vue'
 
 const routes = [
   { path: '/', name: 'Main', component: MainPage },
@@ -15,6 +16,7 @@ const routes = [
   { path: '/mypage', name: 'MyPage', component: MyPage },
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFoundPage },
   { path: '/payment', component: PaymentPage},
+  { path: '/payment/qr', component: QRPage },
 ]
 
 const router = createRouter({
