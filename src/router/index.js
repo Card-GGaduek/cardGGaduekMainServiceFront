@@ -5,6 +5,7 @@ import MapPage from '@/pages/map/MapPage.vue'
 import MyPage from '@/pages/mypage/MyPage.vue'
 import AnalysisPage from '@/pages/analysis/AnalysisPage.vue'
 import NotFoundPage from '@/pages/common/NotFoundPage.vue'
+import PaymentPage from "@/pages/payment/PaymentPage.vue";
 
 const routes = [
   { path: '/', name: 'Main', component: MainPage },
@@ -13,6 +14,7 @@ const routes = [
   { path: '/analysis', name: 'Analysis', component: AnalysisPage },
   { path: '/mypage', name: 'MyPage', component: MyPage },
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFoundPage },
+  { path: '/payment', component: PaymentPage},
 ]
 
 const router = createRouter({
