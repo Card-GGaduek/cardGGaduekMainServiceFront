@@ -16,7 +16,11 @@ const routes = [
   { path: '/mypage', name: 'MyPage', component: MyPage },
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFoundPage },
   { path: '/payment', component: PaymentPage},
-  { path: '/payment/qr', component: QRPage },
+  {
+    path: '/payment/qr',
+    component: QRPage,
+    meta: { hideNav: true }
+  },
 ]
 
 const router = createRouter({

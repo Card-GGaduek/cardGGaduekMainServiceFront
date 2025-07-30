@@ -2,7 +2,9 @@
   <div class="app-wrapper">
     <div class="app-content">
       <router-view />
-      <Navbar />
+
+      <!-- ✅ QR 페이지에서는 Navbar 숨기기 -->
+      <Navbar v-if="!$route.meta.hideNav" />
     </div>
   </div>
 </template>
@@ -34,7 +36,7 @@ import Navbar from './layout/Navbar.vue'
 /* 💡 화면이 768px 이상일 때만 오른쪽으로 이동 */
 @media (min-width: 1025px) {
   .app-content {
-    transform: translateX(200px); /* or left: 100px */
+    transform: translateX(200px);
   }
 }
 </style>
