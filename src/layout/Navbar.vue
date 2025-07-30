@@ -23,15 +23,10 @@
   </nav>
 </template>
 
-<script setup>
-// 별도 스크립트 없음
-</script>
-
 <style scoped>
 .bottom-nav {
-  position: fixed;
+  position: absolute; /* ✅ fixed → absolute */
   bottom: 0;
-  left: 0;
   width: 100%;
   height: 70px;
   z-index: 1000;

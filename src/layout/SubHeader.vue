@@ -1,12 +1,21 @@
 <template>
-  <header class="bg-light border-bottom py-3 px-4 text-center">
-    <h1 class="h5 mb-0 header-title">SubHeader</h1>
+  <header class="bg-light border-bottom py-2 px-3">
+    <button class="back-button" @click="goBack">←</button>
   </header>
 </template>
 
 <script setup>
-// 필요 시 props, emit 등 정의 가능
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+const goBack = () => router.back();
 </script>
 
 <style scoped>
+.back-button {
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
 </style>
