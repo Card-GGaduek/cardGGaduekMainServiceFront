@@ -5,7 +5,7 @@ import MapPage from '@/pages/map/MapPage.vue'
 import MyPage from '@/pages/mypage/MyPage.vue'
 import AnalysisPage from '@/pages/analysis/AnalysisPage.vue'
 import NotFoundPage from '@/pages/common/NotFoundPage.vue'
-
+import BookingAccommodationPage from '@/pages/booking/BookingAccommodationPage.vue'
 const routes = [
   { path: '/', name: 'Main', component: MainPage },
   { path: '/booking', name: 'Booking', component: BookingPage },
@@ -13,6 +13,7 @@ const routes = [
   { path: '/analysis', name: 'Analysis', component: AnalysisPage },
   { path: '/mypage', name: 'MyPage', component: MyPage },
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFoundPage },
+  { path: '/accommodation/:id', name: 'BookingAccommodationPage', component: BookingAccommodationPage},
 ]
 
 const router = createRouter({
