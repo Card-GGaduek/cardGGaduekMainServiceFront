@@ -34,6 +34,15 @@
   border-top: 1px solid #dee2e6;
 }
 
+/* ✅ iPad 및 태블릿 사이즈에서 중앙 정렬 + max-width 유지 */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .bottom-nav {
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 430px;
+  }
+}
+
 .nav-item {
   flex: 1;
   padding: 8px 0;
