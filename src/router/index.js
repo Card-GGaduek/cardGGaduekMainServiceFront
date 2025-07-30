@@ -21,6 +21,12 @@ const routes = [
     component: QRPage,
     meta: { hideNav: true }
   },
+  {
+    path: '/notification',
+    name: 'Notification',
+    component: () => import('@/pages/notification/NotificationPage.vue'),
+    meta: { hideHeader: true }
+  }
 ]
 
 const router = createRouter({

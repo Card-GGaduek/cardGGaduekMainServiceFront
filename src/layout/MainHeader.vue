@@ -7,20 +7,29 @@
 
     <!-- 오른쪽: 알림 아이콘 (메인 페이지일 때만 표시) -->
     <div v-if="showNotification" class="position-relative">
-      <img src="@/assets/icons/notification-bell.png" alt="알림" class="notification-icon" />
+      <img src="@/assets/icons/notification-bell.png" alt="알림" class="notification-icon" @click="goToNotification" />
       <span class="notification-badge">N</span>
     </div>
   </header>
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
 defineProps({
   showNotification: {
     type: Boolean,
     default: false
   }
-});
+})
+
+const goToNotification = () => {
+  router.push('/notification')
+}
 </script>
+
 
 <style scoped>
 .logo-img {
