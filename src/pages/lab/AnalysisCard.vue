@@ -3,7 +3,7 @@
     <div class="analysis-header">
       <img src="@/assets/lab/analysis_icon.png" class="analysis-icon" />
       <div>
-        <h2 class="mt-3 mx-3">이번 달 소비 성향 분석</h2>
+        <h3 class="mt-3 mx-3">이번 달 소비 성향 분석</h3>
         <p class="description mx-3">나의 소비 DNA는?</p>
       </div>
     </div>
@@ -36,14 +36,14 @@ const formattedMonth = computed(() => {
 <style scoped>
 .analysis-card {
   background: #fff;
-  padding: 16px;
+  padding: 20px;
   margin-top: 24px;
   border-radius: 12px;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 .image {
-  width: 140px;
+  width: 230px;
   margin: 12px 0;
 }
 .title {
@@ -68,10 +68,12 @@ const formattedMonth = computed(() => {
   width: 50px;
   height: auto;
   margin-right: 8px;
+  margin-left: 8px;
 }
 .description {
   margin: 4px 0 0;
   font-size: 14px;
   color: #999;
+  text-align: left;
 }
 </style>

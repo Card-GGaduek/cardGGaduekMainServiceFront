@@ -79,7 +79,7 @@ onMounted(async () => {
 <style scoped>
 .fortune-card-wrapper {
   width: 100%;
-  max-width: 375px;
+  max-width: 430px;
   height: 100vh;
   margin: 0 auto;
   position: relative;
@@ -90,20 +90,27 @@ onMounted(async () => {
 .fortune-scroll-container {
   width: 100%;
   height: 100vh;
-  overflow-y: auto; /* 세로 스크롤 활성화 */
+  overflow-y: auto;
   overflow-x: hidden;
+  /* 스크롤바 숨기기 */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.fortune-scroll-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 /* 전체 콘텐츠 컨테이너 */
 .fortune-content {
   width: 100%;
-  min-height: 100vh; /* 최소 높이를 화면 높이로 설정 */
+  min-height: 100vh;
   background-image: url('@/assets/lab/fortune_result_back.png');
-  background-size: cover; /* 화면에 맞게 조정 */
+  background-size: cover;
   background-repeat: no-repeat;
   background-position: center top;
   position: relative;
-  padding-bottom: 50px; /* 하단 여백 추가 */
+  padding-bottom: 50px;
 }
 
 /* 닫기 버튼 */
@@ -120,7 +127,7 @@ onMounted(async () => {
 
 /* 배너 영역 */
 .fortune-banner {
-  height: 240px; /* 배너 높이 설정 */
+  height: 240px;
   position: relative;
   display: flex;
   align-items: center;
@@ -132,7 +139,7 @@ onMounted(async () => {
   font-size: 28px;
   font-weight: bold;
   text-align: center;
-  margin-top: -10px; /* 칸의 중앙으로 조정 */
+  margin-top: -10px;
 }
 
 /* 본문 콘텐츠 */
@@ -140,41 +147,45 @@ onMounted(async () => {
   padding: 0 16px;
   box-sizing: border-box;
   text-align: center;
+  max-width: 430px;
+  margin: 0 auto;
 }
 
 /* 메시지, 아이템 공통 박스 */
 .fortune-section {
   margin-bottom: 24px;
-  background: #ffffff; /* 내부 배경색 */
-  border: 2px solid #333; /* 테두리 진하게 */
+  background: #ffffff;
+  border: 2px solid #333;
   padding: 16px;
+  box-sizing: border-box;
 }
 
 .fortune-section-title {
   font-weight: bold;
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .fortune-section-content {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 500;
   padding: 5px;
 }
 
 /* 아이템 */
 .fortune-item {
-  text-align: center; /* 아이템은 가운데 정렬 유지 */
+  text-align: center;
 }
 
 .fortune-item img {
-  width: 300px;
+  width: 100%;
+  max-width: 300px;
   height: auto;
   object-fit: contain;
   margin-bottom: 6px;
 }
 
 .fortune-item-name {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 500;
 }
 
@@ -191,5 +202,18 @@ onMounted(async () => {
   color: #444;
 }
 
-/* 기존 스크롤바 스타일링 제거 */
+/* 반응형 대응 */
+@media (max-width: 430px) {
+  .fortune-overlay {
+    padding: 0 12px;
+  }
+
+  .fortune-section {
+    padding: 12px;
+  }
+
+  .fortune-index {
+    font-size: 24px;
+  }
+}
 </style>

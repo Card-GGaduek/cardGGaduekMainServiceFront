@@ -3,9 +3,9 @@
     <div class="mission-header">
       <img src="@/assets/lab/mission_icon.png" class="mission-icon" />
       <div>
-        <h2 class="mt-3 mx-3">
+        <h3 class="mt-3 mx-3">
           시즌별 미션 <span class="end-date">~{{ endDate }}</span>
-        </h2>
+        </h3>
         <p class="description mx-3">미션 성공 시 관련 쿠폰이 까득</p>
       </div>
     </div>
@@ -40,22 +40,8 @@
                 {{ mission.progressValue }} / {{ mission.goalValue }}
               </span>
             </div>
-            <!-- 흰색 텍스트 레이어 (채워진 부분에만 표시) -->
-            <div
-              class="progress-text-overlay"
-              :style="{ width: getProgressPercentage(mission) + '%' }"
-            >
-              <span class="mission-title">{{ mission.missionTitle }}</span>
-            </div>
           </div>
         </template>
-        <!-- <span class="mission-title">{{ mission.missionTitle }}</span>
-        <span class="mission-status">
-          <template v-if="mission.isSuccess">미션 성공</template>
-          <template v-else
-            >{{ mission.progressValue }} / {{ mission.goalValue }}</template
-          >
-        </span> -->
       </div>
     </div>
   </div>
@@ -94,7 +80,7 @@ const getProgressPercentage = (mission) => {
   background: #fff;
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   margin-bottom: 16px;
 }
 
@@ -107,6 +93,7 @@ const getProgressPercentage = (mission) => {
   width: 50px;
   height: auto;
   margin-right: 8px;
+  margin-left: 8px;
 }
 .end-date {
   font-size: 14px;
@@ -127,30 +114,17 @@ const getProgressPercentage = (mission) => {
 }
 
 .mission-item {
-  /* display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #fff7e0;
-  border: 2px solid #f7c744;
   border-radius: 12px;
-  padding: 12px 16px;
-  font-size: 15px;
-  font-weight: 500;
-  color: #222; */
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 17px;
+  font-weight: 600;
   overflow: hidden;
 }
 
 .mission-item.success {
-  /* background: #f7c744;
-  color: white;
-  border: none; */
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f7c744;
+  background: #ffd559;
   color: white;
   padding: 12px 16px;
 }
@@ -158,7 +132,7 @@ const getProgressPercentage = (mission) => {
 .progress-container {
   position: relative;
   background: white;
-  border: 2px solid #f7c744;
+  border: 2px solid #ffd559;
   border-radius: 12px;
   height: 48px;
   overflow: hidden;
@@ -170,7 +144,7 @@ const getProgressPercentage = (mission) => {
   top: 0;
   left: 0;
   height: 100%;
-  background: #f7c744;
+  background: #ffd559;
   transition: width 0.3s ease;
   z-index: 1;
 }
@@ -186,39 +160,17 @@ const getProgressPercentage = (mission) => {
   justify-content: space-between;
   align-items: center;
   padding: 0 16px;
-  color: #222;
+  color: #5e514d;
   z-index: 2;
-}
-
-/* 흰색 텍스트 오버레이 (채워진 부분에만 표시) */
-.progress-text-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-  color: white;
-  overflow: hidden;
-  z-index: 3;
-  transition: width 0.3s ease;
-  /* 텍스트 위치를 정확히 맞추기 위해 */
-  white-space: nowrap;
 }
 
 .mission-title {
   flex: 1;
-  /* 두 레이어의 텍스트가 정확히 같은 위치에 오도록 */
-  font-size: 15px;
-  font-weight: 500;
-  /* white-space: nowrap;
-  overflow: hidden; */
-  /* text-overflow: ellipsis; */
+  font-size: 17px;
+  font-weight: 600;
 }
 
 .mission-status {
-  /* font-weight: bold; */
   font-weight: bold;
   white-space: nowrap;
 }

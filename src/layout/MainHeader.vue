@@ -5,7 +5,6 @@
 </template>
 
 <script setup>
-// 필요 시 props, emit 등 정의 가능
 </script>
 
 <style scoped></style>
