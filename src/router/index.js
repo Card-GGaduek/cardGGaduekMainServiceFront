@@ -8,6 +8,7 @@ import NotFoundPage from '@/pages/common/NotFoundPage.vue';
 
 import LabPage from '@/pages/lab/LabPage.vue';
 import FortuneCard from '@/pages/lab/FortuneCard.vue';
+import CardEditPage from '@/pages/card/CardEditPage.vue';
 
 const routes = [
   { path: '/', name: 'Main', component: MainPage },
@@ -17,7 +18,8 @@ const routes = [
   { path: '/mypage', name: 'MyPage', component: MyPage },
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFoundPage },
   { path: '/lab', name: 'Lab', component: LabPage },
-  { path: '/lab/fortune', component: FortuneCard },
+  { path: '/lab/fortune', name: 'Fortune', component: FortuneCard },
+  { path: '/card/edit', name: 'CardEdit', component: CardEditPage },
 ];
 
 const router = createRouter({
