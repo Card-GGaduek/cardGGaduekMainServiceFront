@@ -12,7 +12,6 @@
           v-for="item in notifications"
           :key="item.id"
       >
-        <p class="bank-name">{{ item.bankName }}</p>
         <p class="message">{{ item.title }}</p>
         <p class="description">{{ item.message }}</p>
         <a v-if="item.linkUrl" :href="item.linkUrl" target="_blank">
@@ -30,17 +29,15 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
 import SubHeader from '@/layout/SubHeader.vue'
-// import { useUserStore } from '@/stores/userStore'
-
-const memberId = 1 // 테스트용 memberId
+import { getNotifications } from '@/api/notificationApi'
 
 const notifications = ref([])
+const memberId = 1 // 테스트용
 
 const fetchNotifications = async () => {
   try {
-    const res = await axios.get(`http://localhost:8080/api/notification/${memberId}`)
+    const res = await getNotifications(memberId)
     notifications.value = res.data.data
   } catch (error) {
     console.error('알림 불러오기 실패:', error)
