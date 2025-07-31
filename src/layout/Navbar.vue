@@ -25,13 +25,22 @@
 
 <style scoped>
 .bottom-nav {
-  position: relative; /* ✅ fixed → absolute */
+  position: fixed; /* ✅ fixed → absolute */
   bottom: 0;
   width: 100%;
   height: 70px;
   z-index: 1000;
   background-color: #fff;
   border-top: 1px solid #dee2e6;
+}
+
+/* ✅ iPad 및 태블릿 사이즈에서 중앙 정렬 + max-width 유지 */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .bottom-nav {
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 430px;
+  }
 }
 
 .nav-item {
