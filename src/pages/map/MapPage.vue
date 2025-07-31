@@ -67,6 +67,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import ShinhanCard from '@/assets/images/cards/shinhandeepdream.png'
+import HyundaiZero from '@/assets/images/cards/hyundaizero.png'
+import KBTantandaero from '@/assets/images/cards/kb_tantandaero.png'
 
 // 마커 관련 상태
 const mapInstance = ref(null);
@@ -79,9 +82,9 @@ const selectedCardCategory = ref('');
 
 // 사용자 카드와 검색
 const myCards = ref([
-  { id: 1, name: '신한 Deep Dream', category: 'coffee_shop', color: '#00469B' },
-  { id: 2, name: '현대 Zero', category: 'convenience_store', color: '#1E1E1E' },
-  { id: 3, name: '국민 탄탄대로', category: 'movie_theater', color: '#6A483C' }
+  { id: 1, name: '신한 Deep Dream', category: 'coffee_shop', color: '#00469B' , image: ShinhanCard },
+  { id: 2, name: '현대 Zero', category: 'convenience_store', color: '#1E1E1E' , image: HyundaiZero },
+  { id: 3, name: '국민 탄탄대로', category: 'movie_theater', color: '#6A483C' , image: KBTantandaero }
 ])
 
 
