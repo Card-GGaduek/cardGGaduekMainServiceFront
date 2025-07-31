@@ -1,6 +1,8 @@
 <template>
-  <header class="bg-light border-bottom py-1 px-3">
-    <button class="back-button" @click="goBack">←</button>
+  <header class="py-1 px-3">
+    <button class="back-button" @click="goBack">
+      <i class="fa-solid fa-arrow-left"></i>
+    </button>
   </header>
 </template>
 
