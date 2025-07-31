@@ -1,10 +1,15 @@
-import { fileURLToPath, URL } from 'node:url'
 
+import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
+=======
+import { fileURLToPath, URL } from 'node:url';
 
-// https://vite.dev/config/
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import vueDevTools from 'vite-plugin-vue-devtools';
+
 export default defineConfig({
   server: {
     'proxy': {
@@ -15,9 +20,30 @@ export default defineConfig({
     vue(),
     vueDevTools(),
   ],
+  plugins: [vue(), vueDevTools()],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-})
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+      },
+    },
+  },
+
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+      },
+    },
+  },
+
+  build: {
+    outDir:
+      '/Users/yeahy/Desktop/Card-GGaduek/cardGGaduekMainServiceBackend/src/main/webapp/resources',
+  },
+});
