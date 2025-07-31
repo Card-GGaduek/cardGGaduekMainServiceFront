@@ -1,14 +1,7 @@
-
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
-=======
-import { fileURLToPath, URL } from 'node:url';
-
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
-import vueDevTools from 'vite-plugin-vue-devtools';
 
 export default defineConfig({
   server: {
@@ -33,20 +26,4 @@ export default defineConfig({
       },
     },
   },
-
-
-
-  server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8080',
-      },
-    },
-  },
-
-  build: {
-    outDir:
-      '/Users/yeahy/Desktop/Card-GGaduek/cardGGaduekMainServiceBackend/src/main/webapp/resources',
-  },
-
 });

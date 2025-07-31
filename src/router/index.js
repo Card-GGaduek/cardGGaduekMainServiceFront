@@ -11,8 +11,8 @@ import PaymentPage from "@/pages/payment/PaymentPage.vue"
 import QRPage from '@/pages/payment/QRPage.vue'
 import LabPage from '@/pages/lab/LabPage.vue'
 import FortuneCard from '@/pages/lab/FortuneCard.vue'
-
-
+import LoginPage from '@/pages/login/LoginPage.vue';
+import JoinPage from '@/pages/login/JoinPage.vue';
 
 const routes = [
   { path: '/', name: 'Main', component: MainPage },
@@ -21,6 +21,9 @@ const routes = [
   { path: '/analysis', name: 'Analysis', component: AnalysisPage },
   { path: '/mypage', name: 'MyPage', component: MyPage },
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFoundPage },
+  { path: '/login', name: 'LoginPage', component: LoginPage },
+  { path: '/join', name: 'JoinPage', component: JoinPage },
+];
   { path: '/accommodation/:id', name: 'BookingAccommodationPage', component: BookingAccommodationPage},
   { path: '/booking/confirm',name: 'FinalBookingPage', component: FinalBookingPage}
 ]
