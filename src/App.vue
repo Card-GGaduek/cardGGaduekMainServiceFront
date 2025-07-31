@@ -52,17 +52,30 @@
 
       <!-- ✅ 고정 네비게이션바 -->
       <Navbar v-if="!$route.meta.hideNav" />
+    <div class="app-content">
+      <router-view />
+      <Navbar v-if="!hideNavbar" />
     </div>
   </div>
 </template>
 
 <script setup>
-import Navbar from './layout/Navbar.vue'
+import Navbar from './layout/Navbar.vue';
+
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+
+// lab/fortune에서는 숨김 처리했어요
+const hideNavbar = computed(() => route.path === '/lab/fortune');
 </script>
 
 <style scoped>
 .app-wrapper {
-  background-color: #ffcd39;
+  width: 100dvw;
+  height: 100dvh;
+  background-color: #ffd559;
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -88,6 +101,7 @@ import Navbar from './layout/Navbar.vue'
   flex: 1;
   overflow-y: auto;
   padding-bottom: 70px; /* ✅ Navbar 공간 확보 */
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
 }
 
 /* 데스크톱에서만 위치 조정 (선택) */

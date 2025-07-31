@@ -5,8 +5,11 @@ import MapPage from '@/pages/map/MapPage.vue'
 import MyPage from '@/pages/mypage/MyPage.vue'
 import AnalysisPage from '@/pages/analysis/AnalysisPage.vue'
 import NotFoundPage from '@/pages/common/NotFoundPage.vue'
-import PaymentPage from "@/pages/payment/PaymentPage.vue";
+import PaymentPage from "@/pages/payment/PaymentPage.vue"
 import QRPage from '@/pages/payment/QRPage.vue'
+import LabPage from '@/pages/lab/LabPage.vue'
+import FortuneCard from '@/pages/lab/FortuneCard.vue'
+
 
 const routes = [
   { path: '/', name: 'Main', component: MainPage },
@@ -28,10 +31,12 @@ const routes = [
     meta: { hideHeader: true }
   }
 ]
-
+  { path: '/lab', name: 'Lab', component: LabPage },
+  { path: '/lab/fortune', component: FortuneCard },
+];
 const router = createRouter({
   history: createWebHistory(),
   routes,
-})
+});
 
-export default router
+export default router;
