@@ -6,6 +6,7 @@ import MyPage from '@/pages/mypage/MyPage.vue'
 import AnalysisPage from '@/pages/analysis/AnalysisPage.vue'
 import NotFoundPage from '@/pages/common/NotFoundPage.vue'
 import BookingAccommodationPage from '@/pages/booking/BookingAccommodationPage.vue'
+import FinalBookingPage from '@/pages/booking/FinalBookingPage.vue'
 const routes = [
   { path: '/', name: 'Main', component: MainPage },
   { path: '/booking', name: 'Booking', component: BookingPage },
@@ -14,6 +15,7 @@ const routes = [
   { path: '/mypage', name: 'MyPage', component: MyPage },
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFoundPage },
   { path: '/accommodation/:id', name: 'BookingAccommodationPage', component: BookingAccommodationPage},
+  { path: '/booking/confirm',name: 'FinalBookingPage', component: FinalBookingPage}
 ]
 
 const router = createRouter({

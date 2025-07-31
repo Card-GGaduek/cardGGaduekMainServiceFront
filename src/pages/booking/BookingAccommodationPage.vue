@@ -1,11 +1,13 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import BookingCalendar from '@/pages/booking/BookingCalendar.vue'; // 1. 달력 컴포넌트 import
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 
 
 const route = useRoute();
+const router = useRouter();
+
 const selectedDates = ref(null);
 
 const accommodationId = route.params.id;
@@ -30,6 +32,34 @@ function handleDatesSelected(dates) {
   selectedDates.value = dates;
   console.log('선택된 체크인:', dates.checkIn);
   console.log('선택된 체크아웃:', dates.checkOut);
+}
+
+function handleBooking(room) {
+  // 날짜가 선택되지 않았으면 경고
+  if (!selectedDates.value || !selectedDates.value.checkIn) {
+    alert('체크인 날짜를 먼저 선택해주세요.');
+    return;
+  }
+
+  // 최종 예약 페이지로 이동하면서 쿼리 파라미터로 정보 전달
+  router.push({
+    name: 'FinalBookingPage',
+    query: {
+      roomId: room.id,
+      roomName: room.name,
+      checkIn: formatDate(selectedDates.value.checkIn),
+      checkOut: formatDate(selectedDates.value.checkOut)
+    }
+  });
+}
+
+// Date 객체를 'YYYY-MM-DD' 형식의 문자열로 변환하는 헬퍼 함수
+function formatDate(date) {
+  if (!date) return null;
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 onMounted(() => {
   fetchAccommodationDetail();
@@ -72,7 +102,7 @@ onMounted(() => {
                 <h6 class="card-title fw-bold">{{ room.name }}</h6>
                 <p class="card-text text-muted small mb-1">최대 수용 인원: {{ room.maxCapacity }}</p>
                 <p class="card-text fw-bold">1박 {{ room.pricePerNight }}원</p>
-                <button class="btn btn-warning w-100 fw-bold">선택하기</button>
+                <button  @click="handleBooking(room)" class="btn btn-warning w-100 fw-bold">선택하기</button>
               </div>
             </div>
           </div>
@@ -128,7 +158,7 @@ onMounted(() => {
   object-fit: cover;
 }
 .image-overlay-content {
-  position: absolute;
+
   bottom: 0;
   left: 0;
   right: 0;
