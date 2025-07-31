@@ -5,10 +5,13 @@ import MapPage from '@/pages/map/MapPage.vue'
 import MyPage from '@/pages/mypage/MyPage.vue'
 import AnalysisPage from '@/pages/analysis/AnalysisPage.vue'
 import NotFoundPage from '@/pages/common/NotFoundPage.vue'
+import BookingAccommodationPage from '@/pages/booking/BookingAccommodationPage.vue'
+import FinalBookingPage from '@/pages/booking/FinalBookingPage.vue'
 import PaymentPage from "@/pages/payment/PaymentPage.vue"
 import QRPage from '@/pages/payment/QRPage.vue'
 import LabPage from '@/pages/lab/LabPage.vue'
 import FortuneCard from '@/pages/lab/FortuneCard.vue'
+
 
 
 const routes = [
@@ -18,6 +21,13 @@ const routes = [
   { path: '/analysis', name: 'Analysis', component: AnalysisPage },
   { path: '/mypage', name: 'MyPage', component: MyPage },
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFoundPage },
+  { path: '/accommodation/:id', name: 'BookingAccommodationPage', component: BookingAccommodationPage},
+  { path: '/booking/confirm',name: 'FinalBookingPage', component: FinalBookingPage}
+]
+
+  { path: '/lab', name: 'Lab', component: LabPage },
+  { path: '/lab/fortune', component: FortuneCard },
+];
   { path: '/payment', component: PaymentPage},
   {
     path: '/payment/qr',

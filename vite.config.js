@@ -25,6 +25,8 @@ export default defineConfig({
     },
   },
 
+
+
   server: {
     proxy: {
       '/api': {
@@ -37,4 +39,5 @@ export default defineConfig({
     outDir:
       '/Users/yeahy/Desktop/Card-GGaduek/cardGGaduekMainServiceBackend/src/main/webapp/resources',
   },
+
 });
