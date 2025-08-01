@@ -1,18 +1,9 @@
-import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
+import { fileURLToPath, URL } from 'node:url'
 
 export default defineConfig({
-  server: {
-    'proxy': {
-      'api': 'http://localhost:8080'
-    }
-  },
-  plugins: [
-    vue(),
-    vueDevTools(),
-  ],
   plugins: [vue(), vueDevTools()],
   resolve: {
     alias: {
@@ -22,8 +13,10 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'http://localhost:8080', // 백엔드 주소
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api/, '/api'), // /api 유지
       },
     },
   },
-});
+})

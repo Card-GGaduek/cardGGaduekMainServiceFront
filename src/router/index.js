@@ -11,27 +11,22 @@ import PaymentPage from "@/pages/payment/PaymentPage.vue"
 import QRPage from '@/pages/payment/QRPage.vue'
 import LabPage from '@/pages/lab/LabPage.vue'
 import FortuneCard from '@/pages/lab/FortuneCard.vue'
-import LoginPage from '@/pages/login/LoginPage.vue';
-import JoinPage from '@/pages/login/JoinPage.vue';
-
+import LoginPage from '@/pages/login/LoginPage.vue'
+import JoinPage from '@/pages/login/JoinPage.vue'
+import axios from 'axios';
 const routes = [
   { path: '/', name: 'Main', component: MainPage },
   { path: '/booking', name: 'Booking', component: BookingPage },
+  { path: '/accommodation/:id', name: 'BookingAccommodationPage', component: BookingAccommodationPage },
+  { path: '/booking/confirm', name: 'FinalBookingPage', component: FinalBookingPage },
   { path: '/map', name: 'Map', component: MapPage },
   { path: '/analysis', name: 'Analysis', component: AnalysisPage },
   { path: '/mypage', name: 'MyPage', component: MyPage },
-  { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFoundPage },
   { path: '/login', name: 'LoginPage', component: LoginPage },
   { path: '/join', name: 'JoinPage', component: JoinPage },
-];
-  { path: '/accommodation/:id', name: 'BookingAccommodationPage', component: BookingAccommodationPage},
-  { path: '/booking/confirm',name: 'FinalBookingPage', component: FinalBookingPage}
-]
-
   { path: '/lab', name: 'Lab', component: LabPage },
   { path: '/lab/fortune', component: FortuneCard },
-];
-  { path: '/payment', component: PaymentPage},
+  { path: '/payment', component: PaymentPage },
   {
     path: '/payment/qr',
     component: QRPage,
@@ -42,14 +37,13 @@ const routes = [
     name: 'Notification',
     component: () => import('@/pages/notification/NotificationPage.vue'),
     meta: { hideHeader: true }
-  }
+  },
+  { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFoundPage }
 ]
-  { path: '/lab', name: 'Lab', component: LabPage },
-  { path: '/lab/fortune', component: FortuneCard },
-];
+
 const router = createRouter({
   history: createWebHistory(),
   routes,
-});
+})
 
-export default router;
+export default router
