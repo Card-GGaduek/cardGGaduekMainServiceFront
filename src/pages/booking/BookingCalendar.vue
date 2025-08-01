@@ -11,8 +11,8 @@ const year = computed(() => currentDate.value.getFullYear());
 const month = computed(() => currentDate.value.getMonth());
 // 캡처 이미지가 'October 2020' 이므로 임시로 하드코딩. 실제 사용 시에는 아래 주석처리된 코드를 사용하세요.
 // const monthName = computed(() => new Date(year.value, month.value).toLocaleString('en-US', { month: 'long' }));
-const monthName = ref('October');
-const displayYear = ref(2020);
+const monthName = ref('August');
+const displayYear = ref(2025);
 
 
 const calendarGrid = computed(() => {

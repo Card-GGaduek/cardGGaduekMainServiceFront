@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch,computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 
@@ -17,14 +17,18 @@ const guestName = ref('');
 const guestPhone = ref('');
 const guestEmail = ref('');
 const requestText = ref('');
+const numberOfGuests = ref(2);
 const selectedCouponId = ref(null);
 const selectedCardId = ref(null);
-
 // 3. 서버에서 받아온 데이터를 저장할 ref 변수들
 const priceDetails = ref(null);    // 계산된 가격 정보
 const userCards = ref([]);         // 사용자가 보유한 카드 목록
 const userCoupons = ref([]);       // 사용자가 보유한 쿠폰 목록
 const isLoadingPrice = ref(true);  // 가격 계산 로딩 상태
+
+const travelCoupons = computed(() => {
+  return userCoupons.value.filter(coupon => coupon.couponCategory === 'TRAVEL');
+});
 
 // 4. 서버에 가격 계산을 요청하는 함수
 async function fetchPrice() {
@@ -55,13 +59,15 @@ async function submitBooking() {
   }
 
   const bookingData = {
+    email: guestEmail.value,
     roomId: roomId.value,
     checkInDate: checkIn.value,
     checkOutDate: checkOut.value,
-    guestName: guestName.value,
-    guestPhone: guestPhone.value,
+    name: guestName.value,
+    phone: guestPhone.value,
     requestText: requestText.value,
     couponProductId: selectedCouponId.value,
+    numberOfGuests: numberOfGuests.value,
     cardId: selectedCardId.value,
     memberId: 1, // 실제로는 로그인 정보에서 가져와야 함
   };
@@ -77,14 +83,17 @@ async function submitBooking() {
   }
 }
 
+
 // 6. 카드나 쿠폰 선택이 변경될 때마다 가격 다시 계산
 watch([selectedCouponId, selectedCardId], fetchPrice);
 
-// 7. 페이지가 로드될 때 필요한 모든 데이터(가격, 보유카드/쿠폰) 초기 로드
+// 💡 1. 보유 카드 목록을 가져오는 함수 추가
 async function fetchUserCards() {
   try {
-    const response = await axios.get('/api/my/cards');
-    userCards.value = response.data;
+    // memberId를 기반으로 API 호출 (예: /api/members/1)
+    const memberId = 1; // 실제로는 로그인 정보에서 가져와야 함
+    const response = await axios.get(`/api/card/${memberId}`);
+    userCards.value = response.data.data || response.data;
   } catch (error) {
     console.error("보유 카드 목록 조회 실패:", error);
   }
@@ -93,8 +102,9 @@ async function fetchUserCards() {
 // 💡 2. 보유 쿠폰 목록을 가져오는 함수 추가
 async function fetchUserCoupons() {
   try {
-    const response = await axios.get('/api/member/coupons?memberId=3');
-    userCoupons.value = response.data;
+    const memberId = 1; // 실제로는 로그인 정보에서 가져와야 함
+    const response = await axios.get(`/api/member/coupons/${memberId}`)
+    userCoupons.value = response.data.data.memberCoupons;
   } catch (error) {
     console.error("보유 쿠폰 목록 조회 실패:", error);
   }
@@ -151,9 +161,9 @@ onMounted(() => {
         </section>
 
         <section class="payment-summary">
-          <select class="form-select mb-2" v-model="selectedCouponId">
+          <select  class="form-select mb-2" v-model="selectedCouponId">
             <option :value="null">쿠폰을 선택하세요</option>
-            <option v-for="coupon in userCoupons" :key="coupon.id" :value="coupon.id">{{ coupon.name }}</option>
+            <option v-if = "travelCoupons.length > 0" v-for="coupon in userCoupons" :key="coupon.id" :value="coupon.couponProductId">{{ coupon.couponName }}</option>
           </select>
 
           <select class="form-select mb-4" v-model="selectedCardId">
