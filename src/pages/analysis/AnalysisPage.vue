@@ -28,7 +28,7 @@ import { ref, onMounted } from 'vue';
 import SubHeader          from '@/layout/SubHeader.vue';
 import TabNav             from '@/components/analysis/TabNav.vue';
 import CardSlider         from '@/components/analysis/CardSlider.vue';
-import { getCardPerformance, getCardTransactions } from '@/api/index.js';
+import { getCardPerformance, getCardTransactions } from '@/api/analysisindex.js';
 
 const memberId = 1;  // 실제 로그인한 유저 ID로 대체
 const activeTab = ref('cardPerformance');
