@@ -25,7 +25,7 @@
 
 <style scoped>
 .bottom-nav {
-  position: fixed; /* ✅ fixed → absolute */
+  position: absolute; /* ✅ fixed → absolute */
   bottom: 0;
   width: 100%;
   height: 70px;
