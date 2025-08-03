@@ -86,6 +86,7 @@ const {
   myCards,
   selectedMerchant,
   selectedCardCategory,
+  updateMarkers,
   filterByCategory,
   moveToCurrentLocation,
   handleSearch, 
@@ -98,4 +99,4 @@ const {
 <style scoped>
 @import '@/assets/main.css';
 @import './map.css';
-</style>
+</style>  
