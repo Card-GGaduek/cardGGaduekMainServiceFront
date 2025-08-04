@@ -1,41 +1,34 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import axios from 'axios';
-import { useRouter } from 'vue-router';
+import { ref, computed, onMounted } from "vue";
+import axios from "axios";
+import { useRouter } from "vue-router";
 
 const router = useRouter();
-
 const benefits = ref([]);
 const isLoading = ref(true);
+const selectedCategory = ref("여행");
 
-const selectedCategory = ref('여행');
-const selectedSubCategory = ref('숙박');
-
+// 1. 메인 카테고리 목록 수정 ('OTT' 제거, '입장권' 추가)
 const categories = ref([
-  { name: '여행', icon: 'fa-solid fa-plane', apiValue: 'HOTEL' },
-  { name: 'OTT', icon: 'fa-solid fa-tv', apiValue: 'MOVIE THEATER' },
-  { name: '쇼핑', icon: 'fa-solid fa-bag-shopping', apiValue: 'COFFEE SHOP' },
-  { name: '문화', icon: 'fa-solid fa-ticket', apiValue: 'RESTAURANT' },
+  { name: "여행", icon: "fa-solid fa-plane", apiValue: "HOTEL" },
+  { name: "입장권", icon: "fa-solid fa-ticket", apiValue: "THEME_PARK" }, // '문화' 대신 '입장권'으로 변경
+  { name: "쇼핑", icon: "fa-solid fa-bag-shopping", apiValue: "SHOPPING" },
+  { name: "문화", icon: "fa-solid fa-film", apiValue: "MOVIE_THEATER" }, // 아이콘 예시 변경
 ]);
-const subCategoryMenus = ref({
-  '여행': ['숙박', '입장권'],
-  'OTT': ['미디어', '뮤직'],
-});
 
-const currentSubMenus = computed(() => subCategoryMenus.value[selectedCategory.value] || []);
-
+// 2. API가 필터링된 결과를 준다고 가정
 const filteredBenefits = computed(() => {
-  // 현재는 API가 필터링된 결과를 준다고 가정
   return benefits.value;
 });
 
+// 3. API 호출 함수 (내부 로직은 동일)
 async function fetchBenefits(categoryApiValue) {
   isLoading.value = true;
   benefits.value = [];
   try {
-    const memberId = 3; // 실제 로그인 정보에서 가져와야 함
+    const memberId = 1;
     const response = await axios.get(`/api/category/${categoryApiValue}`, {
-      params: { memberId }
+      params: { memberId },
     });
     benefits.value = response.data.data || response.data;
   } catch (error) {
@@ -44,33 +37,38 @@ async function fetchBenefits(categoryApiValue) {
     isLoading.value = false;
   }
 }
-
+function calculateExpectedPrice(benefit) {
+  // benefit 객체에 price, valueType, rateValue, amountValue가 있다고 가정
+  
+  const basePrice = benefit.price || 0;
+  console.log(benefit); 
+  if (benefit.discountRate <= 50) {
+    return Math.floor(benefit.price * (benefit.discountRate / 100));
+  } 
+  // 혜택 정보가 없으면 원래 가격 반환
+  return benefit.discountRate;
+}
+// 4. 카테고리 선택 함수 (서브 카테고리 로직 제거)
 function selectCategory(category) {
   selectedCategory.value = category.name;
-  const newSubMenus = subCategoryMenus.value[category.name];
-  selectedSubCategory.value = newSubMenus ? newSubMenus[0] : null;
   fetchBenefits(category.apiValue);
 }
 
-function selectSubCategory(subCategoryName) {
-  selectedSubCategory.value = subCategoryName;
-  // TODO: 서브카테고리 선택 시 API를 다시 호출하는 로직 추가
-}
-
+// 5. 컴포넌트 마운트 시 기본 API 호출
 onMounted(() => {
-  // 초기 선택된 카테고리('여행') 객체를 찾음
-  const defaultCategory = categories.value.find(c => c.name === selectedCategory.value);
-  
+  const defaultCategory = categories.value.find(
+    (c) => c.name === selectedCategory.value
+  );
   if (defaultCategory) {
-    // 찾은 객체의 apiValue('TRAVEL')를 사용해 API 호출
     fetchBenefits(defaultCategory.apiValue);
   }
 });
 
+// 6. 예약하기 핸들러 (여행, 입장권일 때 동작)
 function handleBooking(benefit) {
   router.push({
-    name: 'BookingAccommodationPage',
-    params: { id: benefit.id }
+    name: "BookingAccommodationPage",
+    params: { id: benefit.id },
   });
 }
 </script>
@@ -81,19 +79,27 @@ function handleBooking(benefit) {
       <header class="pt-4 mb-4">
         <h5 class="fw-bold mb-4">카드까득</h5>
         <h2 class="fw-bolder text-center">혜택도, 예약도 한 번에!</h2>
-        <p class="text-muted small text-center">상황을 선택하고,<br>혜택을 가장 많이 받는 카드로 예약하세요!</p>
+        <p class="text-muted small text-center">
+          상황을 선택하고,<br />혜택을 가장 많이 받는 카드로 예약하세요!
+        </p>
       </header>
-      
+
       <div class="scrollable-content">
         <div class="card main-category-card mb-4">
           <div class="card-body">
-            <section class="main-categories d-flex justify-content-around text-center">
-              <div 
-                v-for="category in categories" 
-                :key="category.name" 
+            <section
+              class="main-categories d-flex justify-content-around text-center"
+            >
+              <div
+                v-for="category in categories"
+                :key="category.name"
                 class="category-item"
-                @click="selectCategory(category)">
-                <div class="icon-wrapper" :class="{ active: selectedCategory === category.name }">
+                @click="selectCategory(category)"
+              >
+                <div
+                  class="icon-wrapper"
+                  :class="{ active: selectedCategory === category.name }"
+                >
                   <i :class="category.icon"></i>
                 </div>
                 <span class="small">{{ category.name }}</span>
@@ -102,43 +108,59 @@ function handleBooking(benefit) {
           </div>
         </div>
 
-        <ul v-if="currentSubMenus.length > 0" class="nav nav-tabs nav-justified sub-category-tabs mb-4">
-          <li v-for="menu in currentSubMenus" :key="menu" class="nav-item">
-            <a class="nav-link" 
-               :class="{ active: selectedSubCategory === menu }" 
-               href="#"
-               @click.prevent="selectSubCategory(menu)">
-              {{ menu }}
-            </a>
-          </li>
-        </ul>
-
         <main class="benefit-list">
           <div v-if="isLoading" class="text-center p-5">
             <div class="spinner-border" role="status"></div>
           </div>
-          <div v-else-if="filteredBenefits.length === 0" class="text-center p-5 text-muted">
+          <div
+            v-else-if="filteredBenefits.length === 0"
+            class="text-center p-5 text-muted"
+          >
             표시할 혜택 정보가 없습니다.
           </div>
-          <div v-else class="card benefit-card mb-3" v-for="benefit in filteredBenefits" :key="benefit.id">
+          <div
+            v-else
+            class="card benefit-card mb-3"
+            v-for="benefit in filteredBenefits"
+            :key="benefit.id"
+          >
             <div class="card-body d-flex align-items-center">
-              <!-- <img :src="benefit.imageUrl" class="rounded me-3" alt="Benefit Image"> -->
+
+              <img :src="benefit.imageUrl" class="rounded me-3 benefit-image" alt="Benefit Image">
+              
               <div class="flex-grow-1">
                 <p class="card-text small mb-2">
-            보유하신 {{ benefit.cardName }}로 {{ benefit.title }}에서
-            <span class="text-highlight fw-bold">최대 {{ benefit.discountRate }}% 할인</span>을 받을 수 있습니다.
-          </p>
-                <p class="card-text small mb-2 fw-bold">
-                  예상 혜택 금액 : {{ benefit.expectedBenefitAmount}}원
+                  보유하신 {{ benefit.cardName }}로 {{ benefit.title }}에서
+
+                  <span class="text-highlight fw-bold">
+                    <span v-if="benefit.discountRate < 50">
+                      최대 {{ benefit.discountRate }}% 할인
+                    </span>
+                    <span v-else>
+                      최대 {{ benefit.discountRate }}원 할인
+                    </span>
+                  </span>
+
+                  을 받을 수 있습니다.
                 </p>
-                
-                <a v-if="selectedCategory === '여행'" 
-                   @click.prevent="handleBooking(benefit)" 
-                   href="#" 
-                   class="stretched-link text-decoration-none text-muted small">
+                <p class="card-text small mb-2 fw-bold">
+                  예상 혜택 금액 : {{ calculateExpectedPrice(benefit) }}원
+                </p>  
+
+                <a
+                  v-if="selectedCategory === '여행'"
+                  @click.prevent="handleBooking(benefit)"
+                  href="#"
+                  class="stretched-link text-decoration-none text-muted small"
+                >
                   예약하기 <i class="bi bi-chevron-right"></i>
                 </a>
-                <a v-else :href="benefit.linkUrl || '#'" target="_blank" class="stretched-link text-decoration-none text-muted small">
+                <a
+                  v-else
+                  :href="benefit.linkUrl || '#'"
+                  target="_blank"
+                  class="stretched-link text-decoration-none text-muted small"
+                >
                   자세히 보기 <i class="bi bi-chevron-right"></i>
                 </a>
               </div>
@@ -150,6 +172,9 @@ function handleBooking(benefit) {
   </div>
 </template>
 
+<style scoped>
+/* CSS는 이전과 동일합니다. */
+</style>
 <style scoped>
 /* 전체 페이지 스타일 */
 .benefit-page-bg {
@@ -174,10 +199,10 @@ header {
 .main-category-card {
   border: none;
   border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
-.category-item { 
-    cursor: pointer;
+.category-item {
+  cursor: pointer;
 }
 .category-item .icon-wrapper {
   width: 60px;
@@ -215,7 +240,7 @@ header {
 .benefit-card {
   border: none;
   border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 .benefit-card img {
   width: 120px;
