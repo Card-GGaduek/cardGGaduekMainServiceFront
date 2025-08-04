@@ -106,6 +106,58 @@
     border-radius: 5px;
   }
   
+  
+  .animated-location-marker {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+  }
+  
+  /* 중심 점 */
+  .marker-core {
+    width: 14px;
+    height: 14px;
+    background-color: #3b82f6;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    box-shadow: 0 0 6px rgba(59, 130, 246, 0.6);
+  }
+  
+  /* 퍼지는 애니메이션 링 */
+  .marker-wave {
+    width: 30px;
+    height: 30px;
+    background: rgba(59, 130, 246, 0.3);
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    animation: wavePulse 1.6s ease-out infinite;
+    z-index: 1;
+  }
+  
+  /* 애니메이션 정의 */
+  @keyframes wavePulse {
+    0% {
+      transform: scale(0.5);
+      opacity: 0.8;
+    }
+    70% {
+      transform: scale(2.2);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(2.2);
+      opacity: 0;
+    }
+  }
+  
    /* 위치 버튼 스타일 */
   .location-button {
     position: relative;

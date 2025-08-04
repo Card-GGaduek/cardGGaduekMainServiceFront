@@ -144,7 +144,7 @@ const goToStoreList = (cardId) => {
 
   try {
     router.push({
-      name: 'Map', // 또는 'MapPage' - 라우터 설정에 맞게
+      name: 'MapPage', // 또는 'MapPage' - 라우터 설정에 맞게
       query: { cardId: cardId }
     });
   } catch (error) {
@@ -154,7 +154,7 @@ const goToStoreList = (cardId) => {
 
 const loadCards = async () => {
   try {
-    const response = await getCardList(1);
+    const response = await getCardList(4);
     cards.value = response.data.data;
   } catch (err) {
     console.error('카드 리스트 로드 실패:', err);

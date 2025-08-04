@@ -16,15 +16,15 @@
 <script setup>
 import Navbar from './layout/Navbar.vue';
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 
-const route = useRoute();
-const hideNavbar = computed(() => route.path === '/lab/fortune');
+const router = useRouter();
+const hideNavbar = computed(() => router.path === '/lab/fortune');
 </script>
 
 <style scoped>
 html, body {
-  height: 100%;
+  height: 100%; 
   margin: 0;
   overflow: hidden;
 }
