@@ -42,19 +42,27 @@ export const useAuthStore = defineStore('auth', () => {
   };
 
   // 로그인 액션
-  const login = async (member) => {
-    // 임시 테스트용 로그인 (실제 API 호출 전)
-    // state.value.token = 'test token';
-    // state.value.user = {
-    //   username: member.username,
-    //   email: member.username + '@test.com',
-    // };
+  // const login = async (member) => {
+  //   // 임시 테스트용 로그인 (실제 API 호출 전)
+  //   // state.value.token = 'test token';
+  //   // state.value.user = {
+  //   //   username: member.username,
+  //   //   email: member.username + '@test.com',
+  //   // };
 
-    // 실제 API 호출
-    const { data } = await axios.post('/api/auth/login', member);
-    state.value = { ...data }; // 서버 응답 데이터로 상태 업데이트
+  //   // 실제 API 호출
+  //   const { data } = await axios.post('/api/auth/login', member);
+  //   state.value = { ...data }; // 서버 응답 데이터로 상태 업데이트
 
-    // localStorage에 상태 저장
+  //   // localStorage에 상태 저장
+  //   localStorage.setItem('auth', JSON.stringify(state.value));
+  // };
+  const login = async (response) => {
+    state.value.token = response.accessToken;
+    state.value.user = {
+      username: response.user.username,
+      email: response.user.email,
+    };
     localStorage.setItem('auth', JSON.stringify(state.value));
   };
 

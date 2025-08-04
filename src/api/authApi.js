@@ -22,6 +22,20 @@ const authApi = {
       code: code,
     });
   },
+
+  login: async (email, password) => {
+    return await axiosInstance.post('/auth/login', {
+      email: email,
+      password: password,
+    });
+  },
+
+  naverLogin: async (code, state) => {
+    return await axiosInstance.post('/auth/naverLogin', {
+      code: code,
+      state: state,
+    });
+  },
 };
 
 export default authApi;

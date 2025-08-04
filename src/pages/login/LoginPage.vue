@@ -15,7 +15,7 @@
 
     <!-- 이메일 입력 -->
     <input
-      v-model="email"
+      v-model="loginForm.email"
       type="email"
       placeholder="이메일"
       class="form-control form-control-sm mb-2"
@@ -24,7 +24,7 @@
 
     <!-- 비밀번호 입력 -->
     <input
-      v-model="password"
+      v-model="loginForm.password"
       type="password"
       placeholder="비밀번호"
       class="form-control form-control-sm mb-2"
@@ -60,25 +60,73 @@
     <!-- 회원가입 -->
     <p class="mt-4 small text-muted">
       아직 회원이 아니신가요?
-      <span class="text-warning fw-semibold" style="cursor: pointer"
-        >회원가입</span
+      <router-link
+        to="/join"
+        class="text-warning fw-semibold"
+        style="cursor: pointer"
       >
+        회원가입
+      </router-link>
     </p>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
+import authApi from '@/api/authApi';
+import { useAuthStore } from '@/stores/auth';
+import { useRouter } from 'vue-router';
 
-const email = ref('');
-const password = ref('');
+const router = useRouter();
 
-function login() {
-  console.log('로그인 시도:', email.value, password.value);
-}
+const clientId = import.meta.env.VITE_NAVER_API_CLIENT_ID;
+const authStore = useAuthStore();
 
-function goToNaverLogin() {
-  console.log('네이버 로그인 버튼 클릭됨');
-  // 네이버 로그인 리다이렉트 처리
-}
+const loginForm = reactive({
+  email: '',
+  password: '',
+});
+// const email = ref('');
+// const password = ref('');
+
+// function login() {
+//   console.log('로그인 시도:', email.value, password.value);
+// }
+
+const login = async () => {
+  if (!loginForm.email) {
+    alert('이메일을 입력하세요.');
+    return;
+  }
+
+  if (!loginForm.password) {
+    alert('비밀번호를 입력하세요.');
+    return;
+  }
+
+  try {
+    const result = await authApi.login(loginForm.email, loginForm.password);
+    authStore.login(result);
+    router.push('/');
+  } catch (e) {
+    alert(e.message);
+  }
+};
+
+const generateState = () => {
+  return Array.from(crypto.getRandomValues(new Uint8Array(10)))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+};
+
+// localStorage 또는 sessionStorage에 저장 (서버 세션이 없으므로 클라이언트 저장)
+const state = generateState();
+sessionStorage.setItem('naver_oauth_state', state);
+
+const redirectUri = encodeURIComponent('http://localhost:5173/naver/callback'); // 로그인 완료 후 돌아올 URI
+
+// 로그인 URL 생성
+const naverLoginUrl = ref(
+  `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}`
+);
 </script>
