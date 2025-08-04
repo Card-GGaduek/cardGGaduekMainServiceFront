@@ -3,20 +3,20 @@ export default [
   {
     path: '/lab/missions',
     name: 'lab/missions',
-    component: () => import('../pages/lab/MissionCard.vue'),
+    component: () => import('@/pages/lab/MissionCard.vue'),
   },
 
   // 소비 운세
   {
     path: '/lab/fortune',
     name: 'lab/fortune',
-    component: () => import('../pages/lab/FortuneCard.vue'),
+    component: () => import('@/pages/lab/FortuneCard.vue'),
   },
 
   // 소비 성향
   {
     path: '/lab/analysis',
     name: 'lab/analysis',
-    component: () => import('../pages/lab/AnalysisCard.vue'),
+    component: () => import('@/pages/lab/AnalysisCard.vue'),
   },
 ];
