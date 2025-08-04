@@ -15,11 +15,10 @@ import LoginPage from '@/pages/login/LoginPage.vue';
 import JoinPage from '@/pages/login/JoinPage.vue';
 import AllTransactions from '@/components/analysis/AllTransactions.vue';
 import CardEditPage from '@/pages/card/CardEditPage.vue';
-
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
 import NaverCallback from '@/pages/login/NaverCallback.vue';
-import CardEditPage from '@/pages/card/CardEditPage.vue'
+
 const routes = [
   {
     path: '/',

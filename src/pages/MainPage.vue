@@ -20,6 +20,7 @@
 </template>
 
 <script setup>
+import { reactive, ref, onMounted } from 'vue';
 import MainHeader from '@/layout/MainHeader.vue';
 import CardSwiper from '@/components/main/CardSwiper.vue';
 import RecommendedCards from '@/components/main/RecommendedCards.vue';
@@ -59,7 +60,7 @@ const goToStoreList = (cardId) => {
   try {
     router.push({
       name: 'MapPage', // 또는 'MapPage' - 라우터 설정에 맞게
-      query: { cardId: cardId }
+      query: { cardId: cardId },
     });
   } catch (error) {
     console.error('페이지 이동 실패:', error);
