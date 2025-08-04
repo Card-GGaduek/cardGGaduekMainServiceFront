@@ -195,7 +195,7 @@ const sendEmailCode = async () => {
     } catch (e) {
       //   const message = e.response?.data?.message || '서버 오류';
       //   console.log(message);
-
+      isSendingEmail.value = false;
       alert(e.message);
     }
   }
@@ -229,10 +229,10 @@ const signup = async () => {
     return;
   }
 
-  if (!joinForm.birthDate) {
-    alert('생년월일을 입력하세요.');
-    return;
-  }
+  // if (!joinForm.birthDate) {
+  //   alert('생년월일을 입력하세요.');
+  //   return;
+  // }
 
   try {
     const result = await authApi.join(joinForm);
