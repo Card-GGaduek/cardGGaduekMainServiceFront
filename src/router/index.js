@@ -13,6 +13,8 @@ import LabPage from '@/pages/lab/LabPage.vue'
 import FortuneCard from '@/pages/lab/FortuneCard.vue'
 import LoginPage from '@/pages/login/LoginPage.vue'
 import JoinPage from '@/pages/login/JoinPage.vue'
+import AllTransactions from '@/components/analysis/AllTransactions.vue'
+
 import axios from 'axios';
 const routes = [
   { path: '/', name: 'Main', component: MainPage },
@@ -21,6 +23,11 @@ const routes = [
   { path: '/booking/confirm', name: 'FinalBookingPage', component: FinalBookingPage },
   { path: '/map', name: 'Map', component: MapPage },
   { path: '/analysis', name: 'Analysis', component: AnalysisPage },
+  {
+    path: '/analysis/all-transactions', name: 'AllTransactions', component: AllTransactions, props: route => ({
+      cardId: route.query.cardId ? Number(route.query.cardId) : null
+    })
+  },
   { path: '/mypage', name: 'MyPage', component: MyPage },
   { path: '/login', name: 'LoginPage', component: LoginPage },
   { path: '/join', name: 'JoinPage', component: JoinPage },
