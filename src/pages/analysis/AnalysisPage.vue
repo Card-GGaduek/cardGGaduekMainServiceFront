@@ -22,10 +22,8 @@
     <!-- 월간 지출 -->
     <div v-if="activeTab === 'MonthlySpending'" class="monthly-section">
       <MonthlySpending />
-      <CategorySpending/>
+      <CategorySpending />
     </div>
- 
-
 
     <!-- 카드 추천 -->
     <div v-if="activeTab === 'cardRecommend'" class="recommend-section">
@@ -40,10 +38,14 @@ import SubHeader from '@/layout/SubHeader.vue';
 import TabNav from '@/components/analysis/TabNav.vue';
 import CardSlider from '@/components/analysis/CardSlider.vue';
 import MonthlySpending from '@/components/analysis/MonthlySpending.vue';
-import { getCardPerformance, getCardTransactions, getMonthlySpending } from '@/api/analysisindex.js';
+import {
+  getCardPerformance,
+  getCardTransactions,
+  getMonthlySpending,
+} from '@/api/analysisindex.js';
 import CategorySpending from '@/components/analysis/CategorySpending.vue';
 
-const memberId = 1;  // 로그인한 사용자 ID
+// const memberId = 1;  // 로그인한 사용자 ID
 const activeTab = ref('cardPerformance'); //현재 선택된 탭
 const cards = ref([]); //카드 정보 배열 -> api로 가져온 카드 정보 및 거래 내역 저장됨
 const loading = ref(false); //로딩 중 상태
@@ -53,20 +55,23 @@ async function loadAll() {
   loading.value = true;
   error.value = null;
 
+  const auth = JSON.parse(localStorage.getItem('auth'));
+  console.log(auth.token);
+
   try {
     // 카드 실적 api 호출
-    const perfRes = await getCardPerformance(memberId);
+    const perfRes = await getCardPerformance();
     if (!perfRes.data.success) throw new Error(perfRes.data.message);
 
     // 거래 내역 api 호출
-    const txRes = await getCardTransactions(memberId);
+    const txRes = await getCardTransactions();
     if (!txRes.data.success) throw new Error(txRes.data.message);
 
     // 데이터 가공
     const perfData = perfRes.data.data;
     const txData = txRes.data.data;
 
-    cards.value = perfData.map(cd => {
+    cards.value = perfData.map((cd) => {
       const card = {
         id: cd.cardId,
         owner: cd.ownerName || '이유진',
@@ -74,10 +79,10 @@ async function loadAll() {
         image: cd.cardImageUrl,
         currentAmount: cd.spentAmount,
         totalAmount: cd.requiredMonthlySpent,
-        transactions: []
+        transactions: [],
       };
 
-      const found = txData.find(t => t.cardId === cd.cardId);
+      const found = txData.find((t) => t.cardId === cd.cardId);
       if (found) {
         card.transactions = found.transactions
           .sort((a, b) => new Date(b.transDate) - new Date(a.transDate))
@@ -86,7 +91,6 @@ async function loadAll() {
 
       return card;
     });
-
   } catch (e) {
     console.error(e);
     error.value = e.message || '데이터 로드 실패';
@@ -99,26 +103,36 @@ onMounted(loadAll);
 </script>
 
 <style scoped>
-.card-section { margin-top: 24px; }
+.card-section {
+  margin-top: 24px;
+}
 .loading-container,
 .error-container,
 .empty-container {
-  text-align: center; padding: 40px 0;
+  text-align: center;
+  padding: 40px 0;
 }
 .loading-spinner {
-  width: 40px; height: 40px;
+  width: 40px;
+  height: 40px;
   border: 4px solid #f3f3f3;
-  border-top: 4px solid #FFCD39;
+  border-top: 4px solid #ffcd39;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 16px;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 .retry-button {
   margin-top: 12px;
   padding: 6px 12px;
-  background: #FFCD39;
-  border: none; color: white; border-radius: 6px;
+  background: #ffcd39;
+  border: none;
+  color: white;
+  border-radius: 6px;
   cursor: pointer;
 }
 </style>
