@@ -22,11 +22,14 @@ const routes = [
   { path: '/map', name: 'Map', component: MapPage },
   { path: '/analysis', name: 'Analysis', component: AnalysisPage },
   { path: '/mypage', name: 'MyPage', component: MyPage },
+  { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFoundPage },
+  { path: '/accommodation/:id', name: 'BookingAccommodationPage', component: BookingAccommodationPage},
+  { path: '/booking/confirm',name: 'FinalBookingPage', component: FinalBookingPage},
   { path: '/login', name: 'LoginPage', component: LoginPage },
   { path: '/join', name: 'JoinPage', component: JoinPage },
   { path: '/lab', name: 'Lab', component: LabPage },
   { path: '/lab/fortune', component: FortuneCard },
-  { path: '/payment', component: PaymentPage },
+  { path: '/payment', component: PaymentPage},
   {
     path: '/payment/qr',
     component: QRPage,
@@ -37,10 +40,8 @@ const routes = [
     name: 'Notification',
     component: () => import('@/pages/notification/NotificationPage.vue'),
     meta: { hideHeader: true }
-  },
-  { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFoundPage }
+  }
 ]
-
 const router = createRouter({
   history: createWebHistory(),
   routes,
