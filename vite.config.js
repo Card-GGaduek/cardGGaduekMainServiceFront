@@ -1,10 +1,9 @@
-import { fileURLToPath, URL } from 'node:url';
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import vueDevTools from 'vite-plugin-vue-devtools'
+import { fileURLToPath, URL } from 'node:url'
 
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
-import vueDevTools from 'vite-plugin-vue-devtools';
-
-// https://vite.dev/config/
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue(), vueDevTools()],
   resolve: {
@@ -12,17 +11,16 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-
   server: {
     proxy: {
+      // '/api'로 시작하는 요청을 대상 서버로 전달
+      // '/api'로 시작하는 요청을 대상 서버로 전달
       '/api': {
-        target: 'http://localhost:8080',
+
+        target: 'http://localhost:8080', // 백엔드 주소
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api/, '/api'), // /api 유지
       },
     },
-  },
-
-  build: {
-    outDir:
-      '/Users/yeahy/Desktop/Card-GGaduek/cardGGaduekMainServiceBackend/src/main/webapp/resources',
   },
 });
