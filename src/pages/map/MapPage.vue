@@ -6,12 +6,13 @@
     <div class="controls-container">
       <div class="controls-box">
         
+        <span>내 카드에 맞는 가맹점을 찾아보세요</span><br/>
         <div class="search-bar">
           <input 
             type="text" 
             v-model="keyword"
             @keyup.enter="updateMarkers"
-            placeholder="가맹점 이름 검색" 
+            placeholder="내 카드 가맹점 검색" 
             class="search-input"
           />
           <button @click="updateMarkers" class="search-button">
@@ -21,6 +22,7 @@
 
         <!-- 카드 이미지 필터 UI -->
         <div class="filter-section">
+          <p>MyCard</p>
             <div class="card-filter-buttons">
               <div
                   v-for="card in myCards"
@@ -56,14 +58,15 @@
             &times;
           </button>
           <h2 class="merchant-name">{{ selectedMerchant.name }}</h2>
-          <p class="merchant-category">{{ selectedMerchant.category }}</p>
+          <p class="merchant-category">{{ selectedMerchant.primaryType }}</p>
           
           <div class="benefits-list">
             <h3 class="benefits-title">받을 수 있는 혜택</h3>
-            <div v-for="benefit in selectedMerchant.benefits" :key="benefit.id" 
+            <div v-for="benefit in selectedMerchant.benefits" :key="benefit.cardName" 
                  class="benefit-item" :class="{ 'primary': benefit.isPrimary }">
               <p class="benefit-desc">{{ benefit.description }}</p>
-              <p class="benefit-card">{{ benefit.cardName }}</p>
+              <p class="benefit-card">{{ benefit.cardName }} | {{ benefit.rateValue }}% 할인</p>
+              <span v-if="benefit.isPrimary">🥇</span>
             </div>
           </div>
           
@@ -87,6 +90,7 @@ const {
   selectedMerchant,
   selectedCardCategory,
   updateMarkers,
+  onMarkerClick,
   filterByCategory,
   moveToCurrentLocation,
   handleSearch, 

@@ -110,10 +110,11 @@ export function useMap() {
         }
       }
     };
-
     if (selectedCardCategory.value) {
-      requestBody.category = selectedCardCategory.value;
+      requestBody.category = selectedCardCategory.value
     }
+    console.log("가맹점 검색 요청:", requestBody);
+
 
     try {
       const response = await axios.post('http://localhost:8080/api/place', requestBody);
@@ -142,10 +143,40 @@ export function useMap() {
 
     window.naver.maps.Event.addListener(marker, 'click', () => {
       selectedMerchant.value = place;
+      onMarkerClick(3, place.name);
+      map.value.panTo(position);
+      map.value.setZoom(16);
+      console.log("Marker clicked:", place);
+      console.log("Selected Merchant:", selectedMerchant.value);
+
     });
 
     markers.value.push(marker);
   };
+
+  async function getStoreBenefits(memberId) {
+    try {
+      const response = await axios.get(`http://localhost:8080/api/card/front/${memberId}`);
+      return response.data.data || [];
+    } catch (error) {
+      console.error("가맹점 혜택 조회에 실패했습니다:", error);
+      return [];
+    }
+  }
+
+  const onMarkerClick = async (place) => {
+    const memberId = 4;
+    const benefits = await getStoreBenefits(memberId, place.name);
+
+    selectedMerchant.value = {
+      name : store.namem,
+      primaryType: store.primaryType,
+      location: store.location,
+      benefits: benefits,
+    };
+  };
+
+
 
   const filterByCategory = (category) => {
     selectedCardCategory.value = selectedCardCategory.value === category ? '' : category;
@@ -162,6 +193,7 @@ export function useMap() {
     selectedCardCategory,
     selectedMerchant,
     myCards,
+    onMarkerClick,
     moveToCurrentLocation,
     handleSearch,
     filterByCategory,
