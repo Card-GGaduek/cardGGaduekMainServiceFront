@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue';
 import BookingCalendar from '@/pages/booking/BookingCalendar.vue'; // 1. 달력 컴포넌트 import
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
+import { useAuthStore } from '@/stores/auth';
 
 
 const route = useRoute();
@@ -13,6 +14,23 @@ const selectedDates = ref(null);
 const accommodationId = route.params.id;
 
 const accommodation = ref(null);
+
+const authStore = useAuthStore();
+const memberId = authStore.memberId;
+
+async function fetchUserCards() {
+  try {
+    const memberId = 2; // 기존 코드 삭제
+    if (!memberId) {
+      console.error("로그인 정보가 없습니다.");
+      return;
+    }
+    const response = await axios.get(`/api/card/${memberId}`);
+    userCards.value = response.data.data || response.data;
+  } catch (error) {
+    console.error("보유 카드 목록 조회 실패:", error);
+  }
+}
 
 async function fetchAccommodationDetail() {
   if (!accommodationId) return;
@@ -36,7 +54,6 @@ function handleDatesSelected(dates) {
 
 function handleBooking(room) {
   // 날짜가 선택되지 않았으면 경고
-  const memberId = 1;
   if (!selectedDates.value || !selectedDates.value.checkIn) {
     alert('체크인 날짜를 먼저 선택해주세요.');
     return;
@@ -50,7 +67,6 @@ function handleBooking(room) {
       roomName: room.name,
       checkIn: formatDate(selectedDates.value.checkIn),
       checkOut: formatDate(selectedDates.value.checkOut),
-      memberId: memberId
     }
   });
 }
