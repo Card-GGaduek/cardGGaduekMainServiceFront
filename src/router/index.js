@@ -19,6 +19,7 @@ import CardEditPage from '@/pages/card/CardEditPage.vue';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
 import NaverCallback from '@/pages/login/NaverCallback.vue';
+import CardEditPage from '@/pages/card/CardEditPage.vue'
 const routes = [
   {
     path: '/',
@@ -37,7 +38,7 @@ const routes = [
     name: 'FinalBookingPage',
     component: FinalBookingPage,
   },
-  { path: '/map', name: 'Map', component: MapPage },
+  { path: '/map', name: 'MapPage', component: MapPage },
   { path: '/analysis', name: 'Analysis', component: AnalysisPage },
   {
     path: '/analysis/all-transactions',
@@ -63,7 +64,7 @@ const routes = [
   { path: '/join', name: 'JoinPage', component: JoinPage },
   { path: '/lab', name: 'Lab', component: LabPage },
   { path: '/lab/fortune', name: 'Fortune', component: FortuneCard },
-  { path: '/card/edit', name: 'CardEdit', component: CardEditPage },
+  { path: '/card', name: 'CardEditPage', component: CardEditPage },
   { path: '/lab/fortune', component: FortuneCard },
   { path: '/payment', component: PaymentPage },
   {
