@@ -11,14 +11,15 @@ import PaymentPage from '@/pages/payment/PaymentPage.vue';
 import QRPage from '@/pages/payment/QRPage.vue';
 import LabPage from '@/pages/lab/LabPage.vue';
 import FortuneCard from '@/pages/lab/FortuneCard.vue';
-import CardEditPage from '@/pages/card/CardEditPage.vue';
 import LoginPage from '@/pages/login/LoginPage.vue';
 import JoinPage from '@/pages/login/JoinPage.vue';
 import AllTransactions from '@/components/analysis/AllTransactions.vue';
+import CardEditPage from '@/pages/card/CardEditPage.vue';
 
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
 import NaverCallback from '@/pages/login/NaverCallback.vue';
+import CardEditPage from '@/pages/card/CardEditPage.vue'
 const routes = [
   {
     path: '/',
@@ -37,24 +38,35 @@ const routes = [
     name: 'FinalBookingPage',
     component: FinalBookingPage,
   },
-  { path: '/map', name: 'Map', component: MapPage },
+  { path: '/map', name: 'MapPage', component: MapPage },
   { path: '/analysis', name: 'Analysis', component: AnalysisPage },
   {
-    path: '/analysis/all-transactions', name: 'AllTransactions', component: AllTransactions, props: route => ({
-      cardId: route.query.cardId ? Number(route.query.cardId) : null
-    })
+    path: '/analysis/all-transactions',
+    name: 'AllTransactions',
+    component: AllTransactions,
+    props: (route) => ({
+      cardId: route.query.cardId ? Number(route.query.cardId) : null,
+    }),
   },
   { path: '/mypage', name: 'MyPage', component: MyPage },
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFoundPage },
-  { path: '/accommodation/:id', name: 'BookingAccommodationPage', component: BookingAccommodationPage},
-  { path: '/booking/confirm',name: 'FinalBookingPage', component: FinalBookingPage},
+  {
+    path: '/accommodation/:id',
+    name: 'BookingAccommodationPage',
+    component: BookingAccommodationPage,
+  },
+  {
+    path: '/booking/confirm',
+    name: 'FinalBookingPage',
+    component: FinalBookingPage,
+  },
   { path: '/login', name: 'LoginPage', component: LoginPage },
   { path: '/join', name: 'JoinPage', component: JoinPage },
   { path: '/lab', name: 'Lab', component: LabPage },
   { path: '/lab/fortune', name: 'Fortune', component: FortuneCard },
-  { path: '/card/edit', name: 'CardEdit', component: CardEditPage },
+  { path: '/card', name: 'CardEditPage', component: CardEditPage },
   { path: '/lab/fortune', component: FortuneCard },
-  { path: '/payment', component: PaymentPage},
+  { path: '/payment', component: PaymentPage },
   {
     path: '/payment/qr',
     component: QRPage,
