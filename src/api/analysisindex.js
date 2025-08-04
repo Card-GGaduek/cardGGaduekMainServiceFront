@@ -12,8 +12,12 @@ export const getCardPerformance = (memberId) =>
 // 거래 내역 조회 API
 
 export const getCardTransactions = (memberId) =>
-    apiClient.get(`/api/${memberId}/card/trans`);
+    apiClient.get(`/api/members/${memberId}/cards/transactions`);
 
 //월간 실적
-export const getMonthlySummary = (memberId) =>
+export const getMonthlySpending = (memberId) =>
     apiClient.get(`/api/members/${memberId}/summary`);
+
+//카테고리별 불러오기
+export const getCategorySummary = (memberId) =>
+    apiClient.get(`/api/members/${memberId}/cardCateSummary`);
