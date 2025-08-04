@@ -1,9 +1,8 @@
 <template>
   <div class="analysis-page">
     <SubHeader title="지출 내역" :showBack="true" />
-
     <TabNav :activeTab="activeTab" @change="activeTab = $event" />
-
+    <!-- 카드 실적 -->
     <div v-if="activeTab === 'cardPerformance'" class="card-section">
       <div v-if="loading" class="loading-container">
         <div class="loading-spinner"></div>
@@ -20,55 +19,64 @@
         <CardSlider :cards="cards" />
       </div>
     </div>
+    <!-- 월간 지출 -->
+    <div v-if="activeTab === 'MonthlySpending'" class="monthly-section">
+      <MonthlySpending />
+      <CategorySpending/>
+    </div>
+ 
+
+
+    <!-- 카드 추천 -->
+    <div v-if="activeTab === 'cardRecommend'" class="recommend-section">
+      <p>카드 추천 기능은 아직 개발 중입니다.</p>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import SubHeader          from '@/layout/SubHeader.vue';
-import TabNav             from '@/components/analysis/TabNav.vue';
-import CardSlider         from '@/components/analysis/CardSlider.vue';
-import { getCardPerformance, getCardTransactions } from '@/api/analysisindex.js';
+import SubHeader from '@/layout/SubHeader.vue';
+import TabNav from '@/components/analysis/TabNav.vue';
+import CardSlider from '@/components/analysis/CardSlider.vue';
+import MonthlySpending from '@/components/analysis/MonthlySpending.vue';
+import { getCardPerformance, getCardTransactions, getMonthlySpending } from '@/api/analysisindex.js';
+import CategorySpending from '@/components/analysis/CategorySpending.vue';
 
-const memberId = 1;  // 실제 로그인한 유저 ID로 대체
-const activeTab = ref('cardPerformance');
-const cards     = ref([]);
-const loading   = ref(false);
-const error     = ref(null);
-
-// 모든 카드를 일시적으로 동일 이미지로 표시할 기본 URL
-const defaultCardImage = 'https://d1c5n4ri2guedi.cloudfront.net/card/13/card_img/28201/13card.png';
+const memberId = 1;  // 로그인한 사용자 ID
+const activeTab = ref('cardPerformance'); //현재 선택된 탭
+const cards = ref([]); //카드 정보 배열 -> api로 가져온 카드 정보 및 거래 내역 저장됨
+const loading = ref(false); //로딩 중 상태
+const error = ref(null); //에러 메시지
 
 async function loadAll() {
   loading.value = true;
-  error.value   = null;
+  error.value = null;
 
   try {
-    // 1) 카드 실적
+    // 카드 실적 api 호출
     const perfRes = await getCardPerformance(memberId);
     if (!perfRes.data.success) throw new Error(perfRes.data.message);
 
-    // 2) 거래내역
+    // 거래 내역 api 호출
     const txRes = await getCardTransactions(memberId);
-    if (!txRes.data.success)   throw new Error(txRes.data.message);
+    if (!txRes.data.success) throw new Error(txRes.data.message);
 
-    const perfData = perfRes.data.data; // [{ cardId, cardProductName, spentAmount, requiredMonthlySpending, … }]
-    const txData   = txRes.data.data;   // [{ cardId, transactions: […] }, …]
+    // 데이터 가공
+    const perfData = perfRes.data.data;
+    const txData = txRes.data.data;
 
-    // 3) 성능 + 거래내역 병합 → cards 배열 생성
     cards.value = perfData.map(cd => {
-      // 카드 객체 기본 정보
       const card = {
-        id:            cd.cardId,
-        owner:         cd.ownerName    || '이유진',
-        name:          cd.cardProductName,
-        image:         defaultCardImage,              // ← 여기만 바꿨습니다
+        id: cd.cardId,
+        owner: cd.ownerName || '이유진',
+        name: cd.cardProductName,
+        image: cd.cardImageUrl,
         currentAmount: cd.spentAmount,
-        totalAmount:   cd.requiredMonthlySpending,
-        transactions:  []
+        totalAmount: cd.requiredMonthlySpent,
+        transactions: []
       };
 
-      // 해당 카드의 거래내역이 있으면 내림차순 정렬 후 상위 3건 추출
       const found = txData.find(t => t.cardId === cd.cardId);
       if (found) {
         card.transactions = found.transactions
