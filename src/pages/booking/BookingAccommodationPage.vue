@@ -36,6 +36,7 @@ function handleDatesSelected(dates) {
 
 function handleBooking(room) {
   // 날짜가 선택되지 않았으면 경고
+  const memberId = 1;
   if (!selectedDates.value || !selectedDates.value.checkIn) {
     alert('체크인 날짜를 먼저 선택해주세요.');
     return;
@@ -48,7 +49,8 @@ function handleBooking(room) {
       roomId: room.id,
       roomName: room.name,
       checkIn: formatDate(selectedDates.value.checkIn),
-      checkOut: formatDate(selectedDates.value.checkOut)
+      checkOut: formatDate(selectedDates.value.checkOut),
+      memberId: memberId
     }
   });
 }
@@ -144,14 +146,11 @@ onMounted(() => {
   z-index: 10;
   border-bottom: 1px solid #eee;
 }
-.top-header .bi-arrow-left {
+.bi-arrow-left {
   position: absolute;
 }
 
 /* 메인 이미지 섹션 */
-.main-image-section {
-  position: relative;
-}
 .main-image {
   width: 100%;
   height: 250px;
