@@ -4,65 +4,109 @@
 
     <div class="swiper-container">
       <Swiper
-          :slides-per-view="'auto'"
-          :centered-slides="true"
-          :space-between="16"
-          :loop="false"
-          :initial-slide="1"
-          @slideChange="onSlideChange"
-          class="card-swiper"
+        :slides-per-view="'auto'"
+        :centered-slides="true"
+        :space-between="16"
+        :loop="false"
+        :initial-slide="1"
+        @slideChange="onSlideChange"
+        class="card-swiper"
       >
         <SwiperSlide
-            v-for="(card, index) in cards"
-            :key="card.cardId"
-            class="swiper-slide-custom"
+          v-for="(card, index) in cards"
+          :key="card.cardId"
+          class="swiper-slide-custom"
         >
           <div class="card-container">
             <div
-                class="card"
-                :class="{
-                  'active': index === activeIndex,
-                  'inactive': index !== activeIndex,
-                  'flipped': flippedCards.has(index),
-                  'no-animation': isSliding
-                }"
-                @click="toggleCardFlip(index)"
+              class="card"
+              :class="{
+                active: index === activeIndex,
+                inactive: index !== activeIndex,
+                flipped: flippedCards.has(index),
+                'no-animation': isSliding,
+              }"
+              @click="toggleCardFlip(index)"
             >
               <div class="card-inner">
                 <div class="card-front">
-                  <img :src="card.cardImageUrl" alt="카드 이미지" class="card-image" />
+                  <img
+                    :src="card.cardImageUrl"
+                    alt="카드 이미지"
+                    class="card-image"
+                  />
                 </div>
                 <div class="card-back">
                   <div class="card-back-content">
                     <div class="card-back-header">
-                      <h3 class="card-back-title">{{ getCardBackInfo(card.cardId)?.cardName || '카드명' }}</h3>
-                      <p class="card-back-company">{{ getCardBackInfo(card.cardId)?.cardCompany || '카드사' }}</p>
+                      <h3 class="card-back-title">
+                        {{ getCardBackInfo(card.cardId)?.cardName || '카드명' }}
+                      </h3>
+                      <p class="card-back-company">
+                        {{
+                          getCardBackInfo(card.cardId)?.cardCompany || '카드사'
+                        }}
+                      </p>
                     </div>
 
                     <div class="benefits-section">
                       <div
-                          v-for="(benefit, benefitIndex) in (getCardBackInfo(card.cardId)?.benefits || []).slice(0, 3)"
-                          :key="benefitIndex"
-                          class="benefit-item"
+                        v-for="(benefit, benefitIndex) in (
+                          getCardBackInfo(card.cardId)?.benefits || []
+                        ).slice(0, 3)"
+                        :key="benefitIndex"
+                        class="benefit-item"
                       >
                         <div class="benefit-icon">
-                          <span v-if="benefit.storeCategory === 'CONVENIENCE_STORE'" class="category-emoji">🏪</span>
-                          <span v-else-if="benefit.storeCategory === 'COFFEE_SHOP'" class="category-emoji">☕</span>
-                          <span v-else-if="benefit.storeCategory === 'MOVIE_THEATER'" class="category-emoji">🎬</span>
-                          <span v-else-if="benefit.storeCategory === 'GAS_STATION'" class="category-emoji">⛽</span>
-                          <span v-else-if="benefit.storeCategory === 'RESTAURANT'" class="category-emoji">🍽️</span>
-                          <span v-else-if="benefit.storeCategory === 'HOTEL'" class="category-emoji">🏨</span>
-                          <span v-else-if="benefit.storeCategory === 'THEME_PARK'" class="category-emoji">🎡</span>
+                          <span
+                            v-if="benefit.storeCategory === 'CONVENIENCE_STORE'"
+                            class="category-emoji"
+                            >🏪</span
+                          >
+                          <span
+                            v-else-if="benefit.storeCategory === 'COFFEE_SHOP'"
+                            class="category-emoji"
+                            >☕</span
+                          >
+                          <span
+                            v-else-if="
+                              benefit.storeCategory === 'MOVIE_THEATER'
+                            "
+                            class="category-emoji"
+                            >🎬</span
+                          >
+                          <span
+                            v-else-if="benefit.storeCategory === 'GAS_STATION'"
+                            class="category-emoji"
+                            >⛽</span
+                          >
+                          <span
+                            v-else-if="benefit.storeCategory === 'RESTAURANT'"
+                            class="category-emoji"
+                            >🍽️</span
+                          >
+                          <span
+                            v-else-if="benefit.storeCategory === 'HOTEL'"
+                            class="category-emoji"
+                            >🏨</span
+                          >
+                          <span
+                            v-else-if="benefit.storeCategory === 'THEME_PARK'"
+                            class="category-emoji"
+                            >🎡</span
+                          >
                           <span v-else class="category-emoji">💳</span>
                         </div>
-                        <span class="benefit-text">{{ benefit.description }}</span>
+                        <span class="benefit-text">{{
+                          benefit.description
+                        }}</span>
                       </div>
                     </div>
 
                     <!-- 혜택 가능한 매장 보기 버튼 -->
                     <div
-                        class="view-stores-button"
-                        @click.stop="goToStoreList(card.cardId)"
+                      class="view-stores-button"
+                      @click.stop="goToStoreList(card.cardId)"
                     >
                       <span>혜택 적용 가능한 매장 보기</span>
                     </div>
@@ -93,16 +137,10 @@
 
     <!-- 버튼들을 Swiper 밖으로 이동하여 고정 -->
     <div class="fixed-card-buttons">
-      <button
-          class="card-button usage-history-btn"
-          @click="goToAnalysis"
-      >
+      <button class="card-button usage-history-btn" @click="goToAnalysis">
         이용내역 조회
       </button>
-      <button
-          class="card-button payment-btn"
-          @click="goToPayment"
-      >
+      <button class="card-button payment-btn" @click="goToPayment">
         결제하기
       </button>
     </div>
@@ -145,7 +183,7 @@ const goToStoreList = (cardId) => {
   try {
     router.push({
       name: 'Map', // 또는 'MapPage' - 라우터 설정에 맞게
-      query: { cardId: cardId }
+      query: { cardId: cardId },
     });
   } catch (error) {
     console.error('페이지 이동 실패:', error);
@@ -275,7 +313,8 @@ onMounted(() => {
   transform: rotateY(180deg);
 }
 
-.card-front, .card-back {
+.card-front,
+.card-back {
   position: absolute;
   top: 0;
   left: 0;
@@ -386,7 +425,7 @@ onMounted(() => {
   border: 1px solid #ddd;
   border-radius: 10px;
   background-color: white;
-  margin : 0 auto;
+  margin: 0 auto;
   font-size: 10px;
   display: flex;
   align-items: center;
