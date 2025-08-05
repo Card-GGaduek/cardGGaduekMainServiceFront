@@ -7,6 +7,19 @@ const axiosInstance = axios.create({
   },
 });
 
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const auth = JSON.parse(localStorage.getItem('auth'));
+    if (auth?.token) {
+      config.headers.Authorization = `Bearer ${auth.token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 axiosInstance.interceptors.response.use(
   (response) => {
     const res = response.data;
