@@ -18,7 +18,8 @@ import CardEditPage from '@/pages/card/CardEditPage.vue';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
 import NaverCallback from '@/pages/login/NaverCallback.vue';
-
+import AllCardProductPage from '@/pages/card/AllCardProductPage.vue';
+import CardDetailPage from '@/pages/card/CardDetailPage.vue';
 const routes = [
   {
     path: '/',
@@ -66,10 +67,18 @@ const routes = [
   { path: '/card', name: 'CardEditPage', component: CardEditPage },
   { path: '/lab/fortune', component: FortuneCard },
   { path: '/payment', component: PaymentPage },
+  { path: '/allCardProduct', name: 'AllCardProductPage', component: AllCardProductPage },
+  { path: '/CardDetail', name: 'CardDetail', component: CardDetailPage },
   {
     path: '/payment/qr',
     component: QRPage,
     meta: { hideNav: true },
+  },
+  {
+    path: '/card-detail/:id', // 1. URL 파라미터 ':productId' 정의
+    name: 'CardDetail',
+    component: CardDetailPage,
+    props: true // 2. [핵심] 이 옵션을 true로 설정!
   },
   {
     path: '/notification',
