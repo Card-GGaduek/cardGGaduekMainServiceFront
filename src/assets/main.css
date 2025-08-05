@@ -55,3 +55,51 @@ body {
   font-family: 'NanumBarunGothic', sans-serif !important;
 }
 
+/* ========================================
+   간단하고 강력한 Bootstrap 스크롤바 무력화
+   main.css 파일에 추가하세요
+   ======================================== */
+
+/* 모든 요소의 스크롤바를 강제로 숨김 - Bootstrap보다 우선순위 높임 */
+* {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+/* Bootstrap이 !important를 사용하는 경우를 대비한 더 구체적인 선택자 */
+html * {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+html *::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Bootstrap의 overflow 유틸리티 클래스들 무력화 */
+.overflow-auto,
+.overflow-scroll,
+.overflow-hidden,
+.overflow-visible,
+[class*='overflow-'] {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.overflow-auto::-webkit-scrollbar,
+.overflow-scroll::-webkit-scrollbar,
+.overflow-hidden::-webkit-scrollbar,
+.overflow-visible::-webkit-scrollbar,
+[class*='overflow-']::-webkit-scrollbar {
+  display: none !important;
+}
