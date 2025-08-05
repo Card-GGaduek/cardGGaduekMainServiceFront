@@ -4,14 +4,14 @@ const BASE_URL = '/api/card';
 
 export default {
   // 1. 카드 정보 가져오기
-  async getCardFrontInfo(memberId) {
-    const { data } = await api.get(`/api/card/front/${memberId}`);
+  async getCardFrontInfo() {
+    const { data } = await api.get(`${BASE_URL}/front`);
     return data;
   },
 
   // 2. 카드 뒷면 정보 조회
   async getCardDetail(cardId) {
-    const { data } = await api.get(`/api/card/back/${cardId}`);
+    const { data } = await api.get(`${BASE_URL}/back/${cardId}`);
     return data;
   },
 
