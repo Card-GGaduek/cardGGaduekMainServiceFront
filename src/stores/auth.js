@@ -1,6 +1,7 @@
 import { ref, computed, reactive } from 'vue';
 import { defineStore } from 'pinia';
 import axios from 'axios';
+import { setAuthToken } from '@/api';
 
 // 초기 상태 템플릿
 const initState = {
@@ -21,6 +22,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isLogin = computed(() => !!state.value.user.username); // 로그인 여부
   const username = computed(() => state.value.user.username); // 로그인 사용자 ID
   const email = computed(() => state.value.user.email); // 로그인 사용자 email
+  const token = computed(() => state.value.token); // 로그인 사용자 토큰
 
   // isLogin 사용자명 존재 여부로 로그인 상태 판단
   // username, email 반응형 데이터로 컴포넌트에서 자동 업데이트
@@ -63,13 +65,20 @@ export const useAuthStore = defineStore('auth', () => {
       username: response.user.username,
       email: response.user.email,
     };
+
+    setAuthToken(response.accessToken);
     localStorage.setItem('auth', JSON.stringify(state.value));
+    console.log('[Auth Store] 로그인 완료, 토큰 설정:', response.accessToken);
   };
 
   // 로그아웃 액션
   const logout = () => {
     localStorage.clear(); // localStorage 완전 삭제
     state.value = { ...initState }; // 상태를 초기값으로 리셋
+
+    setAuthToken(null);
+
+    console.log('[Auth Store] 로그아웃 완료, 토큰 제거');
   };
 
   // 토큰 얻어오기 액션
@@ -81,7 +90,12 @@ export const useAuthStore = defineStore('auth', () => {
     const auth = localStorage.getItem('auth');
     if (auth != null) {
       state.value = JSON.parse(auth); // JSON 문자열을 객체로 변환
-      console.log(state.value);
+
+      if (state.value.token) {
+        setAuthToken(state.value.token);
+        console.log('[Auth Store] 상태 복원, 토큰 설정:', state.value.token);
+      }
+      console.log('[Auth Store] 상태 복원 완료:', state.value);
     }
   };
 
@@ -97,6 +111,7 @@ export const useAuthStore = defineStore('auth', () => {
   // 외부에서 사용할 수 있도록 반환
   return {
     state,
+    token,
     username,
     email,
     isLogin,

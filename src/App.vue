@@ -3,7 +3,10 @@
   <div class="app-wrapper">
     <div class="app-container">
       <!-- ✅ 스크롤 가능한 콘텐츠 영역 -->
-      <div class="scroll-area">
+      <div
+        class="scroll-area"
+        :class="{ 'fortune-scroll': route.path === '/lab/fortune' }"
+      >
         <router-view />
       </div>
 
@@ -16,15 +19,16 @@
 <script setup>
 import Navbar from './layout/Navbar.vue';
 import { computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 
-const router = useRouter();
-const hideNavbar = computed(() => router.path === '/lab/fortune');
+const route = useRoute();
+const hideNavbar = computed(() => route.path === '/lab/fortune');
 </script>
 
 <style scoped>
-html, body {
-  height: 100%; 
+html,
+body {
+  height: 100%;
   margin: 0;
   overflow: hidden;
 }
@@ -45,7 +49,7 @@ html, body {
   width: 100%;
   height: 100%;
   background-color: white;
-  box-shadow: 0 0 8px rgba(0,0,0,0.05);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
 }
@@ -54,6 +58,10 @@ html, body {
   flex: 1;
   overflow-y: auto;
   padding-bottom: 70px;
+}
+
+.fortune-scroll {
+  background-color: #f9ebd2 !important;
 }
 
 @media (min-width: 1025px) {

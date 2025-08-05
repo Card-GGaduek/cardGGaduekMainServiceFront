@@ -6,7 +6,7 @@
       <div class="fortune-content">
         <!-- 닫기 버튼 -->
         <button class="close-button" @click="goBack">
-          <i class="fa-solid fa-xmark"></i>
+          <i class="bi bi-x-lg fs-2"></i>
         </button>
 
         <!-- 배너 영역 (배경 이미지 포함) -->
@@ -46,29 +46,19 @@
 
 <script setup>
 import { onMounted, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import labApi from '@/api/labApi';
 
-const route = useRoute();
 const router = useRouter();
 const fortune = ref(null);
 
 const goBack = () => {
-  // memberId를 유지하면서 /lab으로 이동
-  const memberId = route.query.memberId;
-  if (memberId) {
-    router.push({ path: '/lab', query: { memberId } });
-  } else {
-    router.push('/lab');
-  }
+  router.push('/lab');
 };
 
 onMounted(async () => {
-  const memberId = Number(route.query.memberId); // URL에서 추출
-  if (!memberId) return;
-
   try {
-    const response = await labApi.getFortune(memberId);
+    const response = await labApi.getFortune();
     fortune.value = response.data;
   } catch (err) {
     console.error('운세 불러오기 실패:', err);
@@ -139,7 +129,7 @@ onMounted(async () => {
   font-size: 28px;
   font-weight: bold;
   text-align: center;
-  margin-top: -10px;
+  margin-top: 20px;
 }
 
 /* 본문 콘텐츠 */

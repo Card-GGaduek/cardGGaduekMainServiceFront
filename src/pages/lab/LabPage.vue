@@ -1,6 +1,6 @@
 <template>
   <div class="lab-page-wrapper">
-    <SubHeader />
+    <SubHeader :backTo="'/'" />
     <div class="lab-page-scroll">
       <div class="lab-page">
         <header class="lab-header">
@@ -46,7 +46,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 
 import { useAuthStore } from '@/stores/auth';
 import labApi from '@/api/labApi';
@@ -55,19 +55,15 @@ import MissionCard from '@/pages/lab/MissionCard.vue';
 import AnalysisCard from '@/pages/lab/AnalysisCard.vue';
 import SubHeader from '@/layout/SubHeader.vue';
 
-const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
-
-// 사용자 ID 가져오기 (로그인 or 쿼리(테스트용))
-const memberId = route.query.memberId ?? authStore.state.value?.user?.id;
 
 const isLoading = ref(false);
 const goToFortune = () => {
   isLoading.value = true;
 
   setTimeout(() => {
-    router.push({ path: '/lab/fortune', query: { memberId } });
+    router.push({ path: '/lab/fortune' });
   }, 2000);
 };
 
@@ -75,13 +71,8 @@ const missions = ref([]);
 const analysis = ref(null);
 
 onMounted(async () => {
-  if (!memberId) {
-    console.warn('memberId가 존재하지 않습니다.');
-    return;
-  }
-
   try {
-    const response = await labApi.getLabOverview(memberId);
+    const response = await labApi.getLabOverview();
     missions.value = response.data.missions;
     analysis.value = response.data.analysis;
   } catch (err) {
