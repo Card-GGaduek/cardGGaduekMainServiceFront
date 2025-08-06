@@ -1,33 +1,75 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useMap } from '@/pages/map/map';
 import axios from 'axios';
+import { calculator } from 'fontawesome';
+import PayNavigator from '@/pages/map/PayNavigator.vue';
+import memberApi from '@/api/memberApi';
 
 const mapDiv = ref(null);
 
 const {
   keyword,
-  selectedCard,
   selectedMerchant,
+  selectedCard,
   handleSearch,
   moveToCurrentLocation,
   myCards,
 } = useMap(mapDiv);
 
+
 // 모달 관리용 변수
-const selectedCardDetail = ref(null);
 const selectedCardDetailModal = ref(false);
 
 // 카드 클릭 시 혜택 모달 호출
 const handleCardClick = async (cardId) => {
   try {
-    const response = await axios.get(`http://localhost:8080/api/main/card/${cardId}/back`);
-    selectedCardDetail.value = response.data.data;
+    const allCards = await memberApi.getMyCard();
+    const cardDetail = allCards.find(card => card.cardId === cardId);
+    if (!cardDetail) return;
+
+    const matchedCard = myCards.value.find(c=> c.cardId === cardId);
+    if (!matchedCard) return;
+
+    selectedCard.value = {
+      ...matchedCard,
+      ...cardDetail
+    };
+
     selectedCardDetailModal.value = true;
   } catch (error) {
     console.error('카드 상세 정보를 불러오지 못했습니다:', error);
   }
 };
+
+// 페이 네비게이터 모드 관리용 변수
+const payNavigatorMode = ref(false);
+const openPayNavigator = () => {
+  console.log('🟢 openPayNavigator 실행');
+  console.log('selectedCard:', selectedCard.value);
+  console.log('selectedMerchant:', selectedMerchant.value);
+  payNavigatorMode.value = true;
+};
+const closePayNavigator = () => {
+  payNavigatorMode.value = false;
+};
+// 🔍 selectedMerchant 변경 추적
+watch(selectedMerchant, (newVal) => {
+  if (newVal === null) {
+    console.warn('❗ selectedMerchant = null → Stack trace:');
+    console.trace(); // 변경이 발생한 코드 스택 출력
+  } else {
+    console.log('📌 selectedMerchant 변경됨:', newVal);
+  }
+});
+watch(selectedCard, (newVal) => {
+  if (newVal === null) {
+    console.warn('❗ selectedCard = null → Stack trace:');
+    console.trace(); // 변경이 발생한 코드 스택 출력
+  } else {
+    console.log('📌 selectedCard 변경됨:', newVal);
+  }
+});
 </script>
 <template>
   <div class="map-container">
@@ -40,14 +82,12 @@ const handleCardClick = async (cardId) => {
         <p class="title">내 카드로 혜택을 적용할 수 있는 매장을 찾아보세요</p>
 
 
-      
-        
         <!-- 선택된 카드 보여주기 -->
         <div class="selected-card-box" v-if="selectedCard">
-          <img :src="selectedCard.image" :alt="selectedCard.name" class="selected-card-img" />
+          <img :src="selectedCard.image" :alt="selectedCard.cardProductName" class="selected-card-img" />
           <div class="selected-card-info">
-            <p class="card-name">카드명:  {{ selectedCard.name }}</p>
-            <p class="card-category">카테고리: {{ selectedCard.category }}</p>
+            <p class="card-name">카드명:  {{ selectedCard.cardProductName }}</p>
+            <p class="card-category">카테고리: {{ selectedCard.storeCategories?.join(', ') || '없음' }}</p>
           </div>
         </div>
         
@@ -83,7 +123,7 @@ const handleCardClick = async (cardId) => {
 
     <!-- 하단 상세 정보 시트 -->
 <transition name="bottom-sheet">
-  <div v-if="selectedMerchant" class="bottom-sheet-container">
+  <div v-if="selectedMerchant && !payNavigatorMode" class="bottom-sheet-container">
     <div class="bottom-sheet-content">
       <button @click="selectedMerchant = null" class="close-button">&times;</button>
       <h2 class="merchant-name">{{ selectedMerchant.name }}</h2>
@@ -118,14 +158,26 @@ const handleCardClick = async (cardId) => {
           <p class="no-benefit-msg">적용 가능한 카드 혜택이 없습니다.</p>
         </div>
       </div>
-
-      <button class="navigator-button">🥇 페이 내비게이터 실행하기</button>
+      <button class="navigator-button" @click="openPayNavigator">
+  🥇 페이 네비게이터 실행하기
+</button>
     </div>
   </div>
 </transition>
 
+
+
     
   </div>
+  <!-- 🥇 페이 네비게이터 모드-->
+ <transition name = "bottom-sheet">
+  <PayNavigator
+  v-if="payNavigatorMode && selectedCard && selectedMerchant"
+  :selectedCard="selectedCard"
+  :selectedMerchant="selectedMerchant"
+  @close="closePayNavigator"
+  />
+ </transition>
 </template>
 
 

@@ -1,7 +1,7 @@
 import { ref, onMounted, onUnmounted, nextTick } from 'vue';
 import axios from 'axios';
 
-import { cat } from 'fontawesome';
+import { cat, store } from 'fontawesome';
 import { useRoute, useRouter } from 'vue-router';
 import memberApi from '@/api/memberApi';
 
@@ -154,33 +154,42 @@ export function useMap(mapDiv) {
 
   const loadMyCards = async (memberId) => {
     try {
-      // const response = await axios.get(`http://localhost:8080/api/main/card/list?memberId=${memberId}`);
       const result = await memberApi.getMyCard();
+      console.log('내 카드 목록:', result);
 
-      myCards.value = result.map((card) => ({
-        cardId: card.cardId,
-        image: card.cardImageUrl,
-        cardNumber: card.cardNumber,
-        cardHolderName: 'card',
-        cardCompany: '신한',
-      }));
-
-      for (const card of myCards.value) {
-        const detail = await loadCardBack(card.cardId);
-        if (detail) {
-          cardDetailsMap.value[card.cardId] = detail;
-        }
+      const cardDetailMap = {};
+      // 카드 상세정보 맵핑
+      for (const card of result) {
+        cardDetailMap[card.cardId] = card
       }
 
+      // 카드 리스트
+      myCards.value = result.map((card) => ({
+        cardId: card.cardId,
+        cardNumber: card.cardNumber,
+        cardProductId: card.cardProductId,
+        cardProductName: card.cardProductName,
+        image: card.cardImageUrl,
+        requiredAmount: card.requiredMonthlyAmount,
+        storeCategories : [...new Set(
+          card.storeBenefitList.map(b => b.storeCategory)
+        )]
+      }));
+
+      //상세 정보 맵에 저장
+      cardDetailsMap.value = cardDetailMap; 
+
+      // 쿼리에서 cardId 받아서 선택 카드 세팅
       const selectedId = Number(route.query.cardId);
       if (!selectedId) return;
 
       const matchedCard = myCards.value.find(
         (card) => card.cardId === selectedId
       );
+
       if (matchedCard) {
         const detail = cardDetailsMap.value[selectedId];
-        selectedCardCategory.value = detail?.benefits?.[0]?.storeCategory || '';
+        selectedCardCategory.value = detail?.storeBenefitList?.[0]?.storeCategory || '';
         selectedCard.value = {
           ...matchedCard,
           ...detail,
