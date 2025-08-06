@@ -1,4 +1,3 @@
-<!-- src/components/analysis/MonthlySpending.vue -->
 <template>
   <div class="monthly-spending-container">
     <!-- 월 선택 -->
@@ -30,7 +29,7 @@
           v-for="(item, idx) in displayChartData"
           :key="`${item.year}-${item.month}`"
           class="bar-item"
-          :class="{ active: item.month === month && item.year === currentYear }"
+          :class="{ active: idx === displayChartData.length - 1 }"
         >
           <div class="bar" :style="barStyle(idx, item.value)"></div>
           <div class="bar-label">{{ item.month }}월</div>
@@ -44,48 +43,45 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { getMonthlySpending } from '@/api/analysisindex.js'
 
-const memberId      = 1
-const month         = ref(new Date().getMonth() + 1)
-const currentYear   = new Date().getFullYear()
-const totalAmount   = ref(0)
-const diffAmount    = ref('0원')
-const diffSign      = ref(0)
-const allMonthlyData = ref([])
+const month       = ref(new Date().getMonth() + 1)
+const currentYear = new Date().getFullYear()
+const totalAmount = ref(0)
+const diffAmount  = ref('0원')
+const diffSign    = ref(0)
+const allData     = ref([])
 
 const displayChartData = computed(() => {
   const arr = []
-  const curM = month.value
+  const m0 = month.value
   for (let i = 3; i >= 1; i--) {
-    let m = curM - i, y = currentYear
+    let m = m0 - i, y = currentYear
     if (m <= 0) { m += 12; y-- }
-    const d = allMonthlyData.value.find(x => {
+    const rec = allData.value.find(x => {
       const [yy, mm] = x.yearMonth.split('-').map(Number)
       return yy === y && mm === m
     })
-    arr.push({ month: m, year: y, value: d ? d.totalSpent : 0 })
+    arr.push({ month: m, year: y, value: rec ? rec.totalSpent : 0 })
   }
-  const cur = allMonthlyData.value.find(x => {
+  const curRec = allData.value.find(x => {
     const [yy, mm] = x.yearMonth.split('-').map(Number)
-    return yy === currentYear && mm === curM
+    return yy === currentYear && mm === m0
   })
-  arr.push({ month: curM, year: currentYear, value: cur ? cur.totalSpent : 0 })
+  arr.push({ month: m0, year: currentYear, value: curRec ? curRec.totalSpent : 0 })
   return arr
 })
 
 async function loadSummary() {
   try {
-    const res = await getMonthlySpending(memberId)
+    const res = await getMonthlySpending()  // 토큰 기반 호출
     const list = res.data.data || []
-    allMonthlyData.value = list
-
-    const curM = month.value
-    const prevM = curM === 1 ? 12 : curM - 1
-    const prevY = curM === 1 ? currentYear - 1 : currentYear
+    allData.value = list
 
     const cur = list.find(x => {
       const [yy, mm] = x.yearMonth.split('-').map(Number)
-      return yy === currentYear && mm === curM
+      return yy === currentYear && mm === month.value
     })
+    const prevM = month.value === 1 ? 12 : month.value - 1
+    const prevY = month.value === 1 ? currentYear - 1 : currentYear
     const prev = list.find(x => {
       const [yy, mm] = x.yearMonth.split('-').map(Number)
       return yy === prevY && mm === prevM
@@ -114,21 +110,16 @@ async function loadSummary() {
 onMounted(loadSummary)
 watch(month, loadSummary)
 
-function prevMonth() {
-  month.value = month.value === 1 ? 12 : month.value - 1
-}
-function nextMonth() {
-  month.value = month.value === 12 ? 1 : month.value + 1
-}
+function prevMonth() { month.value = month.value === 1 ? 12 : month.value - 1 }
+function nextMonth() { month.value = month.value === 12 ? 1 : month.value + 1 }
 
 function barStyle(idx, value) {
   const vals = displayChartData.value.map(x => x.value)
-  const mx   = Math.max(...vals, 1)
-  const h    = value > 0 ? Math.max((value / mx) * 200, 15) : 15
-  const isCur = idx === displayChartData.value.length - 1
+  const maxv = Math.max(...vals, 1)
+  const h    = value > 0 ? Math.max((value / maxv) * 200, 15) : 15
   return {
     height:       `${h}px`,
-    background:   isCur ? '#FFCD39' : '#FFE066',
+    background:   idx === displayChartData.value.length - 1 ? '#FFCD39' : '#FFE066',
     borderRadius: '0.25rem 0.25rem 0 0'
   }
 }
@@ -147,43 +138,33 @@ function barStyle(idx, value) {
   align-items: center;
   padding: 0 1rem;
   margin-top: 1rem;
-  font-size:1.3rem;
-  /* gap 제거하고 화살표별 margin으로 대체 */
+  font-size: 1.3rem;
 }
 
 .arrow:first-child {
-  margin-left:18px;
-  margin-right: 23px;  /* <- 와 8월 사이 */
+  margin-left: 18px;
+  margin-right: 23px;
 }
 .arrow:last-child {
-  margin-left: -2px;   /* 8월 와 > 사이 */
+  margin-left: -2px;
 }
-
 .arrow {
   font-size: 1rem;
-  color: black;
   cursor: pointer;
-  transition: color 0.2s;
 }
-.arrow:hover {
-  color: black;
-}
-
 .month {
-  /* 화살표 사이에 들어가는 텍스트 */
   min-width: 3.125rem;
-  color: black;
+  font-size: 1.125rem;
 }
 
 .total-amount {
   display: flex;
   align-items: center;
   padding: 0 1rem;
-  font-size: 1.3rem;
+  font-size: 1.125rem;
   font-weight: 500;
-  color: #333;
   margin-bottom: 1rem;
-  margin-left:18px;
+  margin-left: 18px;
 }
 
 .chart-card {
@@ -191,11 +172,11 @@ function barStyle(idx, value) {
   border-radius: 0.75rem;
   margin: 0 1rem;
   padding: 1rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 0.125rem 0.375rem rgba(0, 0, 0, 0.05);
 }
 
 .compare-row {
-  font-size: 1.3rem;
+  font-size: 1.125rem;
   color: #666;
   margin-bottom: 5rem;
   line-height: 1.3;
@@ -205,7 +186,7 @@ function barStyle(idx, value) {
   color: #FFCD39;
   font-weight: 500;
   margin: 0 0.125rem;
-  font-size: 1.3rem;
+  font-size: 1.125rem;
 }
 
 .bar-chart {

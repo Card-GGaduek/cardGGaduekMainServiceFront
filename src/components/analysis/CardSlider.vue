@@ -45,17 +45,17 @@
       </div>
     </div>
 
-    <!-- 여기서 cardName prop으로 넘겨줍니다 -->
     <RecentTransactions
       v-if="currentCard.transactions?.length"
       :transactions="currentCard.transactions"
-      :card-name="currentCard.name"
+      :card-id="currentCard.id"
     />
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import RecentTransactions from '@/components/analysis/RecentTransactions.vue'
 
 const props = defineProps({
@@ -65,18 +65,32 @@ const props = defineProps({
   }
 })
 
-const idx = ref(0)
+const route = useRoute()
+const idx   = ref(0)
+
+// 초기 슬라이더 위치
+onMounted(() => {
+  const cid = Number(route.query.cardId)
+  const i   = props.cards.findIndex(c => c.id === cid)
+  if (i >= 0) idx.value = i
+})
+
+watch(() => route.query.cardId, v => {
+  const cid = Number(v)
+  const i   = props.cards.findIndex(c => c.id === cid)
+  if (i >= 0) idx.value = i
+})
 
 const currentCard = computed(() => props.cards[idx.value] || {})
-const pct         = computed(() => {
+const pct = computed(() => {
   const c = currentCard.value
   return c.totalAmount
     ? Math.min((c.currentAmount / c.totalAmount) * 100, 100)
     : 0
 })
-const isFirst     = computed(() => idx.value === 0)
-const isLast      = computed(() => idx.value === props.cards.length - 1)
-const trackStyle  = computed(() => ({
+const isFirst    = computed(() => idx.value === 0)
+const isLast     = computed(() => idx.value === props.cards.length - 1)
+const trackStyle = computed(() => ({
   transform: `translateX(-${idx.value * 100}%)`
 }))
 
@@ -93,39 +107,120 @@ function formatAmount(v) {
 
 <style scoped>
 .card-slider-container {
-  max-width: 360px; margin:0 auto 24px; padding:16px;
-  background:#fff; border-radius:16px; box-shadow:0 2px 12px rgba(0,0,0,0.08);
+  max-width: 22.5rem;           /* 360px */
+  margin: 0 auto 1.5rem;        /* 0 0 24px */
+  padding: 1rem;                /* 16px */
+  background: #fff;
+  border-radius: 1rem;          /* 16px */
+  box-shadow: 0 0.125rem 0.75rem rgba(0,0,0,0.08); /* 0 2px 12px */
 }
-.owner-line { text-align:center; margin-bottom:12px; font-size:18px; }
-.highlight  { color:#FFCD39; font-weight:600; }
 
-.slider-viewport { position:relative; overflow:hidden; }
-.slider-track   { display:flex; transition:transform .3s ease; }
-.slider-item    { flex:0 0 100%; text-align:center; }
+.owner-line {
+  text-align: center;
+  margin-bottom: 0.75rem;       /* 12px */
+  font-size: 1.125rem;          /* 18px */
+}
+.highlight {
+  color: #FFCD39;
+  font-weight: 600;
+}
 
-.card-visual { width:260px; height:150px; margin:0 auto 8px; border-radius:12px; overflow:hidden; }
-.card-visual img { width:100%; height:100%; object-fit:cover; }
+.slider-viewport {
+  position: relative;
+  overflow: hidden;
+}
+.slider-track {
+  display: flex;
+  transition: transform 0.3s ease;
+}
+.slider-item {
+  flex: 0 0 100%;
+  text-align: center;
+}
 
-.card-name { font-weight:600; margin-bottom:16px; }
+.card-visual {
+  width: 16.25rem;              /* 260px */
+  height: 9.375rem;             /* 150px */
+  margin: 0 auto 0.5rem;        /* 0 0 8px */
+  border-radius: 0.75rem;       /* 12px */
+  overflow: hidden;
+}
+.card-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-name {
+  font-weight: 600;
+  margin-bottom: 1rem;          /* 16px */
+}
 
 .nav-arrow {
-  position:absolute; top:50%; transform:translateY(-50%);
-  background:transparent; border:none; padding:8px; cursor:pointer; z-index:10;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  padding: 0.5rem;              /* 8px */
+  cursor: pointer;
+  z-index: 10;
 }
-.nav-arrow[disabled] { opacity:0.3; cursor:not-allowed; }
-.nav-arrow svg { width:20px; height:20px; }
-.nav-arrow svg path { fill:none; stroke:#FFCD39; stroke-width:2; }
-.nav-arrow.left  { left:calc((100% - 260px)/2 - 48px); }
-.nav-arrow.right { right:calc((100% - 260px)/2 - 48px); }
+.nav-arrow[disabled] {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.nav-arrow svg {
+  width: 1.25rem;               /* 20px */
+  height: 1.25rem;
+}
+.nav-arrow svg path {
+  fill: none;
+  stroke: #FFCD39;
+  stroke-width: 0.125rem;       /* 2px */
+}
+/* 좌우 화살표 위치 */
+.nav-arrow.left {
+  left: calc((100% - 16.25rem) / 2 - 3rem); /* 48px */
+}
+.nav-arrow.right {
+  right: calc((100% - 16.25rem) / 2 - 3rem);
+}
 
-.pagination-dots { display:flex; justify-content:center; margin:8px 0; }
+.pagination-dots {
+  display: flex;
+  justify-content: center;
+  margin: 0.5rem 0;             /* 8px */
+}
 .pagination-dots span {
-  width:6px; height:6px; margin:0 4px; border-radius:50%; background:#f5f5f5; cursor:pointer;
+  width: 0.375rem;              /* 6px */
+  height: 0.375rem;
+  margin: 0 0.25rem;            /* 4px */
+  border-radius: 50%;
+  background: #f5f5f5;
+  cursor: pointer;
 }
-.pagination-dots span.active { background:#FFCD39; }
+.pagination-dots span.active {
+  background: #FFCD39;
+}
 
-.card-performance { margin-top:12px; }
-.amount-line { display:flex; justify-content:space-between; margin-bottom:6px; }
-.progress-bar { width:100%; height:16px; background:#f5f5f5; border-radius:8px; }
-.progress-fill { height:100%; background:#FFCD39; border-radius:8px; }
+.card-performance {
+  margin-top: 0.75rem;          /* 12px */
+}
+.amount-line {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.375rem;      /* 6px */
+}
+.progress-bar {
+  width: 100%;
+  height: 1rem;                 /* 16px */
+  background: #f5f5f5;
+  border-radius: 0.5rem;        /* 8px */
+}
+.progress-fill {
+  height: 100%;
+  background: #FFCD39;
+  border-radius: 0.5rem;
+}
 </style>
