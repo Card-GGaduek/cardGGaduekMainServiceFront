@@ -3,19 +3,23 @@
   <div class="recommended-cards-section">
     <div class="section-header">
       <h2 class="section-title">지금 쓰는 카드 vs 추천 카드</h2>
-      <p class="section-subtitle">혜택 비교하고, 더 유리한 카드로 바꿔보세요.</p>
+      <p class="section-subtitle">
+        혜택 비교하고, 더 유리한 카드로 바꿔보세요.
+      </p>
     </div>
     <router-link to="/AllCardProduct" class="view-all-link">
-        전체 보기 &gt;
-      </router-link>
-    <div class="recommended-cards-list">
-
+      전체 보기 &gt;
+    </router-link>
+  </div>
+  <div class="recommended-cards-list">
     <!-- 로딩 상태 -->
     <div v-if="loading" class="loading-container">
       <div class="loading-spinner"></div>
       <p class="loading-text">
         카드 정보를 불러오는 중...
-        <span v-if="retryCount > 0">(재시도 {{ retryCount }}/{{ maxRetries }})</span>
+        <span v-if="retryCount > 0"
+          >(재시도 {{ retryCount }}/{{ maxRetries }})</span
+        >
       </p>
     </div>
 
@@ -27,16 +31,19 @@
 
     <!-- 카드 목록 -->
     <div v-else-if="topBenefitCards.length > 0" class="recommended-cards-list">
-
       <div
-          v-for="(card, index) in displayedCards"
-          :key="card.id"
-          class="recommended-card-item"
-          @click="goToCardDetail(card.id)"
+        v-for="(card, index) in displayedCards"
+        :key="card.id"
+        class="recommended-card-item"
+        @click="goToCardDetail(card.id)"
       >
         <div class="rank-number">{{ index + 1 }}</div>
         <div class="card-image-container">
-          <img :src="card.cardImageUrl" :alt="card.cardProductName" class="recommended-card-image" />
+          <img
+            :src="card.cardImageUrl"
+            :alt="card.cardProductName"
+            class="recommended-card-image"
+          />
         </div>
         <div class="card-details">
           <h3 class="card-name">{{ card.cardProductName }}</h3>
@@ -50,17 +57,13 @@
 
       <div class="view-more-container">
         <button
-            v-if="!showAll && topBenefitCards.length > 3"
-            class="view-more-btn"
-            @click="toggleShowAll"
+          v-if="!showAll && topBenefitCards.length > 3"
+          class="view-more-btn"
+          @click="toggleShowAll"
         >
           혜택 카드 더보기 >
         </button>
-        <button
-            v-if="showAll"
-            class="view-more-btn"
-            @click="toggleShowAll"
-        >
+        <button v-if="showAll" class="view-more-btn" @click="toggleShowAll">
           접기 <
         </button>
       </div>
@@ -113,8 +116,12 @@ const loadTopBenefitCards = async (isRetry = false) => {
 
   try {
     // 타임아웃을 점진적으로 증가
-    const timeoutMs = Math.min(15000 + (retryCount.value * 10000), 60000); // 15초 ~ 60초
-    console.log(`API 호출 시도 ${retryCount.value + 1}/${maxRetries + 1}, 타임아웃: ${timeoutMs}ms`);
+    const timeoutMs = Math.min(15000 + retryCount.value * 10000, 60000); // 15초 ~ 60초
+    console.log(
+      `API 호출 시도 ${retryCount.value + 1}/${
+        maxRetries + 1
+      }, 타임아웃: ${timeoutMs}ms`
+    );
 
     const response = await getTopBenefitCards();
     topBenefitCards.value = response.data || response;
@@ -122,7 +129,6 @@ const loadTopBenefitCards = async (isRetry = false) => {
     // 성공 시 상태 초기화
     error.value = false;
     retryCount.value = 0;
-
   } catch (err) {
     console.error('혜택 카드 로드 실패:', err);
 
@@ -151,7 +157,6 @@ const loadTopBenefitCards = async (isRetry = false) => {
     } else {
       errorMessage.value = '네트워크 오류가 발생했습니다.';
     }
-
   } finally {
     loading.value = false;
   }
@@ -170,7 +175,7 @@ const formatCurrency = (amount) => {
 const goToCardDetail = (cardId) => {
   router.push({
     name: 'CardDetail',
-    params: { id: cardId }
+    params: { id: cardId },
   });
 };
 
@@ -224,8 +229,12 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-text {
