@@ -1,12 +1,15 @@
-// 기존 API 파일과 동일한 import 방식 사용
-import api from './index'; // 또는 기존 파일에서 사용하는 방식
+import api from './index';
 
-// 총 혜택 조회 API  
-export const getTotalBenefit = (memberId, yearMonth) => {
-    return api.get('/api/main/total-benefit', {
-        params: {
-            memberId,
-            yearMonth
-        }
-    });
+// 총 혜택 조회 (로그인 사용자 기준)
+export const getTotalBenefit = async (yearMonth) => {
+    try {
+        const response = await api.get('/api/main/total-benefit', {
+            params: { yearMonth }, // memberId 제거
+            timeout: 15000
+        });
+        return response.data;
+    } catch (error) {
+        console.error('getTotalBenefit 에러:', error);
+        throw error;
+    }
 };
