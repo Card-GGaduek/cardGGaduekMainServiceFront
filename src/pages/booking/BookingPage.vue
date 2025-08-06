@@ -9,10 +9,10 @@ const isLoading = ref(true);
 const selectedCategory = ref("여행");
 
 const categories = ref([
-  { name: "여행", icon: "fa-solid fa-plane", apiValue: "HOTEL" },
-  { name: "입장권", icon: "fa-solid fa-ticket", apiValue: "THEME_PARK" },
-  { name: "쇼핑", icon: "fa-solid fa-bag-shopping", apiValue: "SHOPPING" },
-  { name: "문화", icon: "fa-solid fa-film", apiValue: "MOVIE_THEATER" },
+  { name: "여행", icon: '🏨', apiValue: "HOTEL" },
+  { name: "입장권", icon: '🎡', apiValue: "THEME_PARK" },
+  { name: "쇼핑", icon: '🛒', apiValue: "SHOPPING" },
+  { name: "문화", icon: '🎬', apiValue: "MOVIE_THEATER" },
 ]);
 
 const filteredBenefits = computed(() => {
@@ -98,7 +98,7 @@ function handleBooking(benefit) {
                   class="icon-wrapper"
                   :class="{ active: selectedCategory === category.name }"
                 >
-                  <i :class="category.icon"></i>
+                  <i :class="category.icon">{{ category.icon }}</i>
                 </div>
                 <span class="small">{{ category.name }}</span>
               </div>
