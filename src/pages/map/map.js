@@ -1,10 +1,9 @@
-import { ref, onMounted, onUnmounted,nextTick } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick } from 'vue';
 import axios from 'axios';
 
 import { cat } from 'fontawesome';
 import { useRoute, useRouter } from 'vue-router';
 import memberApi from '@/api/memberApi';
-
 
 export function useMap(mapDiv) {
   const map = ref(null);
@@ -21,23 +20,14 @@ export function useMap(mapDiv) {
   const selectedCard = ref(null);
   const mapMarkers = ref([]);
 
-
   const myCards = ref([]); // 외부 API로 가져올 카드 리스트
   const cardDetailsMap = ref({}); // 카드 ID별 상세 정보 저장용
 
-
-
   onMounted(async () => {
-    try {
-      const result = await memberApi.getMyCard();
-      myCards.push(...result);
-    } catch (e) {
-      alert(e.message);
-    }
-  });
-
- 
-
+    await nextTick();
+    initMap();
+    moveToCurrentLocation();
+    await loadMyCards(1); // 예시: memberId = 1
   });
 
   onUnmounted(() => {
@@ -48,7 +38,7 @@ export function useMap(mapDiv) {
 
   const initMap = () => {
     if (!mapDiv.value) {
-      console.warn("mapDiv is not ready yet.");
+      console.warn('mapDiv is not ready yet.');
       return;
     }
     const mapOptions = {
@@ -100,9 +90,7 @@ export function useMap(mapDiv) {
   const handleSearch = async () => {
     if (!map.value) return;
 
-
     markers.value.forEach((marker) => marker.setMap(null));
-
     markers.value = [];
 
     if (!keyword.value.trim()) {
@@ -110,24 +98,20 @@ export function useMap(mapDiv) {
       return;
     }
 
-
     const center = map.value.getCenter();
     const bounds = map.value.getBounds();
     const sw = bounds.getSW();
     const ne = bounds.getNE();
 
-
     const categoryMap = {
-      'coffee_shop': '커피전문점',
-      'convenience_store': '편의점',
-      'movie_theater': '영화관',
-      'restaurant': '음식점',
-      'gas_station': '주유소',
-      'theme_park': '놀이공원',
-      'hotel': '호텔'
+      coffee_shop: '커피전문점',
+      convenience_store: '편의점',
+      movie_theater: '영화관',
+      restaurant: '음식점',
+      gas_station: '주유소',
+      theme_park: '놀이공원',
+      hotel: '호텔',
     };
-
-
 
     const requestBody = {
       textQuery: keyword.value,
@@ -146,40 +130,10 @@ export function useMap(mapDiv) {
       },
     };
 
-
-    console.log("선택된 카드 category:", selectedCardCategory.value);
-    const mappedCategory = categoryMap[selectedCardCategory.value] || selectedCardCategory.value;
-    console.log("가맹점 검색 요청:", requestBody);
-
-    console.log('검색 요청 바디:', requestBody);
-
-    // ✅ 로그로 현재 선택된 카테고리 확인
     console.log('선택된 카드 category:', selectedCardCategory.value);
-
-    const categoryMap = {
-      coffee_shop: '커피전문점',
-      convenience_store: '편의점',
-      movie_theater: '영화관',
-      restaurant: '음식점',
-      gas_station: '주유소',
-      theme_park: '놀이공원',
-      hotel: '호텔',
-    };
-
     const mappedCategory =
       categoryMap[selectedCardCategory.value] || selectedCardCategory.value;
-    requestBody.category = mappedCategory;
-
-    if (selectedCardCategory.value) {
-      requestBody.category = selectedCardCategory.value;
-    } else {
-      console.warn('선택된 카드의 카테고리가 비어 있습니다. 검색 요청 중단.');
-      return;
-    }
-
-    // ✅ 최종 요청 로그 출력
     console.log('가맹점 검색 요청:', requestBody);
-
 
     try {
       const response = await axios.post(
@@ -200,19 +154,15 @@ export function useMap(mapDiv) {
 
   const loadMyCards = async (memberId) => {
     try {
-
       // const response = await axios.get(`http://localhost:8080/api/main/card/list?memberId=${memberId}`);
       const result = await memberApi.getMyCard();
 
-      myCards.value = result.map(card => ({
-        ...card,
+      myCards.value = result.map((card) => ({
         cardId: card.cardId,
         image: card.cardImageUrl,
         cardNumber: card.cardNumber,
         cardHolderName: 'card',
-        cardCompany: '신한'
-        category: card.category,
-
+        cardCompany: '신한',
       }));
 
       for (const card of myCards.value) {
@@ -233,7 +183,7 @@ export function useMap(mapDiv) {
         selectedCardCategory.value = detail?.benefits?.[0]?.storeCategory || '';
         selectedCard.value = {
           ...matchedCard,
-          ...detail
+          ...detail,
         };
 
         router.replace({
@@ -250,7 +200,9 @@ export function useMap(mapDiv) {
 
   const loadCardBack = async (cardId) => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/main/card/${cardId}/back`);
+      const response = await axios.get(
+        `http://localhost:8080/api/main/card/${cardId}/back`
+      );
       return response.data.data;
     } catch (error) {
       console.error(`카드 상세 정보(${cardId}) 불러오기 실패:`, error);
@@ -260,16 +212,10 @@ export function useMap(mapDiv) {
 
   // 검색 마커 생성
   const createMarker = (place) => {
-
     const position = new window.naver.maps.LatLng(
       place.locationDTO.latitude,
       place.locationDTO.longitude
     );
-    const markerColor =
-      myCards.value.find((c) => c.category === place.primaryType)?.color ||
-      '#ffcd39';
-
-
     const marker = new window.naver.maps.Marker({
       position,
       map: map.value,
@@ -284,9 +230,9 @@ export function useMap(mapDiv) {
         name: place.name,
         primaryType: place.primaryType,
         location: {
-        latitude: place.locationDTO.latitude,
-        longitude: place.locationDTO.longitude
-      }
+          latitude: place.locationDTO.latitude,
+          longitude: place.locationDTO.longitude,
+        },
       });
     });
 
@@ -295,39 +241,42 @@ export function useMap(mapDiv) {
 
   const getStoreBenefits = async (memberId) => {
     try {
-
+      // const response = await axios.get(`http://localhost:8080/api/card/my`);
       const result = await memberApi.getMyCard();
       return result;
+      // return response.data.data || [];
     } catch (error) {
+      // console.error("가맹점 혜택 조회에 실패했습니다:", error);
+      // return [];
       alert(error.message);
-
     }
   };
-
 
   // 마커 클릭
   const onMarkerClick = async (place) => {
     // const memberId = 6;
     const allCards = await getStoreBenefits();
-  
+
     // 카드별 혜택을 펼쳐서 cardName 추가
-    const allBenefits = allCards.flatMap(card =>
-      card.storeBenefitList.map(benefit => ({
+    const allBenefits = allCards.flatMap((card) =>
+      card.storeBenefitList.map((benefit) => ({
         ...benefit,
-        cardName: card.cardProductName // 주입!
+        cardName: card.cardProductName, // 주입!
       }))
     );
-  
+
     // 매장 이름 포함 필터
-    const matchedBenefits = allBenefits.filter(b =>
+    const matchedBenefits = allBenefits.filter((b) =>
       place.name.includes(b.storeName)
     );
-  
+
     // 선택된 카드가 있으면 카드명 기준으로도 필터링
     const filteredBenefits = selectedCard.value
-      ? matchedBenefits.filter(b => b.cardName === selectedCard.value.cardProductName)
+      ? matchedBenefits.filter(
+          (b) => b.cardName === selectedCard.value.cardProductName
+        )
       : matchedBenefits;
-  
+
     selectedMerchant.value = {
       name: place.name,
       primaryType: place.primaryType,
@@ -335,43 +284,42 @@ export function useMap(mapDiv) {
       benefits: filteredBenefits,
     };
   };
-  
-  
+
   // 카드 클릭으로 검색하는 마커
   const handleCardClick = async (cardId) => {
     try {
       // 카드 상세 정보 API 요청
       const response = await memberApi.getMyCard();
       const cardDetail = response.data.data;
-  
+
       // 카드 정보 매핑
-      const matchedCard = myCards.value.find(card => card.cardId === cardId);
+      const matchedCard = myCards.value.find((card) => card.cardId === cardId);
       if (!matchedCard) return;
-  
+
       selectedCard.value = {
         ...matchedCard,
-        ...cardDetail
+        ...cardDetail,
       };
-  
+
       // storeCategory → 검색용 카테고리로 설정
-      selectedCardCategory.value = cardDetail.benefits?.[0]?.storeCategory || '';
-  
+      selectedCardCategory.value =
+        cardDetail.benefits?.[0]?.storeCategory || '';
+
       // URL 쿼리 갱신
       router.replace({
         query: {
           ...route.query,
-          cardId
-        }
+          cardId,
+        },
       });
-  
+
       // 검색 실행
       handleSearch();
-  
     } catch (error) {
       console.error('카드 상세 정보를 불러오지 못했습니다:', error);
     }
   };
-  
+
   const startWatchingLocation = () => {
     if (navigator.geolocation) {
       watchId.value = navigator.geolocation.watchPosition(
