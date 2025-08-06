@@ -12,7 +12,10 @@ const {
   keyword,
   selectedMerchant,
   selectedCard,
+  categoryColorMap,
   handleSearch,
+  handleCardClick,
+  searchStoresByCategory,
   moveToCurrentLocation,
   myCards,
 } = useMap(mapDiv);
@@ -21,26 +24,6 @@ const {
 // 모달 관리용 변수
 const selectedCardDetailModal = ref(false);
 
-// 카드 클릭 시 혜택 모달 호출
-const handleCardClick = async (cardId) => {
-  try {
-    const allCards = await memberApi.getMyCard();
-    const cardDetail = allCards.find(card => card.cardId === cardId);
-    if (!cardDetail) return;
-
-    const matchedCard = myCards.value.find(c=> c.cardId === cardId);
-    if (!matchedCard) return;
-
-    selectedCard.value = {
-      ...matchedCard,
-      ...cardDetail
-    };
-
-    selectedCardDetailModal.value = true;
-  } catch (error) {
-    console.error('카드 상세 정보를 불러오지 못했습니다:', error);
-  }
-};
 
 // 페이 네비게이터 모드 관리용 변수
 const payNavigatorMode = ref(false);
