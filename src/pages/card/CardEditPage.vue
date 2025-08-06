@@ -9,7 +9,7 @@
         <div class="card-list" v-if="!loading">
           <div
             v-for="(card, index) in sortedCards"
-            :key="index"
+            :key="card.cardId"
             class="card-item"
             :class="{ deleted: card.isDeleted }"
           >
@@ -28,7 +28,7 @@
 
             <!-- 카드 이미지 변경 버튼 -->
             <button
-              @click="openImageModal(card, index)"
+              @click="openImageModal(card)"
               class="change-image-btn"
               :disabled="card.isDeleted"
             >
@@ -37,7 +37,7 @@
 
             <!-- 카드 삭제 버튼 -->
             <button
-              @click="deleteCard(card, index)"
+              @click="deleteCard(card)"
               class="delete-btn"
               :disabled="card.isDeleted"
             >
@@ -135,11 +135,15 @@ const sortedCards = computed(() => {
   return [...cards.value].sort((a, b) => b.isValid - a.isValid);
 });
 
+// 카드 ID로 원본 배열에서 인덱스 찾기
+const findCardIndexById = (cardId) => {
+  return cards.value.findIndex((card) => card.cardId === cardId);
+};
+
 // 이미지 변경 모달 열기
-const openImageModal = (card, index) => {
+const openImageModal = (card) => {
   if (card.isDeleted) return;
   selectedCard.value = card;
-  selectedCardIndex.value = index;
   showImageModal.value = true;
 };
 
@@ -147,7 +151,6 @@ const openImageModal = (card, index) => {
 const closeImageModal = () => {
   showImageModal.value = false;
   selectedCard.value = null;
-  selectedCardIndex.value = null;
   uploading.value = false;
 };
 
@@ -189,7 +192,10 @@ const handleFileSelect = async (event) => {
 
     // 2. 응답받은 imageUrl로 카드 이미지 반영
     const newImageUrl = response.data.imageUrl;
-    cards.value[selectedCardIndex.value].cardImageUrl = newImageUrl;
+    const cardIndex = findCardIndexById(selectedCard.value.cardId);
+    if (cardIndex !== -1) {
+      cards.value[cardIndex].cardImageUrl = newImageUrl;
+    }
 
     closeImageModal();
     alert('카드 이미지가 변경되었습니다.');
@@ -213,11 +219,13 @@ const useDefaultImage = async () => {
     await cardApi.updateCardImage(selectedCard.value.cardId, null);
 
     // 2. 원본 이미지 URL로 되돌리기 (카드 상품의 기본 이미지)
-    const card = cards.value[selectedCardIndex.value];
-
-    // 서버에서 다시 카드 정보를 가져와서 기본 이미지 URL 확인
-    // or originalImageUrl 사용 (로드할 때 저장해둔 원본)
-    card.cardImageUrl = card.originalImageUrl;
+    const cardIndex = findCardIndexById(selectedCard.value.cardId);
+    if (cardIndex !== -1) {
+      const card = cards.value[cardIndex];
+      // 서버에서 다시 카드 정보를 가져와서 기본 이미지 URL 확인
+      // or originalImageUrl 사용 (로드할 때 저장해둔 원본)
+      card.cardImageUrl = card.originalImageUrl;
+    }
 
     closeImageModal();
     alert('기본 이미지로 변경되었습니다.');
@@ -230,7 +238,7 @@ const useDefaultImage = async () => {
 };
 
 // 카드 삭제
-const deleteCard = async (card, index) => {
+const deleteCard = async (card) => {
   if (card.isDeleted) return;
 
   const confirmed = confirm('정말로 이 카드를 삭제하시겠습니까?');
@@ -239,9 +247,11 @@ const deleteCard = async (card, index) => {
   try {
     const success = await cardApi.deleteCard(card.cardId);
     if (success) {
-      // 로컬 상태에서 삭제 표시
-      cards.value[index].isDeleted = true;
-      cards.value[index].isValid = 0;
+      const cardIndex = findCardIndexById(card.cardId);
+      if (cardIndex !== -1) {
+        cards.value[cardIndex].isDeleted = true;
+        cards.value[cardIndex].isValid = 0;
+      }
       alert('카드가 삭제되었습니다.');
     }
   } catch (error) {
@@ -304,11 +314,18 @@ onMounted(async () => {
   border-radius: 16px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e6e2dd;
   transition: all 0.3s ease;
+}
+
+.card-item:hover {
+  transform: translateY(-3px);
 }
 
 .card-item.deleted {
   opacity: 0.6;
+  border: 2px dashed #ccc;
+  background-color: #f5f5f5;
 }
 
 .card-container {
@@ -350,7 +367,6 @@ onMounted(async () => {
   width: 100%;
   padding: 6px;
   border-radius: 8px;
-  font-size: 20px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -361,11 +377,11 @@ onMounted(async () => {
   border: 2px solid #5e514d;
   background: white;
   color: #5e514d;
+  font-size: 20px;
 }
 
 .change-image-btn:hover:not(:disabled) {
-  background: rgba(255, 213, 89, 0.8); /* 0.8은 투명도, 1이 완전 불투명 */
-  /* color: white; */
+  background: rgba(255, 213, 89, 0.8);
   border: 2px solid #ffd559;
 }
 
@@ -379,7 +395,9 @@ onMounted(async () => {
   border: none;
   background: none;
   color: #ff3b30;
+  font-size: 16px;
   text-decoration: underline;
+  margin-top: 4px;
 }
 
 .delete-btn:hover:not(:disabled) {
