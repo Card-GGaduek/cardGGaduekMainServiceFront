@@ -200,6 +200,90 @@
   .research-button:hover {
     background-color: #ffcd39;
   }
+
+  
+  .my-cards-wrapper {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  .card-thumbnail {
+    width: 80px;
+    height: auto;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  .card-thumbnail:hover {
+    transform: scale(1.05);
+  }
+  .card-thumbnail.active {
+    border: 3px solid #3b82f6;
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+  }
+  .card-image {
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  
+  /* 기존 selected card 스타일 유지 */
+  .selected-card-box {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .selected-card-img {
+    width: 80px;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  .selected-card-info {
+    display: flex;
+    flex-direction: column;
+  }
+  .card-name {
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
+  .card-category {
+    font-size: 0.9rem;
+    color: gray;
+  }
+  
+  /* 모달 스타일 */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  .modal-content {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+  }
+  .modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
   
   /* 하단 시트 스타일 (이전과 동일) */
   .bottom-sheet-container { position: fixed; bottom: 70px; left: 0; right: 0; z-index: 1020; }
