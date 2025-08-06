@@ -4,7 +4,7 @@ import axios from 'axios';
 // Axios 인스턴스 생성
 const api = axios.create({
   baseURL: '/', // API 기본 경로, 필요시 수정
-  timeout: 5000, // 타임아웃 설정
+  timeout: 10000, // 타임아웃 설정
 });
 
 let authToken = null;

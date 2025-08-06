@@ -19,10 +19,18 @@
 <script setup>
 import Navbar from './layout/Navbar.vue';
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import { useAuthStore } from './stores/auth';
 
 const route = useRoute();
+const router = useRouter();
 const hideNavbar = computed(() => route.path === '/lab/fortune');
+
+window.addEventListener('token-expired', () => {
+  const store = useAuthStore();
+  store.logout();
+  router.push('/login');
+});
 </script>
 
 <style scoped>
