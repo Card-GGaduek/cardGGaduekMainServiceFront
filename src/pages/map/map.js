@@ -55,6 +55,8 @@ export function useMap(mapDiv) {
     },
   };
   
+
+  
   
 
   onMounted(async () => {
@@ -325,7 +327,9 @@ const handleCardClick = async (cardId) => {
     );
 
     // 마커 색상
-    const markerColor = categoryColorMap[place.primaryType] || categoryColorMap['기타'];
+    const typeKey = place.primaryType?.toUpperCase();
+    const markerColor = categoryColorMap[typeKey]?.color || '#888888';
+    
 
     const marker = new window.naver.maps.Marker({
       position,
