@@ -128,10 +128,10 @@ export function useMap(mapDiv) {
     if (!map.value) return;
 
 
-    if (!isAppend) {
+    
     markers.value.forEach((marker) => marker.setMap(null));
     markers.value = [];
-    }
+    
 
     if (!keyword.value.trim()) {
       console.warn('검색어가 비어 있습니다. 검색을 실행하지 않습니다.');
@@ -231,31 +231,42 @@ const handleCardClick = async (cardId) => {
     const matchedCard = myCards.value.find(c => c.cardId === cardId);
     if (!matchedCard) return;
 
+    const isAlreadySelected = selectedCard.value?.cardId === cardId;
+
     // 카드 바꾼다면 기존 마커 제거
     markers.value.forEach((marker) => marker.setMap(null));
     markers.value = [];
 
-    // 선택된 카드
-    selectedCard.value = matchedCard;
+    // 이미 선택된 카드라면 선택 해제
+    if (isAlreadySelected) {
+      selectedCard.value = null;
+      selectedCardCategory.value = '';
+      router.replace({ query: {} }); // URL 쿼리 초기화
+    } else {
+        // 선택된 카드
+        selectedCard.value = matchedCard;
 
-    // 해당 카드의 카테고리 배열로 매장 검색 실행
-    if (matchedCard.storeCategories && matchedCard.storeCategories.length > 0) {
-      for (const category of matchedCard.storeCategories) 
-      await searchStoresByCategory(category,true); // 누적 모드
-    }
+        // 해당 카드의 카테고리 배열로 매장 검색 실행
+        if (matchedCard.storeCategories && matchedCard.storeCategories.length > 0) {
+        for (const category of matchedCard.storeCategories) 
+        await searchStoresByCategory(category,true); // 누적 모드
+                }
 
-    // URL 쿼리 갱신(선택된 카드 상태 반영)
-    router.replace({
-      query: {
+        // URL 쿼리 갱신(선택된 카드 상태 반영)
+        router.replace({
+        query: {
         ...router.query,
         cardId,
-      }
-    })
+          },
+      })
+    }
+
+   
   
-  } catch (error) {
+    } catch (error) {
     console.error('카드 상세 정보를 불러오지 못했습니다:', error);
-  }
-};
+      }
+  };
 
 
   
@@ -377,6 +388,7 @@ const handleCardClick = async (cardId) => {
       card.storeBenefitList.map((benefit) => ({
         ...benefit,
         cardName: card.cardProductName, // 주입!
+        cardImageUrl : card.cardImageUrl
       }))
     );
 
