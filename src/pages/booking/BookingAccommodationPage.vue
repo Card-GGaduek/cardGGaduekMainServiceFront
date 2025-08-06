@@ -15,17 +15,13 @@ const accommodationId = route.params.id;
 
 const accommodation = ref(null);
 
-const authStore = useAuthStore();
-const memberId = authStore.memberId;
-
 async function fetchUserCards() {
-  try {
-    const memberId = 2; // 기존 코드 삭제
+  try { // 기존 코드 삭제
     if (!memberId) {
       console.error("로그인 정보가 없습니다.");
       return;
     }
-    const response = await axios.get(`/api/card/${memberId}`);
+    const response = await axios.get(`/api/card`);
     userCards.value = response.data.data || response.data;
   } catch (error) {
     console.error("보유 카드 목록 조회 실패:", error);

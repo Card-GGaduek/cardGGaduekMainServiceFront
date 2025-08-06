@@ -1,60 +1,59 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import axios from "axios";
-import { useRouter } from "vue-router";
+import { useRouter } from "vue-router"; // 1. authStore 가져오기
+import api from '@/api/index.js';
 
-const router = useRouter();
+const router = useRouter(); 
 const benefits = ref([]);
 const isLoading = ref(true);
 const selectedCategory = ref("여행");
 
-// 1. 메인 카테고리 목록 수정 ('OTT' 제거, '입장권' 추가)
 const categories = ref([
   { name: "여행", icon: "fa-solid fa-plane", apiValue: "HOTEL" },
-  { name: "입장권", icon: "fa-solid fa-ticket", apiValue: "THEME_PARK" }, // '문화' 대신 '입장권'으로 변경
+  { name: "입장권", icon: "fa-solid fa-ticket", apiValue: "THEME_PARK" },
   { name: "쇼핑", icon: "fa-solid fa-bag-shopping", apiValue: "SHOPPING" },
-  { name: "문화", icon: "fa-solid fa-film", apiValue: "MOVIE_THEATER" }, // 아이콘 예시 변경
+  { name: "문화", icon: "fa-solid fa-film", apiValue: "MOVIE_THEATER" },
 ]);
 
-// 2. API가 필터링된 결과를 준다고 가정
 const filteredBenefits = computed(() => {
   return benefits.value;
 });
 
-// 3. API 호출 함수 (내부 로직은 동일)
 async function fetchBenefits(categoryApiValue) {
   isLoading.value = true;
   benefits.value = [];
   try {
-    const memberId = 1;
-    const response = await axios.get(`/api/category/${categoryApiValue}`, {
-      params: { memberId },
-    });
-    benefits.value = response.data.data || response.data;
+    // memberId를 가져오거나 보낼 필요가 없음!
+    // 서버가 쿠키/토큰을 보고 알아서 처리해줌.
+    const response = await api.get(`api/category/${categoryApiValue}`); // params 제거
+    console.log(response.data.data);
+    if (response.data && response.data.data) {
+      benefits.value = response.data.data || response.data;
+      console.log(benefits.value);
+    } else {
+      benefits.value = []; // 데이터가 없는 경우 빈 배열로 설정
+    }
+
   } catch (error) {
     console.error(`${categoryApiValue} 카테고리 조회 실패:`, error);
+    benefits.value = []; // 에러 발생 시에도 빈 배열로 초기화
   } finally {
     isLoading.value = false;
   }
 }
 function calculateExpectedPrice(benefit) {
-  // benefit 객체에 price, valueType, rateValue, amountValue가 있다고 가정
-  
   const basePrice = benefit.price || 0;
-  console.log(benefit); 
   if (benefit.discountRate <= 50) {
     return Math.floor(benefit.price * (benefit.discountRate / 100));
-  } 
-  // 혜택 정보가 없으면 원래 가격 반환
+  }
   return benefit.discountRate;
 }
-// 4. 카테고리 선택 함수 (서브 카테고리 로직 제거)
+
 function selectCategory(category) {
   selectedCategory.value = category.name;
   fetchBenefits(category.apiValue);
 }
 
-// 5. 컴포넌트 마운트 시 기본 API 호출
 onMounted(() => {
   const defaultCategory = categories.value.find(
     (c) => c.name === selectedCategory.value
@@ -64,7 +63,6 @@ onMounted(() => {
   }
 });
 
-// 6. 예약하기 핸들러 (여행, 입장권일 때 동작)
 function handleBooking(benefit) {
   router.push({
     name: "BookingAccommodationPage",
@@ -92,7 +90,7 @@ function handleBooking(benefit) {
             >
               <div
                 v-for="category in categories"
-                :key="category.name"
+                :key="category.apiValue"
                 class="category-item"
                 @click="selectCategory(category)"
               >
@@ -125,9 +123,12 @@ function handleBooking(benefit) {
             :key="benefit.id"
           >
             <div class="card-body d-flex align-items-center">
+              <img
+                :src="benefit.imageUrl"
+                class="rounded me-3 benefit-image"
+                alt="Benefit Image"
+              />
 
-              <img :src="benefit.imageUrl" class="rounded me-3 benefit-image" alt="Benefit Image">
-              
               <div class="flex-grow-1">
                 <p class="card-text small mb-2">
                   보유하신 {{ benefit.cardName }}로 {{ benefit.title }}에서
@@ -145,7 +146,7 @@ function handleBooking(benefit) {
                 </p>
                 <p class="card-text small mb-2 fw-bold">
                   예상 혜택 금액 : {{ calculateExpectedPrice(benefit) }}원
-                </p>  
+                </p>
 
                 <a
                   v-if="selectedCategory === '여행'"
@@ -172,9 +173,6 @@ function handleBooking(benefit) {
   </div>
 </template>
 
-<style scoped>
-/* CSS는 이전과 동일합니다. */
-</style>
 <style scoped>
 /* 전체 페이지 스타일 */
 .benefit-page-bg {

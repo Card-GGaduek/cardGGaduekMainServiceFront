@@ -5,6 +5,10 @@
       <h2 class="section-title">지금 쓰는 카드 vs 추천 카드</h2>
       <p class="section-subtitle">혜택 비교하고, 더 유리한 카드로 바꿔보세요.</p>
     </div>
+    <router-link to="/AllCardProduct" class="view-all-link">
+        전체 보기 &gt;
+      </router-link>
+    <div class="recommended-cards-list">
 
     <!-- 로딩 상태 -->
     <div v-if="loading" class="loading-container">
@@ -23,6 +27,7 @@
 
     <!-- 카드 목록 -->
     <div v-else-if="topBenefitCards.length > 0" class="recommended-cards-list">
+
       <div
           v-for="(card, index) in displayedCards"
           :key="card.id"
@@ -188,6 +193,7 @@ onMounted(() => {
 }
 
 .section-title {
+  display: flexbox;
   font-size: 18px;
   font-weight: bold;
   color: #333;
@@ -293,6 +299,14 @@ onMounted(() => {
 .recommended-card-item:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+.view-all-link {
+  color: #007bff;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap; /* "전체 보기" 텍스트가 줄바꿈되지 않도록 합니다. */
+  flex-shrink: 0; /* 공간이 부족해도 링크 크기가 줄어들지 않도록 합니다. */
 }
 
 .rank-number {
