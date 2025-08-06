@@ -5,7 +5,6 @@ import { cat } from 'fontawesome';
 import { useRoute, useRouter } from 'vue-router';
 import memberApi from '@/api/memberApi';
 
-
 export function useMap(mapDiv) {
   const map = ref(null);
   const markers = ref([]);
@@ -21,23 +20,14 @@ export function useMap(mapDiv) {
   const selectedCard = ref(null);
   const mapMarkers = ref([]);
 
-
   const myCards = ref([]); // 외부 API로 가져올 카드 리스트
   const cardDetailsMap = ref({}); // 카드 ID별 상세 정보 저장용
 
-
-
   onMounted(async () => {
-    try {
-      const result = await memberApi.getMyCard();
-      myCards.push(...result);
-    } catch (e) {
-      alert(e.message);
-    }
-  });
-
- 
-
+    await nextTick();
+    initMap();
+    moveToCurrentLocation();
+    await loadMyCards(1); // 예시: memberId = 1
   });
 
   onUnmounted(() => {
@@ -52,7 +42,7 @@ export function useMap(mapDiv) {
       return;
     }
     const mapOptions = {
-      center: new window.naver.maps.LatLng(37.5665, 126.978),
+      center: new window.naver.maps.LatLng(37.5665, 126.9780),
       zoom: 15,
       minZoom: 6,
     };
@@ -61,7 +51,7 @@ export function useMap(mapDiv) {
 
   const moveToCurrentLocation = () => {
     if (!navigator.geolocation) {
-      alert('현재 위치를 사용할 수 없습니다.');
+      alert("현재 위치를 사용할 수 없습니다.");
       return;
     }
 
@@ -91,8 +81,8 @@ export function useMap(mapDiv) {
         });
       },
       (error) => {
-        alert('위치 정보를 가져올 수 없습니다.');
-        console.error('Geolocation error:', error);
+        alert("위치 정보를 가져올 수 없습니다.");
+        console.error("Geolocation error:", error);
       }
     );
   };
@@ -100,22 +90,18 @@ export function useMap(mapDiv) {
   const handleSearch = async () => {
     if (!map.value) return;
 
-
-    markers.value.forEach((marker) => marker.setMap(null));
-
+    markers.value.forEach(marker => marker.setMap(null));
     markers.value = [];
 
     if (!keyword.value.trim()) {
-      console.warn('검색어가 비어 있습니다. 검색을 실행하지 않습니다.');
+      console.warn("검색어가 비어 있습니다. 검색을 실행하지 않습니다.");
       return;
     }
-
 
     const center = map.value.getCenter();
     const bounds = map.value.getBounds();
     const sw = bounds.getSW();
     const ne = bounds.getNE();
-
 
     const categoryMap = {
       'coffee_shop': '커피전문점',
@@ -127,92 +113,52 @@ export function useMap(mapDiv) {
       'hotel': '호텔'
     };
 
-
-
     const requestBody = {
       textQuery: keyword.value,
-      languageCode: 'ko',
+      languageCode: "ko",
       locationBias: {
         rectangle: {
           low: {
             latitude: sw.y,
-            longitude: sw.x,
+            longitude: sw.x
           },
           high: {
             latitude: ne.y,
-            longitude: ne.x,
-          },
-        },
-      },
+            longitude: ne.x
+          }
+        }
+      }
     };
-
 
     console.log("선택된 카드 category:", selectedCardCategory.value);
     const mappedCategory = categoryMap[selectedCardCategory.value] || selectedCardCategory.value;
     console.log("가맹점 검색 요청:", requestBody);
 
-    console.log('검색 요청 바디:', requestBody);
-
-    // ✅ 로그로 현재 선택된 카테고리 확인
-    console.log('선택된 카드 category:', selectedCardCategory.value);
-
-    const categoryMap = {
-      coffee_shop: '커피전문점',
-      convenience_store: '편의점',
-      movie_theater: '영화관',
-      restaurant: '음식점',
-      gas_station: '주유소',
-      theme_park: '놀이공원',
-      hotel: '호텔',
-    };
-
-    const mappedCategory =
-      categoryMap[selectedCardCategory.value] || selectedCardCategory.value;
-    requestBody.category = mappedCategory;
-
-    if (selectedCardCategory.value) {
-      requestBody.category = selectedCardCategory.value;
-    } else {
-      console.warn('선택된 카드의 카테고리가 비어 있습니다. 검색 요청 중단.');
-      return;
-    }
-
-    // ✅ 최종 요청 로그 출력
-    console.log('가맹점 검색 요청:', requestBody);
-
-
     try {
-      const response = await axios.post(
-        'http://localhost:8080/api/place',
-        requestBody
-      );
+      const response = await axios.post('http://localhost:8080/api/place', requestBody);
       const places = response.data?.data?.places || [];
 
       if (places.length === 0) {
-        console.warn('검색된 매장이 없습니다.');
+        console.warn("검색된 매장이 없습니다.");
       }
 
       places.forEach(createMarker);
     } catch (error) {
-      console.error('가맹점 검색에 실패했습니다:', error);
+      console.error("가맹점 검색에 실패했습니다:", error);
     }
   };
 
   const loadMyCards = async (memberId) => {
     try {
-
       // const response = await axios.get(`http://localhost:8080/api/main/card/list?memberId=${memberId}`);
       const result = await memberApi.getMyCard();
 
       myCards.value = result.map(card => ({
-        ...card,
         cardId: card.cardId,
         image: card.cardImageUrl,
         cardNumber: card.cardNumber,
         cardHolderName: 'card',
         cardCompany: '신한'
-        category: card.category,
-
       }));
 
       for (const card of myCards.value) {
@@ -225,9 +171,7 @@ export function useMap(mapDiv) {
       const selectedId = Number(route.query.cardId);
       if (!selectedId) return;
 
-      const matchedCard = myCards.value.find(
-        (card) => card.cardId === selectedId
-      );
+      const matchedCard = myCards.value.find(card => card.cardId === selectedId);
       if (matchedCard) {
         const detail = cardDetailsMap.value[selectedId];
         selectedCardCategory.value = detail?.benefits?.[0]?.storeCategory || '';
@@ -239,12 +183,12 @@ export function useMap(mapDiv) {
         router.replace({
           query: {
             ...route.query,
-            cardId: matchedCard.cardId,
-          },
+            cardId: matchedCard.cardId
+          }
         });
       }
     } catch (error) {
-      console.error('카드 목록을 불러오는 데 실패했습니다:', error);
+      console.error("카드 목록을 불러오는 데 실패했습니다:", error);
     }
   };
 
@@ -260,16 +204,7 @@ export function useMap(mapDiv) {
 
   // 검색 마커 생성
   const createMarker = (place) => {
-
-    const position = new window.naver.maps.LatLng(
-      place.locationDTO.latitude,
-      place.locationDTO.longitude
-    );
-    const markerColor =
-      myCards.value.find((c) => c.category === place.primaryType)?.color ||
-      '#ffcd39';
-
-
+    const position = new window.naver.maps.LatLng(place.locationDTO.latitude, place.locationDTO.longitude);
     const marker = new window.naver.maps.Marker({
       position,
       map: map.value,
@@ -295,12 +230,14 @@ export function useMap(mapDiv) {
 
   const getStoreBenefits = async (memberId) => {
     try {
-
+      // const response = await axios.get(`http://localhost:8080/api/card/my`);
       const result = await memberApi.getMyCard();
       return result;
+      // return response.data.data || [];
     } catch (error) {
+      // console.error("가맹점 혜택 조회에 실패했습니다:", error);
+      // return [];
       alert(error.message);
-
     }
   };
 
@@ -376,17 +313,14 @@ export function useMap(mapDiv) {
     if (navigator.geolocation) {
       watchId.value = navigator.geolocation.watchPosition(
         (position) => {
-          const newPosition = new window.naver.maps.LatLng(
-            position.coords.latitude,
-            position.coords.longitude
-          );
+          const newPosition = new window.naver.maps.LatLng(position.coords.latitude, position.coords.longitude);
 
           if (!currentLocationMarker.value) {
             currentLocationMarker.value = new window.naver.maps.Marker({
               position: newPosition,
               map: map.value,
               icon: {
-                content: `<div style=\"width:20px;height:20px;background-color:#ffcd39;border:2px solid #fff;border-radius:50%;box-shadow:0 0 5px rgba(0,0,0,0.5);\"></div>`,
+                content: `<div style=\"width:20px;height:20px;background-color:#ffcd39;border:2px solid #fff;border-radius:50%;box-shadow:0 0 5px rgba(0,0,0,0.5);\"></div>` ,
                 anchor: new window.naver.maps.Point(10, 10),
               },
             });
@@ -397,12 +331,12 @@ export function useMap(mapDiv) {
           }
         },
         (error) => {
-          console.error('위치 정보를 가져오는 데 실패했습니다:', error.message);
+          console.error("위치 정보를 가져오는 데 실패했습니다:", error.message);
           handleSearch();
         }
       );
     } else {
-      console.error('이 브라우저는 위치 정보를 지원하지 않습니다.');
+      console.error("이 브라우저는 위치 정보를 지원하지 않습니다.");
       handleSearch();
     }
   };

@@ -4,12 +4,16 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
+
 // https://vite.dev/config/
 export default defineConfig({
   server: {
-    'proxy': {
-      'api': 'http://localhost:8080',
-      changeOrigin: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '/api'), // /api 유지
+      }
     }
   },
   plugins: [
@@ -22,3 +26,4 @@ export default defineConfig({
     },
   },
 })
+
