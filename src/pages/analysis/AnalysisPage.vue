@@ -1,7 +1,8 @@
 <template>
   <div class="analysis-page">
     <SubHeader title="지출 내역" :showBack="true" />
-    <TabNav :activeTab="activeTab" @change="activeTab = $event" />
+    <TabNav :activeTab="activeTab" @change="onTabChange" />
+
     <!-- 카드 실적 -->
     <div v-if="activeTab === 'cardPerformance'" class="card-section">
       <div v-if="loading" class="loading-container">
@@ -19,6 +20,7 @@
         <CardSlider :cards="cards" />
       </div>
     </div>
+
     <!-- 월간 지출 -->
     <div v-if="activeTab === 'MonthlySpending'" class="monthly-section">
       <MonthlySpending />
@@ -34,61 +36,58 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import SubHeader from '@/layout/SubHeader.vue';
 import TabNav from '@/components/analysis/TabNav.vue';
 import CardSlider from '@/components/analysis/CardSlider.vue';
 import MonthlySpending from '@/components/analysis/MonthlySpending.vue';
-import {
-  getCardPerformance,
-  getCardTransactions,
-  getMonthlySpending,
-} from '@/api/analysisindex.js';
 import CategorySpending from '@/components/analysis/CategorySpending.vue';
+import { getCardPerformance, getCardTransactions } from '@/api/analysisindex.js';
 
-// const memberId = 1;  // 로그인한 사용자 ID
-const activeTab = ref('cardPerformance'); //현재 선택된 탭
-const cards = ref([]); //카드 정보 배열 -> api로 가져온 카드 정보 및 거래 내역 저장됨
-const loading = ref(false); //로딩 중 상태
-const error = ref(null); //에러 메시지
+const router = useRouter();
+const activeTab = ref('cardPerformance');
+const cards = ref([]);
+const loading = ref(false);
+const error = ref(null);
+
+// 탭 변경 핸들러: 카드 실적 외 탭 선택 시 URL 쿼리 제거
+function onTabChange(tabKey) {
+  activeTab.value = tabKey;
+  if (tabKey !== 'cardPerformance') {
+    router.replace({ name: 'Analysis', query: {} });
+  }
+}
 
 async function loadAll() {
   loading.value = true;
   error.value = null;
-
-  const auth = JSON.parse(localStorage.getItem('auth'));
-  console.log(auth.token);
-
   try {
-    // 카드 실적 api 호출
+    // 카드 실적 API 호출
     const perfRes = await getCardPerformance();
     if (!perfRes.data.success) throw new Error(perfRes.data.message);
-
-    // 거래 내역 api 호출
+    // 거래 내역 API 호출
     const txRes = await getCardTransactions();
     if (!txRes.data.success) throw new Error(txRes.data.message);
 
-    // 데이터 가공
+    // 데이터 가공: 카드별 실적 + 최근 거래 3건
     const perfData = perfRes.data.data;
     const txData = txRes.data.data;
-
-    cards.value = perfData.map((cd) => {
+    cards.value = perfData.map(cd => {
       const card = {
         id: cd.cardId,
-        owner: cd.ownerName || '이유진',
+        owner: cd.ownerName,
         name: cd.cardProductName,
         image: cd.cardImageUrl,
         currentAmount: cd.spentAmount,
         totalAmount: cd.requiredMonthlySpent,
         transactions: [],
       };
-
-      const found = txData.find((t) => t.cardId === cd.cardId);
+      const found = txData.find(t => t.cardId === cd.cardId);
       if (found) {
         card.transactions = found.transactions
           .sort((a, b) => new Date(b.transDate) - new Date(a.transDate))
           .slice(0, 3);
       }
-
       return card;
     });
   } catch (e) {
@@ -122,9 +121,7 @@ onMounted(loadAll);
   margin: 0 auto 16px;
 }
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 .retry-button {
   margin-top: 12px;

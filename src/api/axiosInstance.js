@@ -41,6 +41,10 @@ axiosInstance.interceptors.response.use(
       'code' in res &&
       'message' in res
     ) {
+      if (res.code === 4001) {
+        window.dispatchEvent(new Event('token-expired'));
+      }
+
       return Promise.reject(res);
     }
 
