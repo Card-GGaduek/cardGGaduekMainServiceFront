@@ -41,7 +41,7 @@ const goBack = () => {
   cursor: pointer;
 }
 .title {
-  padding-left: 10px;
-  font-size: 24px;
+  padding-left: 3px;
+  font-size: 18px;
 }
 </style>

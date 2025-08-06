@@ -2,108 +2,120 @@
   <div class="card-swiper-container">
     <div class="swiper-container">
       <Swiper
-        :slides-per-view="'auto'"
-        :centered-slides="true"
-        :space-between="16"
-        :loop="false"
-        :initial-slide="1"
-        @slideChange="onSlideChange"
-        class="card-swiper"
+          :slides-per-view="'auto'"
+          :centered-slides="true"
+          :space-between="16"
+          :loop="false"
+          :initial-slide="1"
+          @slideChange="onSlideChange"
+          class="card-swiper"
       >
         <SwiperSlide
-          v-for="(card, index) in cards"
-          :key="card.cardId"
-          class="swiper-slide-custom"
+            v-for="(card, index) in cards"
+            :key="card.cardId"
+            class="swiper-slide-custom"
         >
           <div class="card-container">
             <div
-              class="card"
-              :class="{
+                class="card"
+                :class="{
                 active: index === activeIndex,
                 inactive: index !== activeIndex,
                 flipped: flippedCards.has(index),
                 'no-animation': isSliding,
               }"
-              @click="toggleCardFlip(index)"
+                @click="toggleCardFlip(index)"
             >
               <div class="card-inner">
                 <div class="card-front">
                   <img
-                    :src="card.cardImageUrl"
-                    alt="카드 이미지"
-                    class="card-image"
+                      :src="card.cardImageUrl"
+                      alt="카드 이미지"
+                      class="card-image"
                   />
                 </div>
                 <div class="card-back">
                   <div class="card-back-content">
                     <div class="card-back-header">
                       <h3 class="card-back-title">
-                        <!-- {{ getCardBackInfo(card.cardId)?.cardName || '카드명' }} -->
                         {{ card.cardProductName }}
                       </h3>
                       <p class="card-back-company">
-                        {{
-                          getCardBackInfo(card.cardId)?.cardCompany || '카드사'
-                        }}
+                        카드사 <!-- 현재 MyCardDTO에 은행 정보가 없어서 고정값 -->
                       </p>
                     </div>
 
                     <div class="benefits-section">
                       <div
-                        v-for="(benefit, benefitIndex) in card.storeBenefitList"
-                        :key="benefitIndex"
-                        class="benefit-item"
+                          class="benefits-container"
+                          :class="{ 'expanded': expandedCards.has(index) }"
                       >
-                        <div class="benefit-icon">
-                          <span
-                            v-if="benefit.storeCategory === 'CONVENIENCE_STORE'"
-                            class="category-emoji"
+                        <div
+                            v-for="(benefit, benefitIndex) in getDisplayBenefits(card.storeBenefitList, index)"
+                            :key="benefitIndex"
+                            class="benefit-item"
+                        >
+                          <div class="benefit-icon">
+                            <span
+                                v-if="benefit.storeCategory === 'CONVENIENCE_STORE'"
+                                class="category-emoji"
                             >🏪</span
-                          >
-                          <span
-                            v-else-if="benefit.storeCategory === 'COFFEE_SHOP'"
-                            class="category-emoji"
+                            >
+                            <span
+                                v-else-if="benefit.storeCategory === 'COFFEE_SHOP'"
+                                class="category-emoji"
                             >☕</span
-                          >
-                          <span
-                            v-else-if="
-                              benefit.storeCategory === 'MOVIE_THEATER'
-                            "
-                            class="category-emoji"
+                            >
+                            <span
+                                v-else-if="benefit.storeCategory === 'MOVIE_THEATER'"
+                                class="category-emoji"
                             >🎬</span
-                          >
-                          <span
-                            v-else-if="benefit.storeCategory === 'GAS_STATION'"
-                            class="category-emoji"
+                            >
+                            <span
+                                v-else-if="benefit.storeCategory === 'GAS_STATION'"
+                                class="category-emoji"
                             >⛽</span
-                          >
-                          <span
-                            v-else-if="benefit.storeCategory === 'RESTAURANT'"
-                            class="category-emoji"
+                            >
+                            <span
+                                v-else-if="benefit.storeCategory === 'RESTAURANT'"
+                                class="category-emoji"
                             >🍽️</span
-                          >
-                          <span
-                            v-else-if="benefit.storeCategory === 'HOTEL'"
-                            class="category-emoji"
+                            >
+                            <span
+                                v-else-if="benefit.storeCategory === 'HOTEL'"
+                                class="category-emoji"
                             >🏨</span
-                          >
-                          <span
-                            v-else-if="benefit.storeCategory === 'THEME_PARK'"
-                            class="category-emoji"
+                            >
+                            <span
+                                v-else-if="benefit.storeCategory === 'THEME_PARK'"
+                                class="category-emoji"
                             >🎡</span
-                          >
-                          <span v-else class="category-emoji">💳</span>
+                            >
+                            <span v-else class="category-emoji">💳</span>
+                          </div>
+                          <span class="benefit-text">{{
+                              benefit.description
+                            }}</span>
                         </div>
-                        <span class="benefit-text">{{
-                          benefit.description
-                        }}</span>
+                      </div>
+
+                      <!-- 더보기/접기 버튼 -->
+                      <div
+                          v-if="card.storeBenefitList && card.storeBenefitList.length > 2"
+                          class="more-benefits-button"
+                          @click.stop="toggleBenefitsExpand(index)"
+                      >
+                        <span v-if="!expandedCards.has(index)">
+                          더보기 (+{{ card.storeBenefitList.length - 2 }})
+                        </span>
+                        <span v-else>접기</span>
                       </div>
                     </div>
 
                     <!-- 혜택 가능한 매장 보기 버튼 -->
                     <div
-                      class="view-stores-button"
-                      @click.stop="goToStoreList(card)"
+                        class="view-stores-button"
+                        @click.stop="goToStoreList(card.cardId)"
                     >
                       <span>혜택 적용 가능한 매장 보기</span>
                     </div>
@@ -111,11 +123,11 @@
                     <div class="card-back-footer">
                       <div class="footer-item">
                         <span class="footer-icon">📞</span>
-                        <span class="footer-text">신한카드</span>
+                        <span class="footer-text">고객센터</span>
                       </div>
                       <div class="footer-item">
                         <span class="footer-icon">🌐</span>
-                        <span class="footer-text">신한은행</span>
+                        <span class="footer-text">홈페이지</span>
                       </div>
                     </div>
                   </div>
@@ -146,7 +158,6 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { getCardList, getCardBack } from '@/api/maincard';
 import { useRouter } from 'vue-router';
 import 'swiper/css';
 import { Swiper, SwiperSlide } from 'swiper/vue';
@@ -156,7 +167,7 @@ const cards = ref([]);
 const activeIndex = ref(1); // 두 번째 카드부터 시작
 const flippedCards = ref(new Set()); // 뒤집힌 카드들의 인덱스를 저장
 const isSliding = ref(false); // 슬라이딩 중인지 확인
-const cardBackData = ref({}); // 카드 뒷면 데이터 저장
+const expandedCards = ref(new Set()); // 혜택이 확장된 카드들
 
 const router = useRouter();
 
@@ -171,7 +182,7 @@ const goToPayment = () => {
 };
 
 const goToStoreList = (cardId) => {
-  console.log('카드 ID:', cardId); // 디버깅용
+  console.log('카드 ID:', cardId);
   if (!cardId) {
     console.error('카드 ID가 없습니다.');
     return;
@@ -179,7 +190,7 @@ const goToStoreList = (cardId) => {
 
   try {
     router.push({
-      name: 'MapPage', // 또는 'MapPage' - 라우터 설정에 맞게
+      name: 'MapPage',
       query: { cardId: cardId },
     });
   } catch (error) {
@@ -191,15 +202,36 @@ const loadCards = async () => {
   try {
     const result = await memberApi.getMyCard();
     cards.value = result;
-    console.cards;
+    console.log('로드된 카드 데이터:', cards.value);
   } catch (err) {
-    alert(err.message);
+    const userMessage = err.userMessage ||
+        (err.code === 'ECONNABORTED'
+            ? '서버 응답이 지연되고 있습니다. 잠시 후 다시 시도해주세요.'
+            : '카드 정보를 불러오는데 실패했습니다.');
+
+    alert(userMessage);
     console.error('카드 리스트 로드 실패:', err);
+
+    // 임시 해결책: 빈 배열로 설정하여 UI 깨짐 방지
+    cards.value = [];
   }
 };
 
-const getCardBackInfo = (cardId) => {
-  return cardBackData.value[cardId];
+// 혜택 표시 개수 제어 함수
+const getDisplayBenefits = (benefits, cardIndex) => {
+  if (!benefits) return [];
+
+  const isExpanded = expandedCards.value.has(cardIndex);
+  return isExpanded ? benefits : benefits.slice(0, 2);
+};
+
+// 혜택 더보기/접기 토글 함수
+const toggleBenefitsExpand = (cardIndex) => {
+  if (expandedCards.value.has(cardIndex)) {
+    expandedCards.value.delete(cardIndex);
+  } else {
+    expandedCards.value.add(cardIndex);
+  }
 };
 
 const onSlideChange = (swiper) => {
@@ -209,6 +241,9 @@ const onSlideChange = (swiper) => {
   // 즉시 모든 카드를 앞면으로 되돌리기 (애니메이션 없이)
   flippedCards.value.clear();
 
+  // 혜택 확장 상태도 초기화
+  expandedCards.value.clear();
+
   activeIndex.value = swiper.activeIndex;
 
   // 약간의 딜레이 후 애니메이션 다시 활성화
@@ -217,23 +252,13 @@ const onSlideChange = (swiper) => {
   }, 100);
 };
 
-const toggleCardFlip = async (index) => {
+// 카드 뒤집기 함수 - API 호출 없이 바로 뒤집기
+const toggleCardFlip = (index) => {
   // 활성 카드(가운데 카드)만 뒤집기 가능
   if (index === activeIndex.value) {
     if (flippedCards.value.has(index)) {
       flippedCards.value.delete(index);
     } else {
-      // 카드 뒷면 데이터가 없으면 API 호출
-      const cardId = cards.value[index].cardId;
-      if (!cardBackData.value[cardId]) {
-        try {
-          const response = await getCardBack(cardId);
-          cardBackData.value[cardId] = response.data.data;
-        } catch (err) {
-          console.error('카드 뒷면 데이터 로드 실패:', err);
-          return;
-        }
-      }
       flippedCards.value.add(index);
     }
   }
@@ -245,6 +270,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* 기존 CSS 그대로 유지 */
 .card-swiper-container {
   width: 100%;
   overflow: hidden;
@@ -262,7 +288,7 @@ onMounted(() => {
 }
 
 .swiper-slide-custom {
-  width: 220px !important; /* 슬라이드 고정 너비 */
+  width: 220px !important;
   flex-shrink: 0;
 }
 
@@ -299,7 +325,6 @@ onMounted(() => {
   border-radius: 20px;
 }
 
-/* 슬라이딩 중일 때 애니메이션 비활성화 */
 .card.no-animation .card-inner {
   transition: none;
 }
@@ -347,8 +372,7 @@ onMounted(() => {
   justify-content: flex-start;
   position: relative;
   z-index: 1;
-  /* 회색 영역을 피해서 오른쪽 흰색 영역에만 위치 */
-  margin-left: 60px; /* 회색 줄 너비만큼 여백 */
+  margin-left: 60px;
   padding: 20px 20px 20px 0;
 }
 
@@ -375,15 +399,51 @@ onMounted(() => {
   flex: 1;
   display: flex;
   flex-direction: column;
+  margin: 12px 0; /* 마진 조금 줄임 */
+  min-height: 0;
+}
+
+.benefits-container {
+  display: flex;
+  flex-direction: column;
   gap: 5px;
-  margin: 15px 0;
+  max-height: 100px; /* 2개 아이템이 완전히 보이도록 높이 증가 */
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.benefits-container.expanded {
+  max-height: 180px; /* 확장 시 높이 */
+  overflow-y: auto;
+}
+
+.more-benefits-button {
+  margin-top: 10px;
+  padding: 6px 12px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 1px solid #ddd;
+  border-radius: 15px;
+  font-size: 10px;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  align-self: center;
+  color: #666;
+}
+
+.more-benefits-button:hover {
+  background-color: rgba(255, 255, 255, 1);
+  border-color: #bbb;
+  color: #333;
 }
 
 .benefit-item {
   display: flex;
   align-items: center;
   gap: 5px;
-  padding: 6px 0;
+  padding: 4px 0; /* 패딩을 줄여서 공간 확보 */
+  min-height: 32px; /* 최소 높이 보장 */
 }
 
 .benefit-icon {
@@ -434,11 +494,6 @@ onMounted(() => {
   background-color: #f4f4f4;
 }
 
-.view-stores-button .icon {
-  width: 14px;
-  height: 14px;
-}
-
 .footer-item {
   display: flex;
   align-items: center;
@@ -465,27 +520,6 @@ onMounted(() => {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.card-info {
-  position: absolute;
-  bottom: 1rem;
-  left: 1rem;
-  color: white;
-  text-shadow: 0 0 3px black;
-}
-
-.card-info .card-number {
-  font-size: 1rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-}
-
-.card-info .card-name,
-.card-info .card-bank {
-  font-size: 0.9rem;
-  margin-bottom: 0.25rem;
-}
-
-/* 비활성 카드 스타일 */
 .card.inactive {
   transform: scale(0.85);
   opacity: 0.6;
@@ -496,7 +530,6 @@ onMounted(() => {
   filter: grayscale(80%) brightness(0.6) contrast(0.8);
 }
 
-/* 활성 카드 스타일 */
 .card.active {
   transform: scale(1);
   opacity: 1;
@@ -508,7 +541,6 @@ onMounted(() => {
   filter: none;
 }
 
-/* 고정된 카드 버튼 스타일 */
 .fixed-card-buttons {
   display: flex;
   gap: 10px;
@@ -516,7 +548,7 @@ onMounted(() => {
   width: 220px;
   justify-content: center;
   position: relative;
-  z-index: 20; /* Swiper보다 위에 표시 */
+  z-index: 20;
 }
 
 .card-button {
@@ -549,7 +581,6 @@ onMounted(() => {
   background-color: #f4c025;
 }
 
-/* 카드 편집 텍스트 스타일 */
 .card-edit-text {
   margin-top: 15px;
   font-size: 12px;
@@ -557,7 +588,6 @@ onMounted(() => {
   text-align: center;
 }
 
-/* Swiper 기본 스타일 오버라이드 */
 :deep(.swiper-wrapper) {
   align-items: center;
 }
