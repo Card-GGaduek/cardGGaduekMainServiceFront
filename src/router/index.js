@@ -15,11 +15,11 @@ import LoginPage from '@/pages/login/LoginPage.vue';
 import JoinPage from '@/pages/login/JoinPage.vue';
 import AllTransactions from '@/components/analysis/AllTransactions.vue';
 import CardEditPage from '@/pages/card/CardEditPage.vue';
-import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
 import NaverCallback from '@/pages/login/NaverCallback.vue';
 import AllCardProductPage from '@/pages/card/AllCardProductPage.vue';
 import CardDetailPage from '@/pages/card/CardDetailPage.vue';
+import MyCouponPage from '@/pages/mypage/MyCouponPage.vue';
 const routes = [
   {
     path: '/',
@@ -91,6 +91,11 @@ const routes = [
     path: '/naver/callback',
     name: 'NaverCallback',
     component: NaverCallback,
+  },
+  {
+    path: '/mypage/mycouponpage',
+    name: 'MyCouponPage',
+    component: MyCouponPage
   },
 ];
 

@@ -64,15 +64,19 @@ const myPageInfo = reactive({
   couponList: [],
 });
 
-// const user = ref({
-//   name: '홍길동',
-//   coupons: 5,
-// });
-
 const appSettings = ref({
   appLock: false,
   faceId: true,
 });
+
+const goToMyCoupons = () => {
+  router.push({ name: 'MyCouponPage'});
+};
+
+const goToMyBooking = () => {
+  router.push({name: 'myBookingPage'});
+};
+
 </script>
 
 <template>
@@ -88,9 +92,9 @@ const appSettings = ref({
     <main class="scrollable-content">
       <div class="d-flex text-center mb-4">
         <div class="card info-box flex-fill ms-2">
-          <div class="card-body">
+          <div class="card-body" @click="goToMyCoupons">
             <h4 class="fw-bold mb-0">{{ myPageInfo.couponList.length }}</h4>
-            <span class="small text-muted">보유 쿠폰</span>
+            <span class="small text-muted" >보유 쿠폰</span>
           </div>
         </div>
       </div>
