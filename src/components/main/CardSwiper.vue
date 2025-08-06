@@ -38,7 +38,8 @@
                   <div class="card-back-content">
                     <div class="card-back-header">
                       <h3 class="card-back-title">
-                        {{ getCardBackInfo(card.cardId)?.cardName || '카드명' }}
+                        <!-- {{ getCardBackInfo(card.cardId)?.cardName || '카드명' }} -->
+                        {{ card.cardProductName }}
                       </h3>
                       <p class="card-back-company">
                         {{
@@ -49,9 +50,7 @@
 
                     <div class="benefits-section">
                       <div
-                        v-for="(benefit, benefitIndex) in (
-                          getCardBackInfo(card.cardId)?.benefits || []
-                        ).slice(0, 3)"
+                        v-for="(benefit, benefitIndex) in card.storeBenefitList"
                         :key="benefitIndex"
                         class="benefit-item"
                       >
@@ -151,6 +150,7 @@ import { getCardList, getCardBack } from '@/api/maincard';
 import { useRouter } from 'vue-router';
 import 'swiper/css';
 import { Swiper, SwiperSlide } from 'swiper/vue';
+import memberApi from '@/api/memberApi';
 
 const cards = ref([]);
 const activeIndex = ref(1); // 두 번째 카드부터 시작
@@ -189,9 +189,11 @@ const goToStoreList = (cardId) => {
 
 const loadCards = async () => {
   try {
-    const response = await getCardList(1);
-    cards.value = response.data.data;
+    const result = await memberApi.getMyCard();
+    cards.value = result;
+    console.cards;
   } catch (err) {
+    alert(err.message);
     console.error('카드 리스트 로드 실패:', err);
   }
 };

@@ -7,7 +7,22 @@ const api = axios.create({
   timeout: 5000, // 타임아웃 설정
 });
 
+let authToken = null;
+
+export function setAuthToken(token) {
+  authToken = token;
+}
+
 // 요청 인터셉터 (없음) — 토큰 삽입 안 함
+api.interceptors.request.use(
+  (config) => {
+    if (authToken) {
+      config.headers.Authorization = `Bearer ${authToken}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 // 응답 인터셉터 (선택적 에러 처리)
 api.interceptors.response.use(

@@ -1,14 +1,14 @@
 <template>
   <div class="edit-page-wrapper">
-    <SubHeader />
+    <SubHeader title="카드 편집하기" />
     <div class="edit-header">
-      <h3 class="header-title">카드 편집하기</h3>
+      <!-- <h3 class="header-title">카드 편집하기</h3> -->
     </div>
     <div class="edit-page-scroll">
       <div class="edit-page">
         <div class="card-list" v-if="!loading">
           <div
-            v-for="(card, index) in cards"
+            v-for="(card, index) in sortedCards"
             :key="index"
             class="card-item"
             :class="{ deleted: card.isDeleted }"
@@ -97,13 +97,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, onMounted, computed } from 'vue';
 import SubHeader from '@/layout/SubHeader.vue';
 import cardApi from '@/api/cardApi.js';
-
-// 라우터와 스토어
-const route = useRoute();
 
 // 반응형 데이터
 const cards = ref([]);
@@ -112,14 +108,13 @@ const uploading = ref(false);
 const showImageModal = ref(false);
 const selectedCard = ref(null);
 const selectedCardIndex = ref(null);
-const memberId = ref(route.query.memberId || 1);
 const fileInput = ref(null);
 
 // 카드 정보 로드
 const loadCards = async () => {
   try {
     loading.value = true;
-    const response = await cardApi.getCardFrontInfo(memberId.value);
+    const response = await cardApi.getCardFrontInfo();
     cards.value = response.data.map((card) => ({
       ...card,
       cardId: card.cardId ?? card.id,
@@ -134,6 +129,11 @@ const loadCards = async () => {
     loading.value = false;
   }
 };
+
+// isValid 값에 따른 카드 정렬
+const sortedCards = computed(() => {
+  return [...cards.value].sort((a, b) => b.isValid - a.isValid);
+});
 
 // 이미지 변경 모달 열기
 const openImageModal = (card, index) => {
@@ -241,6 +241,7 @@ const deleteCard = async (card, index) => {
     if (success) {
       // 로컬 상태에서 삭제 표시
       cards.value[index].isDeleted = true;
+      cards.value[index].isValid = 0;
       alert('카드가 삭제되었습니다.');
     }
   } catch (error) {
@@ -285,9 +286,9 @@ onMounted(async () => {
 /* Header */
 .header-title {
   text-align: center;
-  margin-top: 20px;
+  margin-top: 10px;
   padding-bottom: 20px;
-  font-size: 30px;
+  font-size: 24px;
   font-weight: 600;
 }
 
@@ -326,7 +327,7 @@ onMounted(async () => {
 }
 
 .card-image.grayscale {
-  filter: grayscale(100%);
+  filter: grayscale(10%);
 }
 
 .deleted-overlay {
@@ -363,8 +364,9 @@ onMounted(async () => {
 }
 
 .change-image-btn:hover:not(:disabled) {
-  background: rgba(255, 213, 89, 0.6); /* 0.8은 투명도, 1이 완전 불투명 */
+  background: rgba(255, 213, 89, 0.8); /* 0.8은 투명도, 1이 완전 불투명 */
   /* color: white; */
+  border: 2px solid #ffd559;
 }
 
 .change-image-btn:disabled {
@@ -443,13 +445,13 @@ onMounted(async () => {
 }
 
 .modal-btn.primary {
-  background: #007aff;
-  color: white;
+  background: #ffd559;
+  color: #5e514d;
   border: none;
 }
 
 .modal-btn.primary:hover {
-  background: #0056cc;
+  background: #f2c232;
 }
 
 .modal-btn.secondary {
