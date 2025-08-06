@@ -1,215 +1,191 @@
-<!-- src/components/analysis/AllTransactions.vue -->
 <template>
   <div class="all-transactions">
     <!-- 상단 헤더 -->
     <div class="header">
       <button class="back-btn" @click="goBack">←</button>
       <h2 class="title">지출 내역</h2>
+      <!-- 카드 선택 드롭다운 -->
+      <div class="card-select">
+        <select v-model.number="selectedCardId" @change="fetchTransactions">
+          <option
+            v-for="c in cardList"
+            :key="c.cardId"
+            :value="c.cardId"
+          >
+            {{ c.cardName }}
+          </option>
+        </select>
+      </div>
     </div>
 
-    <div class="card-select">
-      <select v-model.number="selectedCardId">
-        <option v-for="c in cardList" :key="c.cardId" :value="c.cardId">
-          {{ c.cardName }}
-        </option>
-      </select>
-    </div>
-
-    <!-- 거래 내역 그룹별 렌더링 -->
-    <div
-      v-for="group in groupedTransactions"
-      :key="group.date"
-      class="date-group"
-    >
-      <p class="date-label">{{ formatDate(group.date) }}</p>
-      <div v-for="tx in group.transactions" :key="tx.id" class="tx-item">
-        <div class="store-info">
+    <!-- 거래 내역 리스트 (날짜 헤더 없이) -->
+    <div class="tx-list">
+      <div
+        v-for="tx in sortedTransactions"
+        :key="tx.id"
+        class="tx-item"
+        @click="goToSlider(tx.cardId)"
+      >
+        <div class="tx-info">
+          <span class="datetime">{{ formatDate(tx.transDate) }} {{ formatTime(tx.transDate) }}</span>
           <span class="store">{{ tx.storeName }}</span>
-          <span class="time">{{ formatTime(tx.transDate) }}</span>
         </div>
-        <div class="amount">-{{ formatAmount(tx.amount) }}원</div>
+        <span class="amount">-{{ formatAmount(tx.amount) }}원</span>
       </div>
     </div>
 
     <!-- 로딩 / 빈 상태 -->
     <p v-if="loading">불러오는 중...</p>
-    <p v-else-if="!loading && groupedTransactions.length === 0">
+    <p v-else-if="!loading && sortedTransactions.length === 0">
       거래 내역이 없습니다.
     </p>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import axios from 'axios';
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { getCardTransactions } from '@/api/analysisindex.js'
 
-// 1) props 로 router.query.cardId 받기
-const props = defineProps({
-  cardId: { type: Number, default: null },
-});
+const route = useRoute()
+const router = useRouter()
 
-const route = useRoute();
-const router = useRouter();
-const transactions = ref([]);
-const cardList = ref([]);
-const selectedCardId = ref(props.cardId);
-const loading = ref(false);
+const transactions    = ref([])
+const cardList        = ref([])
+const selectedCardId  = ref(Number(route.query.cardId) || null)
+const loading         = ref(false)
 
-// 2) API 호출: 전체 카드+거래 가져오기
-onMounted(async () => {
-  loading.value = true;
+async function loadAll() {
+  loading.value = true
   try {
-    const auth = JSON.parse(localStorage.getItem('auth'));
-    if (auth.token) {
-      const res = await axios.get(`/api/members/cards/transactions`, {
-        headers: {
-          Authorization: `Bearer ${auth.token}`,
-        },
-      });
-    }
-
-    const list = res.data.data || [];
-
-    // flatMap 으로 모든 거래에 cardId, cardName 붙이기
-    transactions.value = list.flatMap((c) =>
-      c.transactions.map((tx) => ({
-        ...tx,
-        cardId: c.cardId,
-        cardName: c.cardName,
-      }))
-    );
-
-    // 드롭다운 옵션용 카드 목록
-    cardList.value = list.map((c) => ({
-      cardId: c.cardId,
-      cardName: c.cardName,
-    }));
-
-    // 쿼리가 없으면 첫 번째 카드로 초기화
+    const res = await getCardTransactions()
+    const list = res.data.data || []
+    transactions.value = list.flatMap(c =>
+      c.transactions.map(tx => ({ ...tx, cardId: c.cardId }))
+    )
+    cardList.value = list.map(c => ({ cardId: c.cardId, cardName: c.cardName }))
     if (!selectedCardId.value && cardList.value.length) {
-      selectedCardId.value = cardList.value[0].cardId;
+      selectedCardId.value = cardList.value[0].cardId
+      router.replace({ name: 'AllTransactions', query: { cardId: selectedCardId.value } })
     }
   } catch (e) {
-    console.error('거래 내역 로드 실패', e);
+    console.error(e)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-});
+}
+onMounted(loadAll)
 
-// 3) URL 쿼리가 바뀌면 selectedCardId 도 업데이트
-watch(
-  () => route.query.cardId,
-  (id) => {
-    if (id) selectedCardId.value = Number(id);
-  }
-);
+watch(selectedCardId, id => {
+  router.replace({ name: 'AllTransactions', query: { cardId: id } })
+})
 
-// 4) selectedCardId 가 바뀌면 URL 쿼리도 교체
-watch(selectedCardId, (id) => {
-  router.replace({ name: 'AllTransactions', query: { cardId: id } });
-});
+const sortedTransactions = computed(() =>
+  transactions.value
+    .filter(tx => tx.cardId === selectedCardId.value)
+    .sort((a, b) => new Date(b.transDate) - new Date(a.transDate))
+)
 
-// 5) selectedCardId 로 필터 + 날짜별 그룹화
-const groupedTransactions = computed(() => {
-  const filtered = transactions.value
-    .filter((tx) => tx.cardId === selectedCardId.value)
-    .sort((a, b) => new Date(b.transDate) - new Date(a.transDate));
-
-  const map = {};
-  filtered.forEach((tx) => {
-    const day = tx.transDate.split(' ')[0]; // "YYYY-MM-DD"
-    (map[day] ||= []).push(tx);
-  });
-
-  return Object.entries(map).map(([date, txs]) => ({
-    date,
-    transactions: txs,
-  }));
-});
-
-// 6) 포맷 함수들
-function formatDate(dateStr) {
-  const d = new Date(dateStr);
-  const M = String(d.getMonth() + 1).padStart(2, '0');
-  const D = String(d.getDate()).padStart(2, '0');
-  return `${M}.${D}`;
+function formatDate(dt) {
+  const d = new Date(dt)
+  return [d.getMonth()+1, d.getDate()]
+    .map(n => String(n).padStart(2,'0'))
+    .join('.')
 }
 function formatTime(dt) {
-  return dt.split(' ')[1].slice(0, 5);
+  return dt.split(' ')[1].slice(0,5)
 }
 function formatAmount(v) {
-  return v.toLocaleString();
+  return v.toLocaleString()
 }
+
 function goBack() {
-  router.back();
+  router.push({ name: 'Analysis', query: { cardId: selectedCardId.value } })
 }
+function goToSlider(cardId) {
+  router.push({ name: 'Analysis', query: { cardId } })
+}
+
+// (필요 시) 개별 재로딩 로직 추가
+async function fetchTransactions() {}
 </script>
 
 <style scoped>
 .all-transactions {
-  padding: 16px;
+  padding: 1rem;              /* 16px */
   background: #f9f9f9;
   min-height: 100vh;
 }
+
+/* 헤더 */
 .header {
   display: flex;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 0.75rem;     /* 12px */
 }
 .back-btn {
   background: none;
   border: none;
-  font-size: 18px;
-  margin-right: 8px;
+  font-size: 1.125rem;        /* 18px */
+  margin-right: 0.5rem;       /* 8px */
   cursor: pointer;
 }
 .title {
-  font-size: 18px;
+  font-size: 1.125rem;        /* 18px */
   font-weight: bold;
+  flex: 1;
 }
 
+/* 드롭다운 (노란 테두리 + 화살표) */
 .card-select {
-  margin-bottom: 12px;
+  position: relative;
 }
-select {
-  width: 100%;
-  padding: 6px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
+.card-select select {
+  padding: 0.375rem 2rem 0.375rem 0.75rem; /* 6px 32px 6px 12px */
+  font-size: 0.875rem;       /* 14px */
+  border: 1px solid #FFD54F;
+  border-radius: 0.375rem;   /* 6px */
+  background: white;
+  appearance: none;
+  background-image:
+    url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23FFD54F' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center; /* 8px */
+}
+.card-select select:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.125rem rgba(255,213,79,0.3); /* 2px */
 }
 
-.date-group {
-  margin-bottom: 14px;
+/* 거래 리스트 */
+.tx-list {
+  margin-top: 0.5rem;        /* 8px */
 }
-.date-label {
-  font-size: 13px;
-  font-weight: bold;
-  margin: 12px 0 4px;
-}
-
 .tx-item {
   display: flex;
   justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid #eee;
-  background: white;
+  align-items: center;
+  padding: 0.5rem 0;         /* 8px 0 */
+  border-bottom: 0.0625rem solid #f2f2f2; /* 1px */
+  cursor: pointer;
 }
-.store-info {
+.tx-info {
   display: flex;
   flex-direction: column;
 }
-.store {
-  font-size: 14px;
+.datetime {
+  font-size: 0.8125rem;      /* 13px */
+  color: #555;
+  margin-bottom: 0.125rem;   /* 2px */
 }
-.time {
-  font-size: 12px;
-  color: #888;
+.store {
+  font-size: 0.875rem;       /* 14px */
+  color: #000;
 }
 .amount {
-  font-size: 14px;
-  font-weight: bold;
-  color: red;
+  font-size: 0.875rem;       /* 14px */
+  font-weight: 600;
+  color: #d9534f;
+  flex-shrink: 0;
 }
 </style>
