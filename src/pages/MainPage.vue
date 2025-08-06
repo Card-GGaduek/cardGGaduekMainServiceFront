@@ -50,9 +50,9 @@ const goToPayment = () => {
   router.push('/payment/qr');
 };
 
-const goToStoreList = (cardId) => {
+const goToStoreList = (card) => {
   console.log('카드 ID:', cardId); // 디버깅용
-  if (!cardId) {
+  if (!cardId?.cardId){
     console.error('카드 ID가 없습니다.');
     return;
   }
@@ -60,7 +60,10 @@ const goToStoreList = (cardId) => {
   try {
     router.push({
       name: 'MapPage', // 또는 'MapPage' - 라우터 설정에 맞게
-      query: { cardId: cardId },
+      query: { cardId: String(card.cardId),
+        cardName: card.cardName || '카드 이름 없음',
+        cardCategory: card.cardCategory || '카드 카테고리 없음',
+       },
     });
   } catch (error) {
     console.error('페이지 이동 실패:', error);

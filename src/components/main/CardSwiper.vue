@@ -103,7 +103,7 @@
                     <!-- 혜택 가능한 매장 보기 버튼 -->
                     <div
                       class="view-stores-button"
-                      @click.stop="goToStoreList(card.cardId)"
+                      @click.stop="goToStoreList(card)"
                     >
                       <span>혜택 적용 가능한 매장 보기</span>
                     </div>
