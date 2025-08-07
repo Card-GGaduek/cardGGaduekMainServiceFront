@@ -6,6 +6,9 @@ import { calculator } from 'fontawesome';
 import PayNavigator from '@/pages/map/PayNavigator.vue';
 import memberApi from '@/api/memberApi';
 import WalletButton from '@/pages/map/WalletButton.vue';
+import { useRoute } from 'vue-router';
+import { onMounted } from 'vue';
+
 
 const route = useRoute();
 const mapDiv = ref(null);
@@ -162,14 +165,18 @@ watch(selectedCard, (newVal) => {
             </div>
             <span v-if="benefit.isPrimary">🥇</span>
           </div>
+          
           <button class="navigator-button" @click="openPayNavigator">
             🥇 페이 네비게이터 실행하기
           </button>
         </div>
+          <!-- 혜택이 없을 경우 -->
+      <div v-else class="no-benefits">
+        <p class="no-benefit-msg">해당 매장에서 받을 수 있는 혜택이 없습니다.</p>
+    </div>
       </div>
-      <button class="navigator-button" @click="openPayNavigator">
-  🥇 페이 네비게이터 실행하기
-</button>
+      <!-- 혜택이 없을 경우 -->
+       
     </div>
   </div>
 </transition>
