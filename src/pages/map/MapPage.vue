@@ -8,6 +8,9 @@ import { calculator } from 'fontawesome';
 import PayNavigator from '@/pages/map/PayNavigator.vue';
 import memberApi from '@/api/memberApi';
 import WalletButton from '@/pages/map/WalletButton.vue';
+import { useRoute } from 'vue-router';
+import { onMounted } from 'vue';
+
 
 const route = useRoute();
 const mapDiv = ref(null);
@@ -53,29 +56,6 @@ watch(
   }
 );
 
-// 모달 관리용 변수
-const selectedCardDetailModal = ref(false);
-
-// 카드 클릭 시 혜택 모달 호출
-const handleCardClick = async (cardId) => {
-  try {
-    const allCards = await memberApi.getMyCard();
-    const cardDetail = allCards.find((card) => card.cardId === cardId);
-    if (!cardDetail) return;
-
-    const matchedCard = myCards.value.find((c) => c.cardId === cardId);
-    if (!matchedCard) return;
-
-    selectedCard.value = {
-      ...matchedCard,
-      ...cardDetail,
-    };
-
-    selectedCardDetailModal.value = true;
-  } catch (error) {
-    console.error('카드 상세 정보를 불러오지 못했습니다:', error);
-  }
-};
 
 
 // 페이 네비게이터 모드 관리용 변수
@@ -142,14 +122,12 @@ watch(selectedCard, (newVal) => {
           </div>
         </div> -->
       </div> 
-      
       <!-- 현재 위치/재검색 -->
       <div class="research-area">
         <button @click="handleSearch" class="research-button">📍 현재 지도에서 재검색</button>
         <button @click="moveToCurrentLocation" class="location-button" aria-label="현재 위치로 이동">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
               stroke="#ffcd39" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-
             <path d="M21 3L3 10.53v.98l6.84 2.65L12.48 21h.98L21 3z"></path>
           </svg>
         </button>
@@ -198,15 +176,18 @@ watch(selectedCard, (newVal) => {
             </div>
             <span v-if="benefit.isPrimary">🥇</span>
           </div>
+          
           <button class="navigator-button" @click="openPayNavigator">
             🥇 페이 네비게이터 실행하기
           </button>
         </div>
+          <!-- 혜택이 없을 경우 -->
+      <div v-else class="no-benefits">
+        <p class="no-benefit-msg">해당 매장에서 받을 수 있는 혜택이 없습니다.</p>
+    </div>
       </div>
-
-      <button class="navigator-button" @click="openPayNavigator">
-  🥇 페이 네비게이터 실행하기
-</button>
+   
+       
     </div>
   </div>
 </transition>
@@ -215,7 +196,7 @@ watch(selectedCard, (newVal) => {
 
     
 
-
+  
   <!-- 🥇 페이 네비게이터 모드-->
   <transition name="bottom-sheet">
     <PayNavigator
@@ -232,4 +213,3 @@ watch(selectedCard, (newVal) => {
 @import './map.css';
 
 </style>
-

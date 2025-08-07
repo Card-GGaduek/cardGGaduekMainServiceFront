@@ -60,7 +60,6 @@ export function useMap(mapDiv) {
     },
   };
 
-
   const categoryLabel = computed(() => {
     if (!selectedMerchant.value?.primaryType) return '';
     const key = selectedMerchant.value.primaryType.toUpperCase();
@@ -68,6 +67,7 @@ export function useMap(mapDiv) {
   });
   
 
+  
   
 
   onMounted(async () => {
