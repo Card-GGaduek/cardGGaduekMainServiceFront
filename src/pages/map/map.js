@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted, nextTick } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick,computed } from 'vue';
 import axios from 'axios';
 
 import { cat, store } from 'fontawesome';
@@ -59,7 +59,16 @@ export function useMap(mapDiv) {
       color: '#4169E1', // 로얄블루
     },
   };
- 
+
+
+  const categoryLabel = computed(() => {
+    if (!selectedMerchant.value?.primaryType) return '';
+    const key = selectedMerchant.value.primaryType.toUpperCase();
+    return categoryColorMap[key]?.label || selectedMerchant.value.primaryType;
+  });
+  
+
+  
 
   onMounted(async () => {
     await nextTick();
@@ -180,7 +189,7 @@ export function useMap(mapDiv) {
     const requestBody = {
       textQuery: keyword.value,
       languageCode: 'ko',
-      locationBias: {
+      locationRestriction: {
         rectangle: {
           low: {
             latitude: sw.y,
@@ -228,7 +237,7 @@ export function useMap(mapDiv) {
     const requestBody = {
       textQuery: category,
       languageCode: 'ko',
-      locationBias: {
+      locationRestriction: {
         rectangle: {
           low: {
             latitude: sw.y,
@@ -464,6 +473,7 @@ const handleCardClick = async (cardId) => {
     isMapReady,
     onMapReady,
     categoryColorMap,
+    categoryLabel,
     handleSearch,
     useRoute,
     moveToCurrentLocation,
