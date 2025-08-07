@@ -74,15 +74,18 @@ const goToMyCoupons = () => {
 };
 
 const goToMyBooking = () => {
-  router.push({name: 'myBookingPage'});
+  router.push({name: 'MyBookingPage'});
 };
 
+const goToMyCards = () => {
+  router.push({ name: 'MyCardPage'});
+};
 </script>
 
 <template>
   <div class="page-container">
     <header class="d-flex justify-content-between align-items-center p-3">
-      <h5 class="fw-bold m-0"><i class="bi bi-cart3 me-1"></i>카드까득</h5>
+      <img src="@/assets/logo/logo.jpg" alt="카드까득 로고" class="logo-img" />
       <div class="d-flex align-items-center">
         <span class="fw-bold me-2">{{ myPageInfo.name }}님</span>
         <i class="bi bi-person-circle fs-2"></i>
@@ -120,10 +123,10 @@ const goToMyBooking = () => {
             <span><i class="bi bi-person-vcard-fill me-2"></i>내 정보</span>
             <a href="#" class="small text-decoration-none">내 정보 변경 ></a>
           </li>
-          <li class="list-group-item">
+          <li class="list-group-item" @click="goToMyCards">
             <i class="bi bi-credit-card-fill me-2"></i>내 카드
           </li>
-          <li class="list-group-item">
+          <li class="list-group-item" @click="goToMyBooking">
             <i class="bi bi-calendar-check-fill me-2"></i>예약 내역
           </li>
           <li class="list-group-item">
@@ -187,29 +190,34 @@ const goToMyBooking = () => {
 
 <style scoped>
 /* 스타일 ... */
+.logo-img{
+  height: 32px;
+}
 .page-container {
   max-width: 420px;
   margin: 0 auto;
-  background-color: #f8f9fa;
+  background-color: white;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
+
 .scrollable-content {
   flex-grow: 1;
   overflow-y: auto;
   padding: 0 1rem;
 }
 .info-box {
-  border: 1px solid #eee;
+  border: 1px solid black;
   border-radius: 12px;
 }
 .card {
-  border-radius: 12px;
   border: none;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 .card-header {
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid black;
 }
 .list-group-item {
   display: flex;

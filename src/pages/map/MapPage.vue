@@ -14,7 +14,10 @@ const {
   keyword,
   selectedMerchant,
   selectedCard,
+  categoryColorMap,
   handleSearch,
+  handleCardClick,
+  searchStoresByCategory,
   moveToCurrentLocation,
   myCards,
   isMapReady,
@@ -69,6 +72,7 @@ const handleCardClick = async (cardId) => {
     console.error('카드 상세 정보를 불러오지 못했습니다:', error);
   }
 };
+
 
 // 페이 네비게이터 모드 관리용 변수
 const payNavigatorMode = ref(false);
@@ -175,52 +179,44 @@ watch(selectedCard, (newVal) => {
     </div>
 
     <!-- 하단 상세 정보 시트 -->
-    <transition name="bottom-sheet">
-      <div
-        v-if="selectedMerchant && !payNavigatorMode"
-        class="bottom-sheet-container"
-      >
-        <div class="bottom-sheet-content">
-          <button @click="selectedMerchant = null" class="close-button">
-            &times;
-          </button>
-          <h2 class="merchant-name">{{ selectedMerchant.name }}</h2>
-          <p class="merchant-category">{{ selectedMerchant.primaryType }}</p>
+<transition name="bottom-sheet">
+  <div v-if="selectedMerchant && !payNavigatorMode" class="bottom-sheet-container">
+    <div class="bottom-sheet-content">
+      <button @click="selectedMerchant = null" class="close-button">&times;</button>
+      <h2 class="merchant-name">{{ selectedMerchant.name }}</h2>
+      <p class="merchant-category">{{ selectedMerchant.primaryType }}</p>
 
-          <!-- 혜택 리스트 -->
-          <div class="benefits-list">
-            <h3 class="benefits-title">받을 수 있는 혜택</h3>
-
-            <!-- 혜택이 있을 경우 -->
-            <div
-              v-if="
-                selectedMerchant.benefits && selectedMerchant.benefits.length
-              "
-            >
-              <div
-                v-for="benefit in selectedMerchant.benefits"
-                :key="benefit.cardName + benefit.storeName"
-                class="benefit-item"
-                :class="{ primary: benefit.isPrimary }"
-              >
-                <p class="benefit-desc">{{ benefit.description }}</p>
-                <p class="benefit-card">
-                  {{ benefit.cardName }}
-                  <template v-if="benefit.rateValue">
-                    | {{ benefit.rateValue }}% 할인</template
-                  >
-                  <template v-else-if="benefit.amountValue">
-                    | {{ benefit.amountValue }}원 할인</template
-                  >
-                </p>
-                <span v-if="benefit.isPrimary">🥇</span>
-              </div>
+      <!-- 혜택 리스트 -->
+      <div class="benefits-list">
+        <h3 class="benefits-title">받을 수 있는 혜택</h3>
+        <!-- 혜택이 있을 경우 -->
+        <div
+          v-if="selectedMerchant.benefits && selectedMerchant.benefits.length"
+        >
+          <div
+            v-for="benefit in selectedMerchant.benefits"
+            :key="benefit.cardName + benefit.storeName"
+            class="benefit-item"
+            :class="{ 'primary': benefit.isPrimary }"
+          >
+          
+          <img
+            v-if="benefit.cardImageUrl"
+            :src="benefit.cardImageUrl || selectedCard.image"
+            :alt="benefit.cardName"
+            class="benefit-card-image"
+            />
+            <div class="benefit-text">
+               <!-- 카드 이미지 -->
+            
+              <p class="benefit-desc">{{ benefit.description }}</p>
+              <p class="benefit-card">
+                {{ benefit.cardName }}
+                <template v-if="benefit.rateValue"> | {{ benefit.rateValue }}% 할인</template>
+                <template v-else-if="benefit.amountValue"> | {{ benefit.amountValue }}원 할인</template>
+              </p>
             </div>
-
-            <!-- 혜택이 없을 경우 -->
-            <div v-else>
-              <p class="no-benefit-msg">적용 가능한 카드 혜택이 없습니다.</p>
-            </div>
+            <span v-if="benefit.isPrimary">🥇</span>
           </div>
           <button class="navigator-button" @click="openPayNavigator">
             🥇 페이 네비게이터 실행하기
