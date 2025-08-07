@@ -1,5 +1,7 @@
 <script setup>
-import { ref, watch , computed} from 'vue';
+
+import { onMounted, ref, watch,computed} from 'vue';
+import { useRoute } from 'vue-router';
 import { useMap } from '@/pages/map/map';
 import axios from 'axios';
 import { calculator } from 'fontawesome';
@@ -94,6 +96,8 @@ watch(selectedCard, (newVal) => {
     <div class="controls-container">
       <div class="controls-box">
         <p class="title">{{walletMessage}}</p>
+
+       
         <!-- 검색창 + 지갑 -->
         <div class="search-bar">
           <input
@@ -110,6 +114,13 @@ watch(selectedCard, (newVal) => {
           />
           <button @click="handleSearch" class="search-button">검색</button>
         </div>
+
+        <!-- 카드 리스트 보여주기 (클릭 시 누적 검색) -->
+         <!-- <div class="my-cards-wrapper"> 
+          <div v-for="card in myCards" :key="card.cardId" class="card-thumbnail" :class="{ active: selectedCard?.cardId === card.cardId }" @click="handleCardClick(card.cardId)">
+            <img :src="card.image" class="card-image" :alt="card.cardName" />
+          </div>
+        </div> -->
       </div> 
       <!-- 현재 위치/재검색 -->
       <div class="research-area">
@@ -175,7 +186,7 @@ watch(selectedCard, (newVal) => {
         <p class="no-benefit-msg">해당 매장에서 받을 수 있는 혜택이 없습니다.</p>
     </div>
       </div>
-      <!-- 혜택이 없을 경우 -->
+   
        
     </div>
   </div>
