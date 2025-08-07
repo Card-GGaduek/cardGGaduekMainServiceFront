@@ -1,5 +1,7 @@
 <script setup>
-import { ref, watch , computed} from 'vue';
+
+import { onMounted, ref, watch,computed} from 'vue';
+import { useRoute } from 'vue-router';
 import { useMap } from '@/pages/map/map';
 import axios from 'axios';
 import { calculator } from 'fontawesome';
@@ -7,6 +9,7 @@ import PayNavigator from '@/pages/map/PayNavigator.vue';
 import memberApi from '@/api/memberApi';
 import WalletButton from '@/pages/map/WalletButton.vue';
 
+const route = useRoute();
 const mapDiv = ref(null);
 const walletMessage = ref('내 주변 혜택을 받을 수 있는 매장을 검색해보세요');
 
@@ -21,11 +24,58 @@ const {
   
   moveToCurrentLocation,
   myCards,
+  isMapReady,
+  onMapReady,
 } = useMap(mapDiv);
 
+// App.vue에서 전달받은 검색어 처리
+onMounted(() => {
+  // URL 쿼리 파라미터로 전달된 검색어 확인
+  const searchKeyword = route.query.keyword;
+  if (searchKeyword) {
+    onMapReady(() => {
+      keyword.value = searchKeyword;
+      handleSearch();
+    });
+  }
+});
+
+// 라우트 변경 감지
+watch(
+  () => route.query.keyword,
+  (newKeyword) => {
+    if (newKeyword && newKeyword !== keyword.value) {
+      onMapReady(() => {
+        keyword.value = newKeyword;
+        handleSearch();
+      });
+    }
+  }
+);
 
 // 모달 관리용 변수
 const selectedCardDetailModal = ref(false);
+
+// 카드 클릭 시 혜택 모달 호출
+const handleCardClick = async (cardId) => {
+  try {
+    const allCards = await memberApi.getMyCard();
+    const cardDetail = allCards.find((card) => card.cardId === cardId);
+    if (!cardDetail) return;
+
+    const matchedCard = myCards.value.find((c) => c.cardId === cardId);
+    if (!matchedCard) return;
+
+    selectedCard.value = {
+      ...matchedCard,
+      ...cardDetail,
+    };
+
+    selectedCardDetailModal.value = true;
+  } catch (error) {
+    console.error('카드 상세 정보를 불러오지 못했습니다:', error);
+  }
+};
 
 
 // 페이 네비게이터 모드 관리용 변수
@@ -67,23 +117,14 @@ watch(selectedCard, (newVal) => {
       <div class="controls-box">
         <p class="title">{{walletMessage}}</p>
 
-
-        <!-- 선택된 카드 보여주기 -->
-         <!-- <div class="selected-card-box" v-if="selectedCard"> 
-          <img :src="selectedCard.image" :alt="selectedCard.cardProductName" class="selected-card-img" />
-          <div class="selected-card-info">
-            <p class="card-name">카드명:  {{ selectedCard.cardProductName }}</p>
-            <p class="card-category">카테고리: {{ selectedCard.storeCategories?.join(', ') || '없음' }}</p>
-          </div>
-        </div> -->
-        
+       
         <!-- 검색창 + 지갑 -->
         <div class="search-bar">
           <input
-          v-model="keyword"
-          @keyup.enter="handleSearch"
-          placeholder="매장 키워드를 입력하세요"
-          class="search-input"
+            v-model="keyword"
+            @keyup.enter="handleSearch"
+            placeholder="매장 키워드를 입력하세요"
+            class="search-input"
           />
           <WalletButton
             :myCards="myCards"
@@ -93,6 +134,7 @@ watch(selectedCard, (newVal) => {
           />
           <button @click="handleSearch" class="search-button">검색</button>
         </div>
+
         <!-- 카드 리스트 보여주기 (클릭 시 누적 검색) -->
          <!-- <div class="my-cards-wrapper"> 
           <div v-for="card in myCards" :key="card.cardId" class="card-thumbnail" :class="{ active: selectedCard?.cardId === card.cardId }" @click="handleCardClick(card.cardId)">
@@ -107,6 +149,7 @@ watch(selectedCard, (newVal) => {
         <button @click="moveToCurrentLocation" class="location-button" aria-label="현재 위치로 이동">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
               stroke="#ffcd39" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
             <path d="M21 3L3 10.53v.98l6.84 2.65L12.48 21h.98L21 3z"></path>
           </svg>
         </button>
@@ -155,13 +198,12 @@ watch(selectedCard, (newVal) => {
             </div>
             <span v-if="benefit.isPrimary">🥇</span>
           </div>
-        </div>
-
-        <!-- 혜택이 없을 경우 -->
-        <div v-else>
-          <p class="no-benefit-msg">적용 가능한 카드 혜택이 없습니다.</p>
+          <button class="navigator-button" @click="openPayNavigator">
+            🥇 페이 네비게이터 실행하기
+          </button>
         </div>
       </div>
+
       <button class="navigator-button" @click="openPayNavigator">
   🥇 페이 네비게이터 실행하기
 </button>
@@ -173,22 +215,21 @@ watch(selectedCard, (newVal) => {
 
     
 
-  
+
   <!-- 🥇 페이 네비게이터 모드-->
- <transition name = "bottom-sheet">
-  <PayNavigator
-  v-if="payNavigatorMode && selectedCard && selectedMerchant"
-  :selectedCard="selectedCard"
-  :selectedMerchant="selectedMerchant"
-  @close="closePayNavigator"
-  />
- </transition>
+  <transition name="bottom-sheet">
+    <PayNavigator
+      v-if="payNavigatorMode && selectedCard && selectedMerchant"
+      :selectedCard="selectedCard"
+      :selectedMerchant="selectedMerchant"
+      @close="closePayNavigator"
+    />
+  </transition>
 </template>
-
-
 
 <style>
 @import '@/assets/main.css';
 @import './map.css';
 
 </style>
+
