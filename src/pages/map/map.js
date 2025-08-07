@@ -23,6 +23,11 @@ export function useMap(mapDiv) {
   const myCards = ref([]); // 외부 API로 가져올 카드 리스트
   const cardDetailsMap = ref({}); // 카드 ID별 상세 정보 저장용
 
+  // App.vue 검색 관련 추가
+  const isMapReady = ref(false);
+  const mapReadyCallbacks = ref([]);
+  //
+
   onMounted(async () => {
     await nextTick();
     initMap();
@@ -34,6 +39,10 @@ export function useMap(mapDiv) {
     if (watchId.value) {
       navigator.geolocation.clearWatch(watchId.value);
     }
+
+    // App.vue 검색 관련 추가
+    mapReadyCallbacks.value = [];
+    //
   });
 
   const initMap = () => {
@@ -47,7 +56,35 @@ export function useMap(mapDiv) {
       minZoom: 6,
     };
     map.value = new window.naver.maps.Map(mapDiv.value, mapOptions);
+
+    // App.vue 검색 관련 추가
+    window.naver.maps.Event.addListener(map.value, 'idle', () => {
+      if (!isMapReady.value) {
+        isMapReady.value = true;
+
+        mapReadyCallbacks.value.forEach((callback) => {
+          try {
+            callback();
+          } catch (error) {
+            console.error('지도 준비 콜백 실행 중 오류: ', error);
+          }
+        });
+
+        mapReadyCallbacks.value = [];
+      }
+    });
+    //
   };
+
+  // App.vue 검색 관련 추가
+  const onMapReady = (callback) => {
+    if (isMapReady.value) {
+      callback();
+    } else {
+      mapReadyCallbacks.value.push(callback);
+    }
+  };
+  //
 
   const moveToCurrentLocation = () => {
     if (!navigator.geolocation) {
@@ -146,7 +183,7 @@ export function useMap(mapDiv) {
         console.warn('검색된 매장이 없습니다.');
       }
 
-      places.forEach(createMarker);
+      await places.forEach(createMarker);
     } catch (error) {
       console.error('가맹점 검색에 실패했습니다:', error);
     }
@@ -160,7 +197,7 @@ export function useMap(mapDiv) {
       const cardDetailMap = {};
       // 카드 상세정보 맵핑
       for (const card of result) {
-        cardDetailMap[card.cardId] = card
+        cardDetailMap[card.cardId] = card;
       }
 
       // 카드 리스트
@@ -171,13 +208,13 @@ export function useMap(mapDiv) {
         cardProductName: card.cardProductName,
         image: card.cardImageUrl,
         requiredAmount: card.requiredMonthlyAmount,
-        storeCategories : [...new Set(
-          card.storeBenefitList.map(b => b.storeCategory)
-        )]
+        storeCategories: [
+          ...new Set(card.storeBenefitList.map((b) => b.storeCategory)),
+        ],
       }));
 
       //상세 정보 맵에 저장
-      cardDetailsMap.value = cardDetailMap; 
+      cardDetailsMap.value = cardDetailMap;
 
       // 쿼리에서 cardId 받아서 선택 카드 세팅
       const selectedId = Number(route.query.cardId);
@@ -189,7 +226,8 @@ export function useMap(mapDiv) {
 
       if (matchedCard) {
         const detail = cardDetailsMap.value[selectedId];
-        selectedCardCategory.value = detail?.storeBenefitList?.[0]?.storeCategory || '';
+        selectedCardCategory.value =
+          detail?.storeBenefitList?.[0]?.storeCategory || '';
         selectedCard.value = {
           ...matchedCard,
           ...detail,
@@ -220,7 +258,7 @@ export function useMap(mapDiv) {
   };
 
   // 검색 마커 생성
-  const createMarker = (place) => {
+  const createMarker = async (place) => {
     const position = new window.naver.maps.LatLng(
       place.locationDTO.latitude,
       place.locationDTO.longitude
@@ -376,6 +414,8 @@ export function useMap(mapDiv) {
     myCards,
     selectedCard,
     mapMarkers,
+    isMapReady,
+    onMapReady,
     handleSearch,
     useRoute,
     moveToCurrentLocation,

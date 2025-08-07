@@ -6,6 +6,21 @@
       <h2 class="subtitle-line">혜택이 까득</h2>
     </div>
 
+    <!-- 검색창 -->
+    <div class="search-section">
+      <div class="search-bar">
+        <input
+          v-model="keyword"
+          @keyup.enter="handleSearch"
+          placeholder="매장 키워드를 입력하세요"
+          class="search-input"
+        />
+        <button @click="handleSearch" class="search-button">
+          <i class="bi bi-search"></i>
+        </button>
+      </div>
+    </div>
+
     <a
       href="https://www.notion.so/PJT_13_WeFin-22c014feab4d805e952ae019598b7895"
       target="_blank"
@@ -33,13 +48,32 @@
 
 <script setup>
 import Navbar from './layout/Navbar.vue';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from './stores/auth';
 
 const route = useRoute();
 const router = useRouter();
 const hideNavbar = computed(() => route.path === '/lab/fortune');
+
+// 검색
+const keyword = ref('');
+const handleSearch = () => {
+  if (keyword.value.trim()) {
+    console.log('검색어: ', keyword.value);
+
+    // MapPage로 라우팅
+    router.push({
+      name: 'MapPage',
+      query: {
+        keyword: keyword.value.trim(),
+      },
+    });
+
+    // 검색 후 입력창 초기화
+    keyword.value = '';
+  }
+};
 
 window.addEventListener('token-expired', () => {
   const store = useAuthStore();
@@ -114,6 +148,64 @@ body {
   margin: 4px 0 0 0;
   animation: popUp 1s ease-out;
   letter-spacing: -1px;
+}
+
+/* ✅ 검색창 스타일 추가 */
+.search-section {
+  position: absolute;
+  top: 250px;
+  transform: translateX(-330px);
+  z-index: 10;
+  width: 350px;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  height: 70px;
+  border: 4px solid #ff7f50;
+  border-radius: 50px;
+  overflow: hidden;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(255, 127, 80, 0.1);
+}
+
+.search-input {
+  flex: 1;
+  margin-top: 15px;
+  padding: 0 16px;
+  border: none;
+  font-size: 20px;
+  outline: none;
+  background-color: transparent;
+  color: #333;
+  box-shadow: none;
+}
+
+.search-input::placeholder {
+  color: #aaa;
+}
+
+.search-button {
+  width: 70px;
+  height: 70px;
+  margin-top: 15px;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff7f50, #d62828);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 30px;
+  transition: all 0.2s ease;
+}
+
+.search-button:hover {
+  background: linear-gradient(135deg, #ff9060, #f04747);
+  transform: scale(1.05);
 }
 
 /* ✨ Animation Effects */
@@ -192,6 +284,9 @@ body {
     display: none;
   }
   .title-section {
+    display: none;
+  }
+  .search-section {
     display: none;
   }
 }
