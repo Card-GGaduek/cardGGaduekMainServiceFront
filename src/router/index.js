@@ -20,6 +20,8 @@ import NaverCallback from '@/pages/login/NaverCallback.vue';
 import AllCardProductPage from '@/pages/card/AllCardProductPage.vue';
 import CardDetailPage from '@/pages/card/CardDetailPage.vue';
 import MyCouponPage from '@/pages/mypage/MyCouponPage.vue';
+import MyBookingPage from '@/pages/mypage/MyBookingPage.vue';
+import MyCardPage from '@/pages/mypage/MyCardPage.vue';
 const routes = [
   {
     path: '/',
@@ -97,6 +99,16 @@ const routes = [
     name: 'MyCouponPage',
     component: MyCouponPage
   },
+  {
+    path: '/mypage/mybookingpage',
+    name: 'MyBookingPage',
+    component: MyBookingPage
+  },
+  {
+    path: '/mypage/mycardpage',
+    name: 'MyCardPage',
+    component: MyCardPage
+  }
 ];
 
 const router = createRouter({

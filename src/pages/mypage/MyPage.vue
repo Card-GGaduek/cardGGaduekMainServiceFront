@@ -74,7 +74,7 @@ const goToMyCoupons = () => {
 };
 
 const goToMyBooking = () => {
-  router.push({name: 'myBookingPage'});
+  router.push({name: 'MyBookingPage'});
 };
 
 </script>
@@ -123,7 +123,7 @@ const goToMyBooking = () => {
           <li class="list-group-item">
             <i class="bi bi-credit-card-fill me-2"></i>내 카드
           </li>
-          <li class="list-group-item">
+          <li class="list-group-item" @click="goToMyBooking">
             <i class="bi bi-calendar-check-fill me-2"></i>예약 내역
           </li>
           <li class="list-group-item">

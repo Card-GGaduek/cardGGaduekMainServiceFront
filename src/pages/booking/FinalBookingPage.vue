@@ -162,13 +162,9 @@ async function fetchUserCoupons() {
     const response = await api.get("api/member/coupons");
     
     // 서버로부터 받은 원본 데이터 배열을 먼저 변수에 담습니다.
-    const rawCoupons = response.data.data || response.data;
-
-    // [수정] 배열인지 확인하고, .filter()를 사용해 이름(name)이 있는 쿠폰만 걸러냅니다.
-    if (Array.isArray(rawCoupons)) {
-      userCoupons.value = rawCoupons.filter(coupon => coupon.name);
-    }
-    
+    const travelCoupons = response.data.data.memberCoupons.filter(coupon => coupon.couponCategory === 'TRAVEL');
+    userCoupons.value = travelCoupons;
+    console.log("1. [원본 데이터] 서버에서 받은 모습:", userCoupons.value);
   } catch (e) {
     console.error("쿠폰 목록 조회 실패", e);
   }
@@ -334,7 +330,7 @@ function increaseGuests() {
               :key="coupon.id"
               :value="coupon.id"
             >
-              {{ coupon.name }}
+            {{ coupon.couponName }}
             </option>
           </select>
           <select class="form-select mb-4" v-model="selectedCardId">
