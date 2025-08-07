@@ -4,7 +4,7 @@
       <span class="title">최근 거래내역</span>
       <button class="more-btn" @click="goToAll">더보기</button>
     </div>
-
+    
     <div
       v-for="tx in recentList"
       :key="tx.id"
@@ -35,7 +35,7 @@ const recentList = computed(() =>
     .sort((a, b) => new Date(b.transDate) - new Date(a.transDate))
     .slice(0, 3)
 )
-
+console.log(recentList);
 function formatDate(dt) {
   const d = new Date(dt)
   return [
