@@ -5,6 +5,7 @@ import { cat, store } from 'fontawesome';
 import { useRoute, useRouter } from 'vue-router';
 import memberApi from '@/api/memberApi';
 
+
 export function useMap(mapDiv) {
   const map = ref(null);
   const markers = ref([]);
@@ -22,6 +23,41 @@ export function useMap(mapDiv) {
 
   const myCards = ref([]); // 외부 API로 가져올 카드 리스트
   const cardDetailsMap = ref({}); // 카드 ID별 상세 정보 저장용
+
+  const categoryColorMap = {
+    COFFEE_SHOP: {
+      label: '커피전문점',
+      color: '#8B4513', // 갈색
+    },
+    CONVENIENCE_STORE: {
+      label: '편의점',
+      color: '#32CD32', // 연두색
+    },
+    MOVIE_THEATER: {
+      label: '영화관',
+      color: '#8A2BE2', // 보라색
+    },
+    RESTAURANT: {
+      label: '음식점',
+      color: '#FF6347', // 토마토색
+    },
+    GAS_STATION: {
+      label: '주유소',
+      color: '#FFD700', // 금색
+    },
+    THEME_PARK: {
+      label: '놀이공원',
+      color: '#00CED1', // 청록색
+    },
+    HOTEL: {
+      label: '호텔',
+      color: '#4169E1', // 로얄블루
+    },
+  };
+  
+
+  
+  
 
   onMounted(async () => {
     await nextTick();
@@ -87,11 +123,15 @@ export function useMap(mapDiv) {
     );
   };
 
-  const handleSearch = async () => {
+  // 1)키워드 검색
+  const handleSearch = async (isAppend = false) => {
     if (!map.value) return;
 
+
+    
     markers.value.forEach((marker) => marker.setMap(null));
     markers.value = [];
+    
 
     if (!keyword.value.trim()) {
       console.warn('검색어가 비어 있습니다. 검색을 실행하지 않습니다.');
@@ -102,16 +142,6 @@ export function useMap(mapDiv) {
     const bounds = map.value.getBounds();
     const sw = bounds.getSW();
     const ne = bounds.getNE();
-
-    const categoryMap = {
-      coffee_shop: '커피전문점',
-      convenience_store: '편의점',
-      movie_theater: '영화관',
-      restaurant: '음식점',
-      gas_station: '주유소',
-      theme_park: '놀이공원',
-      hotel: '호텔',
-    };
 
     const requestBody = {
       textQuery: keyword.value,
@@ -132,7 +162,7 @@ export function useMap(mapDiv) {
 
     console.log('선택된 카드 category:', selectedCardCategory.value);
     const mappedCategory =
-      categoryMap[selectedCardCategory.value] || selectedCardCategory.value;
+      categoryColorMap[selectedCardCategory.value] || selectedCardCategory.value;
     console.log('가맹점 검색 요청:', requestBody);
 
     try {
@@ -152,6 +182,97 @@ export function useMap(mapDiv) {
     }
   };
 
+  // 2) 카드 혜택 카테고리 검색
+  // 2-1) 누적검색 메소드
+  const searchStoresByCategory = async (category, isAppend = false) => {
+    if (!map.value) return;
+
+    const bounds = map.value.getBounds();
+    const sw = bounds.getSW();
+    const ne = bounds.getNE();
+
+    const requestBody = {
+      textQuery: category,
+      languageCode: 'ko',
+      locationBias: {
+        rectangle: {
+          low: {
+            latitude: sw.y,
+            longitude: sw.x,
+          },
+          high: {
+            latitude: ne.y,
+            longitude: ne.x,
+          },
+        },
+      },
+  };
+  
+  try {
+    const response = await axios.post(
+     'http://localhost:8080/api/place',
+     requestBody
+   );
+   const places = response.data?.data?.places || [];
+
+   places.forEach(createMarker);
+   if (places.length === 0) {
+    console.warn('카테고리 검색 결과가 없습니다:', category);
+  }
+
+ } catch(error) {
+  console.error('카테고리 검색 실패:', error);
+  }
+};
+
+  // 2-2)카드 클릭 시 카테고리 해당 매장 검색
+const handleCardClick = async (cardId) => {
+  try {
+    const matchedCard = myCards.value.find(c => c.cardId === cardId);
+    if (!matchedCard) return;
+
+    const isAlreadySelected = selectedCard.value?.cardId === cardId;
+
+    // 카드 바꾼다면 기존 마커 제거
+    markers.value.forEach((marker) => marker.setMap(null));
+    markers.value = [];
+
+    // 이미 선택된 카드라면 선택 해제
+    if (isAlreadySelected) {
+      selectedCard.value = null;
+      selectedCardCategory.value = '';
+      router.replace({ query: {} }); // URL 쿼리 초기화
+    } else {
+        // 선택된 카드
+        selectedCard.value = matchedCard;
+
+        // 해당 카드의 카테고리 배열로 매장 검색 실행
+        if (matchedCard.storeCategories && matchedCard.storeCategories.length > 0) {
+        for (const category of matchedCard.storeCategories) 
+        await searchStoresByCategory(category,true); // 누적 모드
+                }
+
+        // URL 쿼리 갱신(선택된 카드 상태 반영)
+        router.replace({
+        query: {
+        ...router.query,
+        cardId,
+          },
+      })
+    }
+
+   
+  
+    } catch (error) {
+    console.error('카드 상세 정보를 불러오지 못했습니다:', error);
+      }
+  };
+
+
+  
+
+
+  // 내 카드 목록 불러오기
   const loadMyCards = async (memberId) => {
     try {
       const result = await memberApi.getMyCard();
@@ -207,17 +328,7 @@ export function useMap(mapDiv) {
     }
   };
 
-  const loadCardBack = async (cardId) => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8080/api/main/card/${cardId}/back`
-      );
-      return response.data.data;
-    } catch (error) {
-      console.error(`카드 상세 정보(${cardId}) 불러오기 실패:`, error);
-      return null;
-    }
-  };
+
 
   // 검색 마커 생성
   const createMarker = (place) => {
@@ -225,11 +336,17 @@ export function useMap(mapDiv) {
       place.locationDTO.latitude,
       place.locationDTO.longitude
     );
+
+    // 마커 색상
+    const typeKey = place.primaryType?.toUpperCase();
+    const markerColor = categoryColorMap[typeKey]?.color || '#888888';
+    
+
     const marker = new window.naver.maps.Marker({
       position,
       map: map.value,
       icon: {
-        content: `<div style=\"background-color: #ffcd39; width: 22px; height: 22px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);\"></div>`,
+        content: `<div style=\"background-color: ${markerColor}; width: 22px; height: 22px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);\"></div>`,
         anchor: new window.naver.maps.Point(11, 11),
       },
     });
@@ -248,7 +365,7 @@ export function useMap(mapDiv) {
     markers.value.push(marker);
   };
 
-  const getStoreBenefits = async (memberId) => {
+  const getStoreBenefits = async () => {
     try {
       // const response = await axios.get(`http://localhost:8080/api/card/my`);
       const result = await memberApi.getMyCard();
@@ -271,6 +388,7 @@ export function useMap(mapDiv) {
       card.storeBenefitList.map((benefit) => ({
         ...benefit,
         cardName: card.cardProductName, // 주입!
+        cardImageUrl : card.cardImageUrl
       }))
     );
 
@@ -294,75 +412,7 @@ export function useMap(mapDiv) {
     };
   };
 
-  // 카드 클릭으로 검색하는 마커
-  const handleCardClick = async (cardId) => {
-    try {
-      // 카드 상세 정보 API 요청
-      const response = await memberApi.getMyCard();
-      const cardDetail = response.data.data;
-
-      // 카드 정보 매핑
-      const matchedCard = myCards.value.find((card) => card.cardId === cardId);
-      if (!matchedCard) return;
-
-      selectedCard.value = {
-        ...matchedCard,
-        ...cardDetail,
-      };
-
-      // storeCategory → 검색용 카테고리로 설정
-      selectedCardCategory.value =
-        cardDetail.benefits?.[0]?.storeCategory || '';
-
-      // URL 쿼리 갱신
-      router.replace({
-        query: {
-          ...route.query,
-          cardId,
-        },
-      });
-
-      // 검색 실행
-      handleSearch();
-    } catch (error) {
-      console.error('카드 상세 정보를 불러오지 못했습니다:', error);
-    }
-  };
-
-  const startWatchingLocation = () => {
-    if (navigator.geolocation) {
-      watchId.value = navigator.geolocation.watchPosition(
-        (position) => {
-          const newPosition = new window.naver.maps.LatLng(
-            position.coords.latitude,
-            position.coords.longitude
-          );
-
-          if (!currentLocationMarker.value) {
-            currentLocationMarker.value = new window.naver.maps.Marker({
-              position: newPosition,
-              map: map.value,
-              icon: {
-                content: `<div style=\"width:20px;height:20px;background-color:#ffcd39;border:2px solid #fff;border-radius:50%;box-shadow:0 0 5px rgba(0,0,0,0.5);\"></div>`,
-                anchor: new window.naver.maps.Point(10, 10),
-              },
-            });
-            map.value.setCenter(newPosition);
-            handleSearch();
-          } else {
-            currentLocationMarker.value.setPosition(newPosition);
-          }
-        },
-        (error) => {
-          console.error('위치 정보를 가져오는 데 실패했습니다:', error.message);
-          handleSearch();
-        }
-      );
-    } else {
-      console.error('이 브라우저는 위치 정보를 지원하지 않습니다.');
-      handleSearch();
-    }
-  };
+  
 
   return {
     map,
@@ -376,10 +426,13 @@ export function useMap(mapDiv) {
     myCards,
     selectedCard,
     mapMarkers,
+    categoryColorMap,
     handleSearch,
     useRoute,
     moveToCurrentLocation,
     initMap,
     loadMyCards,
+    searchStoresByCategory,
+    handleCardClick
   };
 }

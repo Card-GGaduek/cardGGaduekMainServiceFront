@@ -12,7 +12,10 @@ const {
   keyword,
   selectedMerchant,
   selectedCard,
+  categoryColorMap,
   handleSearch,
+  handleCardClick,
+  searchStoresByCategory,
   moveToCurrentLocation,
   myCards,
 } = useMap(mapDiv);
@@ -21,26 +24,6 @@ const {
 // 모달 관리용 변수
 const selectedCardDetailModal = ref(false);
 
-// 카드 클릭 시 혜택 모달 호출
-const handleCardClick = async (cardId) => {
-  try {
-    const allCards = await memberApi.getMyCard();
-    const cardDetail = allCards.find(card => card.cardId === cardId);
-    if (!cardDetail) return;
-
-    const matchedCard = myCards.value.find(c=> c.cardId === cardId);
-    if (!matchedCard) return;
-
-    selectedCard.value = {
-      ...matchedCard,
-      ...cardDetail
-    };
-
-    selectedCardDetailModal.value = true;
-  } catch (error) {
-    console.error('카드 상세 정보를 불러오지 못했습니다:', error);
-  }
-};
 
 // 페이 네비게이터 모드 관리용 변수
 const payNavigatorMode = ref(false);
@@ -83,13 +66,13 @@ watch(selectedCard, (newVal) => {
 
 
         <!-- 선택된 카드 보여주기 -->
-        <div class="selected-card-box" v-if="selectedCard">
+        <!-- <div class="selected-card-box" v-if="selectedCard">
           <img :src="selectedCard.image" :alt="selectedCard.cardProductName" class="selected-card-img" />
           <div class="selected-card-info">
             <p class="card-name">카드명:  {{ selectedCard.cardProductName }}</p>
             <p class="card-category">카테고리: {{ selectedCard.storeCategories?.join(', ') || '없음' }}</p>
           </div>
-        </div>
+        </div> -->
         
         <!-- 검색창 -->
         <div class="search-bar">
@@ -132,7 +115,6 @@ watch(selectedCard, (newVal) => {
       <!-- 혜택 리스트 -->
       <div class="benefits-list">
         <h3 class="benefits-title">받을 수 있는 혜택</h3>
-
         <!-- 혜택이 있을 경우 -->
         <div
           v-if="selectedMerchant.benefits && selectedMerchant.benefits.length"
@@ -143,12 +125,23 @@ watch(selectedCard, (newVal) => {
             class="benefit-item"
             :class="{ 'primary': benefit.isPrimary }"
           >
-            <p class="benefit-desc">{{ benefit.description }}</p>
-            <p class="benefit-card">
-              {{ benefit.cardName }}
-              <template v-if="benefit.rateValue"> | {{ benefit.rateValue }}% 할인</template>
-              <template v-else-if="benefit.amountValue"> | {{ benefit.amountValue }}원 할인</template>
-            </p>
+          
+          <img
+            v-if="benefit.cardImageUrl"
+            :src="benefit.cardImageUrl || selectedCard.image"
+            :alt="benefit.cardName"
+            class="benefit-card-image"
+            />
+            <div class="benefit-text">
+               <!-- 카드 이미지 -->
+            
+              <p class="benefit-desc">{{ benefit.description }}</p>
+              <p class="benefit-card">
+                {{ benefit.cardName }}
+                <template v-if="benefit.rateValue"> | {{ benefit.rateValue }}% 할인</template>
+                <template v-else-if="benefit.amountValue"> | {{ benefit.amountValue }}원 할인</template>
+              </p>
+            </div>
             <span v-if="benefit.isPrimary">🥇</span>
           </div>
         </div>
