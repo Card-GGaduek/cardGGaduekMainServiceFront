@@ -27,7 +27,7 @@ export function useMap(mapDiv) {
     await nextTick();
     initMap();
     moveToCurrentLocation();
-    await loadMyCards(1); // 예시: memberId = 1
+    await loadMyCards(); // 예시: memberId = 1
   });
 
   onUnmounted(() => {
@@ -152,7 +152,7 @@ export function useMap(mapDiv) {
     }
   };
 
-  const loadMyCards = async (memberId) => {
+  const loadMyCards = async () => {
     try {
       const result = await memberApi.getMyCard();
       console.log('내 카드 목록:', result);
@@ -160,7 +160,7 @@ export function useMap(mapDiv) {
       const cardDetailMap = {};
       // 카드 상세정보 맵핑
       for (const card of result) {
-        cardDetailMap[card.cardId] = card
+        cardDetailMap[card.cardId] = card;
       }
 
       // 카드 리스트
@@ -171,13 +171,13 @@ export function useMap(mapDiv) {
         cardProductName: card.cardProductName,
         image: card.cardImageUrl,
         requiredAmount: card.requiredMonthlyAmount,
-        storeCategories : [...new Set(
-          card.storeBenefitList.map(b => b.storeCategory)
-        )]
+        storeCategories: [
+          ...new Set(card.storeBenefitList.map((b) => b.storeCategory)),
+        ],
       }));
 
       //상세 정보 맵에 저장
-      cardDetailsMap.value = cardDetailMap; 
+      cardDetailsMap.value = cardDetailMap;
 
       // 쿼리에서 cardId 받아서 선택 카드 세팅
       const selectedId = Number(route.query.cardId);
@@ -189,7 +189,8 @@ export function useMap(mapDiv) {
 
       if (matchedCard) {
         const detail = cardDetailsMap.value[selectedId];
-        selectedCardCategory.value = detail?.storeBenefitList?.[0]?.storeCategory || '';
+        selectedCardCategory.value =
+          detail?.storeBenefitList?.[0]?.storeCategory || '';
         selectedCard.value = {
           ...matchedCard,
           ...detail,

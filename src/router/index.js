@@ -20,6 +20,7 @@ import NaverCallback from '@/pages/login/NaverCallback.vue';
 import AllCardProductPage from '@/pages/card/AllCardProductPage.vue';
 import CardDetailPage from '@/pages/card/CardDetailPage.vue';
 import MyCouponPage from '@/pages/mypage/MyCouponPage.vue';
+import MapPage2 from '@/pages/map/MapPage2.vue';
 const routes = [
   {
     path: '/',
@@ -38,7 +39,7 @@ const routes = [
     name: 'FinalBookingPage',
     component: FinalBookingPage,
   },
-  { path: '/map', name: 'MapPage', component: MapPage },
+  { path: '/map', name: 'MapPage2', component: MapPage2 },
   { path: '/analysis', name: 'Analysis', component: AnalysisPage },
   {
     path: '/analysis/all-transactions',
@@ -67,7 +68,11 @@ const routes = [
   { path: '/card', name: 'CardEditPage', component: CardEditPage },
   { path: '/lab/fortune', component: FortuneCard },
   { path: '/payment', component: PaymentPage },
-  { path: '/allCardProduct', name: 'AllCardProductPage', component: AllCardProductPage },
+  {
+    path: '/allCardProduct',
+    name: 'AllCardProductPage',
+    component: AllCardProductPage,
+  },
   { path: '/CardDetail', name: 'CardDetail', component: CardDetailPage },
   {
     path: '/payment/qr',
@@ -78,7 +83,7 @@ const routes = [
     path: '/card-detail/:id', // 1. URL 파라미터 ':productId' 정의
     name: 'CardDetail',
     component: CardDetailPage,
-    props: true // 2. [핵심] 이 옵션을 true로 설정!
+    props: true, // 2. [핵심] 이 옵션을 true로 설정!
   },
   {
     path: '/notification',
@@ -95,7 +100,7 @@ const routes = [
   {
     path: '/mypage/mycouponpage',
     name: 'MyCouponPage',
-    component: MyCouponPage
+    component: MyCouponPage,
   },
 ];
 
