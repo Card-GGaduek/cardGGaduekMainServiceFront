@@ -3,6 +3,8 @@ import { reactive, onMounted } from 'vue';
 // import { useAuthStore } from '@/stores/auth'; // 현재 코드에서는 직접 사용되지 않음
 // import { useRouter } from 'vue-router'; // 현재 코드에서는 직접 사용되지 않음
 import memberApi from '@/api/memberApi';
+import router from '@/router';
+
 
 // 1. myPageInfo 상태 변수 선언
 // reactive를 사용하여 객체 내부의 속성들이 변경될 때 화면이 자동으로 업데이트되도록 합니다.
@@ -34,13 +36,12 @@ onMounted(async () => {
 });
 </script>
 <template>
-  <div class="app-container">
-    <div class="logo-header">
-      <span class="logo">카드까득</span>
+    <div class="pt-4 logo-container">
+      <img src="@/assets/logo/logo.jpg" alt="카드까득 로고" class="logo-img" />
     </div>
 
-    <header class="page-header">
-      <button class="back-button">&larr;</button>
+    <header class="page-header pt-4 mb-4">
+      <button @click="router.back()" class="back-button">&larr;</button>
       <h1 class="page-title">내 쿠폰함</h1>
       <div class="placeholder"></div>
     </header>
@@ -71,36 +72,20 @@ onMounted(async () => {
         </div>
       </div>
     </main>
-  </div>
 </template>
 
 <style scoped>
-/* 전체 앱 컨테이너 스타일 */
-.app-container {
-  max-width: 420px;
-  margin: 0 auto;
-  background-color: white; /* 이미지의 연한 회색 배경 */
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  min-height: 100vh;
-  padding-bottom: 70px; /* 하단 네비게이션바 높이만큼 패딩 */
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+.logo-container {
+  padding-left: 1rem; /* 이 부분을 추가하여 내부 요소를 가운데 정렬합니다. */
 }
 
 /* 로고 헤더 */
-.logo-header {
-  padding: 10px 15px;
+.logo-img {
+  height:32px;
   background-color: white;
 }
 
-.logo {
-  display: inline-block;
-  padding: 5px 10px;
-  background-color: #fff;
-  border: 2px solid #007bff;
-  border-radius: 15px;
-  font-weight: bold;
-  color: #007bff;
-}
+
 
 /* 페이지 헤더 */
 .page-header {
@@ -134,6 +119,7 @@ onMounted(async () => {
 /* 쿠폰 목록 컨테이너 */
 .coupon-list-container {
   padding: 20px 15px;
+  
   background-color: white;
 }
 
@@ -143,6 +129,7 @@ onMounted(async () => {
   align-items: center;
   background-color: #ffffff;
   border-radius: 15px;
+  
   padding: 20px;
   margin-bottom: 15px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
