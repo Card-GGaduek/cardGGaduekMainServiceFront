@@ -44,7 +44,6 @@ onMounted(async () => {
       ...booking,
       isExpanded: false, // 모든 카드를 초기에 접힌 상태로 설정
     }));
-
   } catch (e) {
   }
 });
@@ -52,8 +51,11 @@ onMounted(async () => {
 
 <template>
   <div class="page-container">
+    <div class="pt-4 logo-container">
+      <img src="@/assets/logo/logo.jpg" alt="카드까득 로고" class="logo-img" />
+    </div>
     <header class="page-header">
-      <button class="back-button">&larr;</button>
+      <button @click="router.back()" class="back-button">&larr;</button>
       <h1 class="page-title">내 예약내역</h1>
       <div class="placeholder"></div>
     </header>
@@ -100,11 +102,20 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.logo-container {
+  padding-left: 1rem; /* 이 부분을 추가하여 내부 요소를 가운데 정렬합니다. */
+}
+
+/* 로고 헤더 */
+.logo-img {
+  height:32px;
+  background-color: white;
+}
 /* 전체 페이지 컨테이너 */
 .page-container {
   max-width: 420px;
   margin: 0 auto;
-  background-color: #f8f9fa;
+  background-color: white;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   min-height: 100vh;
   display: flex;
@@ -122,7 +133,7 @@ onMounted(async () => {
 }
 .back-button { font-size: 24px; background: none; border: none; cursor: pointer; }
 .page-title { font-size: 18px; font-weight: bold; margin: 0; }
-.placeholder { width: 24px; }
+.placeholder { width: 24px; color: white;}
 
 /* 메인 콘텐츠 영역 */
 .content-area {

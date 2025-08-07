@@ -81,29 +81,32 @@ onMounted(() => {
 </script>
 
 <template>
-    <router-link to="/booking">뒤로 가기</router-link>
-    <section class="p-3">
+    <header class="top-header d-flex align-items-center p-3">
+      <router-link to="/booking" class="text-dark"><i class="bi bi-arrow-left fs-4"></i></router-link>
+      <h5 class="fw-bold m-0 flex-grow-1 text-center">예약하기</h5>
+      <div style="width: 24px;"></div>
+  </header>
+
+  <div v-if="accommodation" class="booking-page-container">
+    <section>
+    <section class="main-image-section">
+      <h3 class="fw-bold">{{ accommodation.name }}</h3>
+            <p class="mb-0 small"><i class="bi bi-clock me-2"></i>체크인 {{ accommodation.checkInTime }}</p>
+            <p class="mb-0 small"><i class="bi bi-clock me-2"></i>체크아웃 {{ accommodation.checkOutTime }}</p>
+          <img src="@/assets/accommodations/롯데호텔서울3.jpg" class="main-image" alt="Main accommodation image">
+          <div class="image-overlay-content p-3 text-white">
+            
+          </div>
+        </section>
     <h6 class="fw-bold mb-3"><i class="bi bi-calendar-check me-2"></i>일정을 선택하세요</h6>
-    
     <BookingCalendar @dates-selected="handleDatesSelected" />
 
   </section>
   <div class="booking-page-bg">
     <div v-if="accommodation" class="container booking-page-container p-0">
-      
-      <header class="top-header d-flex align-items-center p-3">
-        <router-link to="/" class="text-dark"><i class="bi bi-arrow-left fs-4"></i></router-link>
-        <h5 class="fw-bold m-0 flex-grow-1 text-center">예약하기</h5>
-      </header>
 
       <div class="scrollable-content">
-        <section class="main-image-section">
-          <img src="@/assets/accommodations/부산펜션.png" class="main-image" alt="Main accommodation image">
-          <div class="image-overlay-content p-3 text-white">
-            <h3 class="fw-bold">{{ accommodation.name }}</h3>
-            <p class="mb-0 small"><i class="bi bi-clock me-2"></i>체크인 {{ accommodation.checkInTime }} 체크아웃 {{ accommodation.checkOutTime }}</p>
-          </div>
-        </section>
+        
 
         <hr class="my-4">
 
@@ -111,7 +114,7 @@ onMounted(() => {
           <h6 class="fw-bold mb-3"><i class="bi bi-door-open-fill me-2"></i>객실을 선택하세요</h6>
           <div class="room-list">
             <div class="card room-card mb-3" v-for="room in accommodation.rooms" :key="room.id">
-              <img src="@/assets/accommodations/부산펜션.png" alt="RoomImage"/>
+              <img src="@/assets/accommodations/롯데호텔서울1.jpg" alt="RoomImage"/>
               <div class="card-body">
                 <h6 class="card-title fw-bold">{{ room.name }}</h6>
                 <p class="card-text text-muted small mb-1">최대 수용 인원: {{ room.maxCapacity }}</p>
@@ -128,6 +131,7 @@ onMounted(() => {
       <p>숙소 정보를 찾을 수 없습니다.</p>
       <router-link to="/">홈으로 돌아가기</router-link>
     </div>
+  </div>
   </div>
 </template>
 
