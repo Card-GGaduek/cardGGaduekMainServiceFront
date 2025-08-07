@@ -462,9 +462,10 @@ onMounted(async () => {
   transition: all 0.3s ease;
 }
 
+/* 주요 버튼: KB 노란색 */
 .modal-btn.primary {
   background: #ffd559;
-  color: #5e514d;
+  color: #3e3a39;
   border: none;
 }
 
@@ -472,24 +473,26 @@ onMounted(async () => {
   background: #f2c232;
 }
 
+/* 보조 버튼: 연한 베이지 + KB 갈색 텍스트 */
 .modal-btn.secondary {
-  background: #f2f2f7;
-  color: #007aff;
-  border: none;
+  background: #f8f4ef;
+  color: #5e514d;
+  border: 1px solid #e0d5c8;
 }
 
 .modal-btn.secondary:hover {
-  background: #e5e5ea;
+  background: #f0eae2;
 }
 
+/* 취소 버튼: 깔끔한 붉은 포인트 */
 .modal-btn.cancel {
   background: none;
-  color: #ff3b30;
-  border: 1px solid #ff3b30;
+  color: #c0392b;
+  border: 1px solid #c0392b;
 }
 
 .modal-btn.cancel:hover {
-  background: #fff5f5;
+  background: #fff1f0;
 }
 
 /* 스크롤바 완전히 숨기기 */
