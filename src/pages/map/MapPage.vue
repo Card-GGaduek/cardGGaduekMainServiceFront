@@ -27,25 +27,19 @@ const {
   myCards,
   isMapReady,
   onMapReady,
+  noBenefitAlert,
+  showNoBenefitMessage,
 } = useMap(mapDiv);
 
-// App.vue에서 전달받은 검색어 처리
-onMounted(() => {
-  // URL 쿼리 파라미터로 전달된 검색어 확인
-  const searchKeyword = route.query.keyword;
-  if (searchKeyword) {
-    onMapReady(() => {
-      keyword.value = searchKeyword;
-      handleSearch();
-    });
-  }
-});
+
 
 // 라우트 변경 감지
+let previousKeyword = '';
 watch(
   () => route.query.keyword,
   (newKeyword) => {
-    if (newKeyword && newKeyword !== keyword.value) {
+    if (newKeyword && newKeyword !== keyword.value && newKeyword !== previousKeyword) {
+      previousKeyword = newKeyword;
       onMapReady(() => {
         keyword.value = newKeyword;
         handleSearch();
@@ -54,7 +48,21 @@ watch(
   }
 );
 
+const selectedCardId = ref('');
+const selectedStoreName = ref('');
 
+const selectedCardComputed = computed(() =>
+  myCards.value.find((card) => card.cardId === selectedCardId.value)
+);
+
+// selectedCard도 연동
+watch(selectedCardId, (newId) => {
+  const matched = myCards.value.find(c => c.cardId === newId);
+  if (matched) {
+    selectedCard.value = matched;
+    selectedStoreName.value = '';
+  }
+}); 
 
 // 페이 네비게이터 모드 관리용 변수
 const payNavigatorMode = ref(false);
@@ -94,10 +102,26 @@ watch(selectedCard, (newVal) => {
     <div class="controls-container">
       <div class="controls-box">
         <p class="title">{{walletMessage}}</p>
-
+          <!-- 가맹점 선택 -->
+          <select
+          v-if="benefit && selectedCard.storeBenefitList"  
+            v-model="selectedStoreName"
+            :key="benefit.storeName"
+            :value="benefit.storeName"
+            >
+            <option disabled value="">가맹점을 선택하세요</option>
+            <option
+              v-for="benefit in selectedCard.value.storeBenefitList"
+              :key="benefit.storeName"
+              :value="benefit.storeName"
+              >
+              {{ benefit.storeName }}
+            </option>
+          </select>
        
         <!-- 검색창 + 지갑 -->
         <div class="search-bar">
+          
           <input
             v-model="keyword"
             @keyup.enter="handleSearch"
@@ -132,6 +156,13 @@ watch(selectedCard, (newVal) => {
       </div>
     </div>
   </div>
+
+  <!-- 혜택 가능한 매장이 없을 때 알림 -->
+<transition name="fade">
+  <div v-if="noBenefitAlert" class="no-benefit-alert">
+    조건에 맞는 혜택 가능한 매장이 없습니다.
+  </div>
+</transition>
 
     <!-- 하단 상세 정보 시트 -->
 <transition name="bottom-sheet">
@@ -209,5 +240,6 @@ watch(selectedCard, (newVal) => {
 <style>
 @import '@/assets/main.css';
 @import './map.css';
+@import './alym.css';
 
 </style>
