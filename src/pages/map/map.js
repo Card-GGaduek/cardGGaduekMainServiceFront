@@ -1,7 +1,7 @@
 import { ref, onMounted, onUnmounted, nextTick,computed } from 'vue';
 import axios from 'axios';
 
-import { cat, store } from 'fontawesome';
+
 import { useRoute, useRouter } from 'vue-router';
 import memberApi from '@/api/memberApi';
 

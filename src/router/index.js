@@ -22,6 +22,7 @@ import CardDetailPage from '@/pages/card/CardDetailPage.vue';
 import MyCouponPage from '@/pages/mypage/MyCouponPage.vue';
 import MyBookingPage from '@/pages/mypage/MyBookingPage.vue';
 import MyCardPage from '@/pages/mypage/MyCardPage.vue';
+import MapPage2 from '@/pages/map/MapPage2.vue';
 const routes = [
   {
     path: '/',
@@ -41,6 +42,7 @@ const routes = [
     component: FinalBookingPage,
   },
   { path: '/map', name: 'MapPage', component: MapPage },
+  { path: '/map2', name: 'MapPage2', component: MapPage2 }, 
   { path: '/analysis', name: 'Analysis', component: AnalysisPage },
   {
     path: '/analysis/all-transactions',

@@ -91,6 +91,7 @@ body {
 }
 
 .app-wrapper {
+  position: fixed;
   width: 100vw;
   height: 100vh;
   background-color: rgb(255, 240, 179);

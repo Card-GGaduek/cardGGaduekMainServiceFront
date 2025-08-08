@@ -8,8 +8,6 @@ import { calculator } from 'fontawesome';
 import PayNavigator from '@/pages/map/PayNavigator.vue';
 import memberApi from '@/api/memberApi';
 import WalletButton from '@/pages/map/WalletButton.vue';
-import { useRoute } from 'vue-router';
-import { onMounted } from 'vue';
 
 
 const route = useRoute();
