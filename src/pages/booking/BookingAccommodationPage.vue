@@ -169,49 +169,126 @@ onMounted(() => {
 </template>
 
 <style scoped>
-/* 전체 페이지 스타일 */
+/* 공통 배경 */
 .booking-page-bg {
-  background-color: #f8f9fa;
+  background: linear-gradient(to bottom, #f8f9fa, #ffffff);
 }
+
+/* 페이지 컨테이너 */
 .booking-page-container {
   max-width: 420px;
+  margin: 0 auto;
   background-color: #fff;
-  
   display: flex;
   flex-direction: column;
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
 }
-/* 스크롤 가능 영역 설정 */
+
+/* 스크롤 가능한 영역 */
 .scrollable-content {
   flex-grow: 1;
   overflow-y: auto;
 }
+
 /* 상단 헤더 */
 .top-header {
   position: sticky;
   top: 0;
-  background-color: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(5px);
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(6px);
   z-index: 10;
-  border-bottom: 1px solid #eee;
-}
-.bi-arrow-left {
-  position: absolute;
+  border-bottom: 1px solid #dee2e6;
 }
 
-/* 메인 이미지 섹션 */
+.bi-arrow-left {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.4rem;
+  color: #333;
+}
+
+/* 이미지 섹션 */
 .main-image {
   width: 100%;
-  height: 250px;
+  height: 230px;
   object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-top: 12px;
 }
+
 .image-overlay-content {
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.5), transparent);
 }
+
 .image-overlay-content p {
   opacity: 0.9;
+}
+
+/* 텍스트 */
+h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #212529;
+  margin-bottom: 0.5rem;
+  position: relative;
+  padding-left: 8px;
+}
+
+/* 제목 왼쪽에 강조 라인 */
+h3::before {
+  content: '';
+  position: absolute;
+  top: 0.2rem;
+  left: 0;
+  width: 4px;
+  height: 1.2em;
+  background-color: #ffc107;
+  border-radius: 4px;
+}
+
+h6 {
+  color: #343a40;
+}
+
+/* 객실 카드 */
+.room-card {
+  border: none;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease;
+  background-color: #fff;
+}
+
+.room-card:hover {
+  transform: translateY(-4px);
+}
+
+.room-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+/* 버튼 */
+.btn-warning {
+  background: linear-gradient(135deg, #ffc107, #ffb300);
+  color: #fff;
+  border: none;
+  font-weight: bold;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-warning:hover {
+  transform: scale(1.02);
+  background-color: #ffb300;
 }
 
 /* 달력 */
@@ -221,29 +298,28 @@ onMounted(() => {
   gap: 8px;
   text-align: center;
 }
+
 .day-name {
   font-weight: bold;
   font-size: 0.8rem;
   color: #6c757d;
 }
+
 .day-cell {
   padding: 8px 0;
   font-size: 0.9rem;
+  transition: all 0.2s;
 }
+
+.day-cell:hover {
+  background-color: #ffe082;
+  border-radius: 50%;
+}
+
 .day-cell.selected {
   background-color: #ffc107;
   color: #fff;
   border-radius: 50%;
   font-weight: bold;
-}
-
-/* 객실 카드 */
-.room-card {
-  border: 1px solid #eee;
-  border-radius: 12px;
-}
-.btn-warning {
-  background-color: #ffc107;
-  border: none;
 }
 </style>

@@ -358,7 +358,7 @@ function increaseGuests() {
             <option
                 v-for="coupon in userCoupons"
                 :key="coupon.id"
-                :value="coupon.id"
+                :value="coupon.couponproductId"
             >
               {{ coupon.couponName }}
             </option>
