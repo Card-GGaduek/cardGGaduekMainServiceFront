@@ -176,7 +176,6 @@ onMounted(() => {
 
 /* 페이지 컨테이너 */
 .booking-page-container {
-  max-width: 420px;
   margin: 0 auto;
   background-color: #fff;
   display: flex;

@@ -422,7 +422,6 @@ function increaseGuests() {
   background-color: #f8f9fa;
 }
 .page-container {
-  max-width: 420px;
   background-color: #f8f9fa;
   min-height: 100vh;
   display: flex;
@@ -439,8 +438,13 @@ function increaseGuests() {
   z-index: 10;
   border-bottom: 1px solid #eee;
 }
-.top-header .bi-arrow-left {
+.bi-arrow-left {
   position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.4rem;
+  color: #333;
 }
 .card {
   border: none;
