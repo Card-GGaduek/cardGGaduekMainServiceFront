@@ -1,8 +1,9 @@
 <script setup>
-import { ref, onMounted, reactive } from 'vue';
-import { useAuthStore } from '@/stores/auth';
-import { useRouter } from 'vue-router';
-import memberApi from '@/api/memberApi';
+// 1. vue에서 computed는 이제 필요 없으므로 제거해도 됩니다.
+import { ref, onMounted, reactive } from "vue";
+import { useAuthStore } from "@/stores/auth";
+import { useRouter } from "vue-router";
+import memberApi from "@/api/memberApi";
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -10,43 +11,43 @@ const router = useRouter();
 onMounted(async () => {
   try {
     const result = await memberApi.getMyInfo();
+    const bookingsFromApi = result.bookingList || [];
+
+    myPageInfo.bookingList = bookingsFromApi.map((booking) => ({
+      ...booking,
+      isExpanded: false,
+    }));
     myPageInfo.email = result.email;
     myPageInfo.name = result.name;
-    myPageInfo.bookingList = result.bookingList;
   } catch (e) {
+    console.error("내 정보 조회 실패:", e.message);
     alert(e.message);
   }
 });
-// API를 통해 받아올 사용자 정보를 담을 반응형 객체
+
 const myPageInfo = reactive({
+  name: "",
+  email: "",
   bookingList: [],
 });
 
-// 각 예약의 상세 정보 펼침/접힘 상태를 토글하는 함수
 const toggleDetails = (booking) => {
   booking.isExpanded = !booking.isExpanded;
 };
 
-// onMounted: 컴포넌트가 로드될 때 실행
-onMounted(async () => {
-  try {
-    // 실제 API 연동 시 아래 주석을 해제하고, 하단의 목업 데이터 부분을 삭제하세요.
-    // const result = await memberApi.getMyInfo();
-    // const bookingsFromApi = result.bookingList || [];
-
-    // --- 테스트를 위한 목업(Mockup) 데이터 시작 ---
-    const bookingsFromApi = result.bookingList || []; 
-    // --- 테스트를 위한 목업 데이터 끝 ---
-
-
-    // API에서 받은 데이터에 isExpanded 상태를 추가하여 반응형으로 관리
-    myPageInfo.bookingList = bookingsFromApi.map(booking => ({
-      ...booking,
-      isExpanded: false, // 모든 카드를 초기에 접힌 상태로 설정
-    }));
-  } catch (e) {
+// 2. 예약 상태 코드를 한글로 변환하는 함수를 추가합니다.
+const getStatusText = (status) => {
+  switch (status) {
+    case "CONFIRMED":
+      return "예약 완료";
+    case "PENDING":
+      return "예약 대기";
+    case "CANCELED":
+      return "취소됨"; // 'CANCELED'일 경우 '취소됨'을 반환
+    default:
+      return status; // 그 외의 경우 원래 상태값을 그대로 표시
   }
-});
+};
 </script>
 
 <template>
@@ -61,18 +62,41 @@ onMounted(async () => {
     </header>
 
     <main class="content-area">
-      <div v-if="myPageInfo.bookingList.length === 0" class="empty-message">
+      <div
+        v-if="myPageInfo.bookingList.length === 0 || myPageInfo.booking"
+        class="empty-message"
+      >
         <p>예약 내역이 없습니다.</p>
       </div>
-      
+
       <div v-else>
-        <div v-for="booking in myPageInfo.bookingList" :key="booking.id" class="booking-card">
+        <div
+          v-for="booking in myPageInfo.bookingList"
+          :key="booking.id"
+          class="booking-card"
+        >
           <div class="summary-view">
-            <img :src="booking.imageUrl" alt="예약 이미지" class="thumbnail-image" />
+            <img
+              src="@/assets/accommodations/롯데호텔서울1.jpg"
+              alt="예약 이미지"
+              class="thumbnail-image"
+            />
             <div class="info-area">
-              <span class="booking-title">{{ booking.accommodationName }}</span>
+              <div
+                class="booking-title d-flex justify-content-between align-items-center"
+              >
+                <span>{{ booking.accommodationName }}</span>
+
+                <span class="booking-status">{{
+                  getStatusText(booking.status)
+                }}
+                </span>
+              </div>
               <a @click.prevent="toggleDetails(booking)" class="details-link">
-                {{ booking.isExpanded ? '상세정보 닫기' : '예약정보 보기' }} &rsaquo;
+                {{
+                  booking.isExpanded ? "상세정보 닫기" : "예약정보 보기"
+                }}
+                &rsaquo;
               </a>
             </div>
           </div>
@@ -80,13 +104,18 @@ onMounted(async () => {
           <transition name="slide-fade">
             <div v-if="booking.isExpanded" class="details-view">
               <ul>
-                <li><strong>예약 상태:</strong> {{ booking.status === 'CONFIRMED' ? '예약 완료' : '예약 대기' }}</li>
+                <li>
+                  <strong>예약 상태:</strong>
+                  {{ getStatusText(booking.status) }}
+                </li>
                 <li><strong>이름:</strong> {{ booking.name }}</li>
                 <li><strong>핸드폰:</strong> {{ booking.phone }}</li>
                 <li><strong>이메일:</strong> {{ booking.email }}</li>
                 <li><strong>체크인:</strong> {{ booking.checkInDate }}</li>
                 <li><strong>체크아웃:</strong> {{ booking.checkOutDate }}</li>
-                <li><strong>숙소 이름:</strong> {{ booking.accommodationName }}</li>
+                <li>
+                  <strong>숙소 이름:</strong> {{ booking.accommodationName }}
+                </li>
                 <li><strong>방 이름:</strong> {{ booking.roomName }}</li>
                 <li><strong>결제 금액:</strong> {{ booking.totalPrice }}원</li>
                 <li><strong>요청사항:</strong> {{ booking.requestText }}</li>
@@ -108,7 +137,7 @@ onMounted(async () => {
 
 /* 로고 헤더 */
 .logo-img {
-  height:32px;
+  height: 32px;
   background-color: white;
 }
 /* 전체 페이지 컨테이너 */
@@ -116,7 +145,8 @@ onMounted(async () => {
   max-width: 420px;
   margin: 0 auto;
   background-color: white;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -131,9 +161,21 @@ onMounted(async () => {
   background-color: #ffffff;
   border-bottom: 1px solid #e9ecef;
 }
-.back-button { font-size: 24px; background: none; border: none; cursor: pointer; }
-.page-title { font-size: 18px; font-weight: bold; margin: 0; }
-.placeholder { width: 24px; color: white;}
+.back-button {
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.page-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+}
+.placeholder {
+  width: 24px;
+  color: white;
+}
 
 /* 메인 콘텐츠 영역 */
 .content-area {
@@ -141,7 +183,11 @@ onMounted(async () => {
   overflow-y: auto;
   padding: 20px 15px;
 }
-.empty-message { text-align: center; color: #888; padding-top: 50px; }
+.empty-message {
+  text-align: center;
+  color: #888;
+  padding-top: 50px;
+}
 
 /* 예약 카드 */
 .booking-card {
@@ -169,6 +215,7 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  flex-grow: 1;
 }
 .booking-title {
   font-size: 17px;
@@ -215,5 +262,19 @@ onMounted(async () => {
 .slide-fade-leave-to {
   transform: translateY(-10px);
   opacity: 0;
+}
+.booking-status {
+  font-size: 14px;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: #555;
+  background-color: #e9ecef;
+}
+
+/* 예를 들어 '취소됨' 상태일 때 특별한 스타일을 주고 싶다면 */
+.is-canceled .booking-status {
+  background-color: #f8d7da;
+  color: #721c24;
 }
 </style>

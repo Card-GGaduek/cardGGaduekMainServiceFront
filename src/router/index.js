@@ -13,7 +13,7 @@ import LabPage from '@/pages/lab/LabPage.vue';
 import FortuneCard from '@/pages/lab/FortuneCard.vue';
 import LoginPage from '@/pages/login/LoginPage.vue';
 import JoinPage from '@/pages/login/JoinPage.vue';
-import AllTransactions from '@/components/analysis/AllTransactions.vue';
+import AllTransactions from '@/pages/analysis/AllTransactions.vue';
 import CardEditPage from '@/pages/card/CardEditPage.vue';
 import { useAuthStore } from '@/stores/auth';
 import NaverCallback from '@/pages/login/NaverCallback.vue';
@@ -22,6 +22,7 @@ import CardDetailPage from '@/pages/card/CardDetailPage.vue';
 import MyCouponPage from '@/pages/mypage/MyCouponPage.vue';
 import MyBookingPage from '@/pages/mypage/MyBookingPage.vue';
 import MyCardPage from '@/pages/mypage/MyCardPage.vue';
+import MapPage2 from '@/pages/map/MapPage2.vue';
 const routes = [
   {
     path: '/',
@@ -41,14 +42,18 @@ const routes = [
     component: FinalBookingPage,
   },
   { path: '/map', name: 'MapPage', component: MapPage },
+  { path: '/map2', name: 'MapPage2', component: MapPage2 }, 
   { path: '/analysis', name: 'Analysis', component: AnalysisPage },
   {
-    path: '/analysis/all-transactions',
+    path: '/analysis/allTransactions',
     name: 'AllTransactions',
     component: AllTransactions,
-    props: (route) => ({
-      cardId: route.query.cardId ? Number(route.query.cardId) : null,
-    }),
+    props: route => ({
+      // 쿼리 param 이름을 cardId 로 통일
+      cardId: route.query.cardId
+        ? Number(route.query.cardId)
+        : null
+    })
   },
   { path: '/mypage', name: 'MyPage', component: MyPage },
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFoundPage },
@@ -69,7 +74,11 @@ const routes = [
   { path: '/card', name: 'CardEditPage', component: CardEditPage },
   { path: '/lab/fortune', component: FortuneCard },
   { path: '/payment', component: PaymentPage },
-  { path: '/allCardProduct', name: 'AllCardProductPage', component: AllCardProductPage },
+  {
+    path: '/allCardProduct',
+    name: 'AllCardProductPage',
+    component: AllCardProductPage,
+  },
   { path: '/CardDetail', name: 'CardDetail', component: CardDetailPage },
   {
     path: '/payment/qr',
@@ -80,7 +89,7 @@ const routes = [
     path: '/card-detail/:id', // 1. URL 파라미터 ':productId' 정의
     name: 'CardDetail',
     component: CardDetailPage,
-    props: true // 2. [핵심] 이 옵션을 true로 설정!
+    props: true, // 2. [핵심] 이 옵션을 true로 설정!
   },
   {
     path: '/notification',
@@ -97,18 +106,23 @@ const routes = [
   {
     path: '/mypage/mycouponpage',
     name: 'MyCouponPage',
-    component: MyCouponPage
+    component: MyCouponPage,
   },
   {
     path: '/mypage/mybookingpage',
     name: 'MyBookingPage',
-    component: MyBookingPage
+    component: MyBookingPage,
   },
   {
     path: '/mypage/mycardpage',
     name: 'MyCardPage',
-    component: MyCardPage
-  }
+    component: MyCardPage,
+  },
+  {
+    path: '/card',
+    name: 'CardEditPage',
+    component: CardEditPage,
+  },
 ];
 
 const router = createRouter({

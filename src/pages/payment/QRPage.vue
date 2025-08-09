@@ -17,63 +17,63 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useUserStore } from '@/stores/userStore'
-import axios from 'axios'
+import { ref, onMounted } from 'vue';
+import { useUserStore } from '@/stores/userStore';
+import axios from 'axios';
 
-const userStore = useUserStore()
-userStore.setUser(3)
-userStore.setCard(5)
+const userStore = useUserStore();
+userStore.setUser(3);
+userStore.setCard(5);
 
-const memberId = userStore.memberId
-const cardId = userStore.selectedCardId
+const memberId = userStore.memberId;
+const cardId = userStore.selectedCardId;
 
-const qrImage = ref('')
-const minutes = ref(2)
-const seconds = ref(59)
-let timerInterval = null
+const qrImage = ref('');
+const minutes = ref(2);
+const seconds = ref(59);
+let timerInterval = null;
 
 const generateQRCode = async () => {
   try {
     const response = await axios.post(
-        'http://localhost:8080/api/payment/qr',
-        { memberId, cardId },
-        { headers: { 'Content-Type': 'application/json' } }
-    )
-    qrImage.value = response.data.data
+      'http://localhost:8080/api/payment/qr',
+      { memberId, cardId },
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+    qrImage.value = response.data.data;
   } catch (error) {
-    console.error('QR 생성 실패:', error)
+    console.error('QR 생성 실패:', error);
   }
-}
+};
 
 const startTimer = () => {
-  minutes.value = 2
-  seconds.value = 59
-  clearInterval(timerInterval)
+  minutes.value = 2;
+  seconds.value = 59;
+  clearInterval(timerInterval);
   timerInterval = setInterval(() => {
     if (seconds.value === 0) {
       if (minutes.value === 0) {
-        clearInterval(timerInterval)
-        regenerateQRCode()
-        return
+        clearInterval(timerInterval);
+        regenerateQRCode();
+        return;
       }
-      minutes.value--
-      seconds.value = 59
+      minutes.value--;
+      seconds.value = 59;
     } else {
-      seconds.value--
+      seconds.value--;
     }
-  }, 1000)
-}
+  }, 1000);
+};
 
 const regenerateQRCode = () => {
-  generateQRCode()
-  startTimer()
-}
+  generateQRCode();
+  startTimer();
+};
 
 onMounted(() => {
-  generateQRCode()
-  startTimer()
-})
+  generateQRCode();
+  startTimer();
+});
 </script>
 
 <style scoped>
