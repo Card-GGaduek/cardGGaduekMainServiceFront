@@ -3,9 +3,9 @@
     <div class="mission-header">
       <img src="@/assets/lab/mission_icon.png" class="mission-icon" />
       <div>
-        <h3 class="mt-3 mx-3">
+        <h4 class="mt-3 mx-3">
           시즌별 미션 <span class="end-date">~{{ endDate }}</span>
-        </h3>
+        </h4>
         <p class="description mx-3">미션 성공 시 관련 쿠폰이 까득</p>
       </div>
     </div>
@@ -90,9 +90,10 @@ const getProgressPercentage = (mission) => {
   margin-bottom: 12px;
 }
 .mission-icon {
-  width: 50px;
+  width: 35px;
   height: auto;
-  margin-right: 8px;
+  margin-top: -7px;
+  margin-right: -2px;
   margin-left: 8px;
 }
 .end-date {
@@ -115,8 +116,7 @@ const getProgressPercentage = (mission) => {
 
 .mission-item {
   border-radius: 12px;
-  font-size: 17px;
-  font-weight: 600;
+  font-size: 16px;
   overflow: hidden;
 }
 
@@ -167,11 +167,9 @@ const getProgressPercentage = (mission) => {
 .mission-title {
   flex: 1;
   font-size: 17px;
-  font-weight: 600;
 }
 
 .mission-status {
-  font-weight: bold;
   white-space: nowrap;
 }
 .empty-message {
