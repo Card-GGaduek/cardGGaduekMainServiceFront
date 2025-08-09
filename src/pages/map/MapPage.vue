@@ -2,82 +2,54 @@
 import { onMounted, ref, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useMap } from '@/pages/map/map';
+import axios from 'axios';
+import { calculator } from 'fontawesome';
 import PayNavigator from '@/pages/map/PayNavigator.vue';
+import memberApi from '@/api/memberApi';
 import WalletButton from '@/pages/map/WalletButton.vue';
 
 const route = useRoute();
 const mapDiv = ref(null);
 const walletMessage = ref('내 주변 혜택을 받을 수 있는 매장을 검색해보세요');
 
-const selectedCardId = ref('');
-const selectableBenefits = computed(
-  () => selectedCard.value?.storeBenefitList ?? []
-);
-
 const {
   keyword,
   selectedMerchant,
   selectedCard,
-  selectedStoreName,
   categoryColorMap,
   categoryLabel,
-  isSearching,
-  // handleCardClick,
-  myCards,
-  isMapReady,
-  noBenefitAlert,
   handleSearch,
   handleCardClick,
+
   moveToCurrentLocation,
+  myCards,
+  isMapReady,
   onMapReady,
-  searchByStoreName,
-  showNoBenefitMessage,
 } = useMap(mapDiv);
 
-// 도착 시 1회만 자동검색
-const arrivalSearched = ref(false);
-
-// (A) 맵이 이미 준비된 뒤에 라우트 키워드가 들어오는 경우
-watch(
-  () => route.query.keyword,
-  (k) => {
-    const kk = String(k ?? '').trim();
-    if (!kk || arrivalSearched.value) return;
-    if (isMapReady.value) {
-      arrivalSearched.value = true;
-      keyword.value = kk;
+// App.vue에서 전달받은 검색어 처리
+onMounted(() => {
+  // URL 쿼리 파라미터로 전달된 검색어 확인
+  const searchKeyword = route.query.keyword;
+  if (searchKeyword) {
+    onMapReady(() => {
+      keyword.value = searchKeyword;
       handleSearch();
-    }
-  },
-  { immediate: true }
-);
-
-
-// (B) 라우트 키워드는 있는데 맵이 늦게 준비되는 경우
-onMapReady(() => {
-  if (arrivalSearched.value) return;
-  const kk = String(route.query.keyword ?? '').trim();
-  if (!kk) return;
-  arrivalSearched.value = true;
-  keyword.value = kk;
-  handleSearch();
+    });
+  }
 });
 
-
-// 2. 카드 스와이퍼에서 넘어올 경우
-// 카드 매장 누적 검색
-const headerMessage = computed(() =>
-  isSearching.value ? '매장을 검색중입니다' : walletMessage.value
-);
+// 라우트 변경 감지
 watch(
-  () => route.query.cardId,
-  (newCardId) => {
-    if (route.query.autoSearch && newCardId) {
-      console.log('자동 실행 - cardId:', newCardId);
-      if (newCardId) handleCardClick(Number(newCardId));
+  () => route.query.keyword,
+  (newKeyword) => {
+    if (newKeyword && newKeyword !== keyword.value) {
+      onMapReady(() => {
+        keyword.value = newKeyword;
+        handleSearch();
+      });
     }
-  },
-  { immediate: false }
+  }
 );
 
 // 페이 네비게이터 모드 관리용 변수
@@ -117,24 +89,7 @@ watch(selectedCard, (newVal) => {
     <!-- 검색 및 MyCard UI -->
     <div class="controls-container">
       <div class="controls-box">
-        <p class="title">
-          {{ headerMessage }}
-        </p>
-        <!-- 가맹점 선택 -->
-        <select
-          v-if="selectableBenefits.length"
-          v-model="selectedStoreName"
-          @change="searchByStoreName"
-        >
-          <option disabled value="">가맹점을 선택하세요</option>
-          <option
-            v-for="benefit in selectableBenefits"
-            :key="benefit.storeName"
-            :value="benefit.storeName"
-          >
-            {{ benefit.storeName }}
-          </option>
-        </select>
+        <p class="title">{{ walletMessage }}</p>
 
         <!-- 검색창 + 지갑 -->
         <div class="search-bar">
@@ -187,13 +142,6 @@ watch(selectedCard, (newVal) => {
     </div>
   </div>
 
-  <!-- 혜택 가능한 매장이 없을 때 알림 -->
-  <transition name="fade">
-    <div v-if="noBenefitAlert" class="no-benefit-alert">
-      조건에 맞는 혜택 가능한 매장이 없습니다.
-    </div>
-  </transition>
-
   <!-- 하단 상세 정보 시트 -->
   <transition name="bottom-sheet">
     <div
@@ -201,13 +149,11 @@ watch(selectedCard, (newVal) => {
       class="bottom-sheet-container"
     >
       <div class="bottom-sheet-content">
-        <div class="sheet-handle" role="presentation" aria-hidden="true"></div>
         <button @click="selectedMerchant = null" class="close-button">
           &times;
         </button>
-        <p class="merchant-name">
-          {{ selectedMerchant.name }}
-        </p>
+        <h2 class="merchant-name">{{ selectedMerchant.name }}</h2>
+        <p class="merchant-category">{{ categoryLabel }}</p>
 
         <!-- 혜택 리스트 -->
         <div class="benefits-list">
@@ -275,5 +221,4 @@ watch(selectedCard, (newVal) => {
 <style>
 @import '@/assets/main.css';
 @import './map.css';
-@import './alym.css';
 </style>

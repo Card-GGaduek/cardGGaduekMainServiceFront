@@ -14,7 +14,7 @@
           <div class="fortune-title">
             <img src="@/assets/lab/fortune_icon.png" class="fortune-icon" />
             <div>
-              <h3 class="mt-3 mx-1">오늘의 소비 운세</h3>
+              <h4 class="mt-3 mx-1">오늘의 소비 운세</h4>
               <p class="description fortune-sub">지름신으로부터 지켜줄게요 !</p>
             </div>
           </div>
@@ -83,7 +83,7 @@ onMounted(async () => {
 
 <style scoped>
 .lab-icon {
-  width: 60px;
+  width: 45px;
   height: auto;
   /* margin-right: 8px; */
 }
@@ -120,7 +120,7 @@ onMounted(async () => {
   margin-bottom: 16px;
 }
 .lab-title {
-  font-size: 35px;
+  font-size: 25px;
   font-weight: 600;
   margin-left: 8px;
 }
@@ -140,9 +140,10 @@ onMounted(async () => {
   margin-bottom: 12px;
 }
 .fortune-icon {
-  width: 60px;
+  width: 45px;
   height: auto;
-  margin-right: 8px;
+  margin-top: -10px;
+  margin-right: 5px;
   margin-left: 8px;
 }
 .fortune-sub {
@@ -156,7 +157,7 @@ onMounted(async () => {
   align-items: center;
 }
 .fortune-image {
-  width: 250px;
+  width: 180px;
   margin: 5px auto 14px auto;
 }
 .fortune-button {
