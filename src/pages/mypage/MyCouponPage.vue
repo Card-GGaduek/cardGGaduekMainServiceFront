@@ -120,6 +120,7 @@ onMounted(async () => {
 
 .placeholder {
   width: 24px; /* 뒤로가기 버튼과 너비를 맞추어 제목을 중앙에 배치 */
+  background-color: white;
 }
 
 /* 쿠폰 목록 컨테이너 */
