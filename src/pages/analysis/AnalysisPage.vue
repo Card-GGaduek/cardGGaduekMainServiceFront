@@ -29,82 +29,81 @@
 
     <!-- 카드 추천 -->
     <div v-if="activeTab === 'cardRecommend'" class="recommend-section">
-      <p>카드 추천 기능은 아직 개발 중입니다.</p>
+      <CardRecommend />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import SubHeader from '@/layout/SubHeader.vue';
-import TabNav from '@/components/analysis/TabNav.vue';
-import CardSlider from '@/components/analysis/CardSlider.vue';
-import MonthlySpending from '@/components/analysis/MonthlySpending.vue';
-import CategorySpending from '@/components/analysis/CategorySpending.vue';
-import { getCardPerformance, getCardTransactions } from '@/api/analysisindex.js';
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import SubHeader from '@/layout/SubHeader.vue'
+import TabNav from '@/components/analysis/TabNav.vue'
+import CardSlider from '@/components/analysis/CardSlider.vue'
+import MonthlySpending from '@/components/analysis/MonthlySpending.vue'
+import CategorySpending from '@/components/analysis/CategorySpending.vue'
+import CardRecommend from '@/components/analysis/CardRecommend.vue'
+import { getCardPerformance, getCardTransactions } from '@/api/analysisindex.js'
 
-const router = useRouter();
-const activeTab = ref('cardPerformance');
-const cards = ref([]);
-const loading = ref(false);
-const error = ref(null);
+const router = useRouter()
+const activeTab = ref('cardPerformance')
+const cards     = ref([])
+const loading   = ref(false)
+const error     = ref(null)
 
-// 탭 변경 핸들러: 카드 실적 외 탭 선택 시 URL 쿼리 제거
+/* 탭 변경 */
 function onTabChange(tabKey) {
-  activeTab.value = tabKey;
+  activeTab.value = tabKey
   if (tabKey !== 'cardPerformance') {
-    router.replace({ name: 'Analysis', query: {} });
+    router.replace({ name: 'Analysis', query: {} })
   }
 }
 
+/* 데이터 로드 */
 async function loadAll() {
-  loading.value = true;
-  error.value = null;
+  loading.value = true
+  error.value   = null
   try {
-    // 카드 실적 API 호출
-    const perfRes = await getCardPerformance();
-    if (!perfRes.data.success) throw new Error(perfRes.data.message);
-    // 거래 내역 API 호출
-    const txRes = await getCardTransactions();
-    if (!txRes.data.success) throw new Error(txRes.data.message);
+    const perfRes = await getCardPerformance()
+    if (!perfRes.data.success) throw new Error(perfRes.data.message)
 
-    // 데이터 가공: 카드별 실적 + 최근 거래 3건
-    const perfData = perfRes.data.data;
-    const txData = txRes.data.data;
+    const txRes = await getCardTransactions()
+    if (!txRes.data.success) throw new Error(txRes.data.message)
+
+    const perfData = perfRes.data.data
+    const txData   = txRes.data.data
+
     cards.value = perfData.map(cd => {
       const card = {
-        id: cd.cardId,
-        owner: cd.ownerName,
-        name: cd.cardProductName,
-        image: cd.cardImageUrl,
+        cardProductId: cd.cardProductId,
+        owner:         cd.ownerName,
+        name:          cd.cardProductName,
+        image:         cd.cardImageUrl,
         currentAmount: cd.spentAmount,
-        totalAmount: cd.requiredMonthlySpent,
-        transactions: [],
-      };
-      const found = txData.find(t => t.cardId === cd.cardId);
+        totalAmount:   cd.requiredMonthlySpent,
+        transactions:  []
+      }
+      const found = txData.find(t => t.cardProductId === cd.cardProductId)
       if (found) {
         card.transactions = found.transactions
           .sort((a, b) => new Date(b.transDate) - new Date(a.transDate))
-          .slice(0, 3);
+          .slice(0, 3)
       }
-      return card;
-    });
+      return card
+    })
   } catch (e) {
-    console.error(e);
-    error.value = e.message || '데이터 로드 실패';
+    console.error(e)
+    error.value = e.message || '데이터 로드 실패'
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 
-onMounted(loadAll);
+onMounted(loadAll)
 </script>
 
 <style scoped>
-.card-section {
-  margin-top: 24px;
-}
+.card-section { margin-top: 24px; }
 .loading-container,
 .error-container,
 .empty-container {
@@ -120,9 +119,7 @@ onMounted(loadAll);
   animation: spin 1s linear infinite;
   margin: 0 auto 16px;
 }
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 .retry-button {
   margin-top: 12px;
   padding: 6px 12px;

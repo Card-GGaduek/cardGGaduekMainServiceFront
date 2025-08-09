@@ -1,59 +1,58 @@
 <template>
-    <div class="wallet-container">
-      <button @click="toggleWallet" class="wallet-button">
-        <img
-          :src="isWalletOpen ? openWalletImg : closeWalletImg"
-          alt="지갑 버튼"
-          class="wallet-img"
-        />
-      </button>
-  
-      <!-- 부채꼴 카드 드롭다운 -->
-      <transition-group name="fan" tag="div" class="fan-card-wrapper" >
-        
-        <img
-          v-for="(card, i) in animatedCards"
-          :key="card.cardId"
-          :src="card.image"
-          class="fan-card"
-          :class="{ 'show': shownCardIds.includes(card.cardId) }" 
-          :style="fanCardStyle(i, card)"
-          @mouseover="hoveredCard = card.cardId"
-          @mouseleave="hoveredCard = null"
-          @click="handleCardSelection(card)"
-        />
+  <div class="wallet-container">
+    <button @click="toggleWallet" class="wallet-button">
+      <img
+        :src="isWalletOpen ? openWalletImg : closeWalletImg"
+        alt="지갑 버튼"
+        class="wallet-img"
+      />
+    </button>
+
+    <!-- 부채꼴 카드 드롭다운 -->
+    <transition-group name="fan" tag="div" class="fan-card-wrapper">
+      <img
+        v-for="(card, i) in animatedCards"
+        :key="card.cardId"
+        :src="card.image"
+        class="fan-card"
+        :class="{ show: shownCardIds.includes(card.cardId) }"
+        :style="fanCardStyle(i, card)"
+        @mouseover="hoveredCard = card.cardId"
+        @mouseleave="hoveredCard = null"
+        @click="handleCardSelection(card)"
+      />
     </transition-group>
   </div>
 </template>
-  
-  <script setup>
-  import { ref, nextTick } from 'vue';
-  import closeWalletImg from '@/assets/images/wallet/closeWalletImg.png';
-  import openWalletImg from '@/assets/images/wallet/openWalletImg.png';
-  
-  // props
-  const props = defineProps({
-    myCards: {
-      type: Array,
-      required: true,
-    },
-    selectedCard: {
-      type: Object,
-      required: false,
-    },
-    handleCardClick: {
-      type: Function,
-      required: true,
-    },
-  });
-  const emit = defineEmits(['update-message']);
-  
-  const isWalletOpen = ref(false); // 카드 지갑 열림/닫힘
-  const animatedCards = ref([]); // 카드 부채꼴 애니메이션
-  const hoveredCard = ref(null); // 카드 호버하면 떠오름
-  const shownCardIds = ref([]); // 애니메이션 렌더링 속도 문제 해결용
 
-  const toggleWallet = async () => {
+<script setup>
+import { ref, nextTick } from 'vue';
+import closeWalletImg from '@/assets/images/wallet/closeWalletImg.png';
+import openWalletImg from '@/assets/images/wallet/openWalletImg.png';
+
+// props
+const props = defineProps({
+  myCards: {
+    type: Array,
+    required: true,
+  },
+  selectedCard: {
+    type: Object,
+    required: false,
+  },
+  handleCardClick: {
+    type: Function,
+    required: true,
+  },
+});
+const emit = defineEmits(['update-message']);
+
+const isWalletOpen = ref(false); // 카드 지갑 열림/닫힘
+const animatedCards = ref([]); // 카드 부채꼴 애니메이션
+const hoveredCard = ref(null); // 카드 호버하면 떠오름
+const shownCardIds = ref([]); // 애니메이션 렌더링 속도 문제 해결용
+
+const toggleWallet = async () => {
   isWalletOpen.value = !isWalletOpen.value;
   animatedCards.value = [];
   shownCardIds.value = [];
@@ -71,8 +70,8 @@
     emit('update-message', '내 주변 혜택을 받을 수 있는 매장을 검색해보세요');
   }
 };
-  
-const fanCardStyle = (i,card) => {
+
+const fanCardStyle = (i, card) => {
   const spread = 60 / props.myCards.length; // 카드 수에 따라 각도 조정
   const angle = (i - (animatedCards.value.length - 1) / 2) * spread;
   const radius = 110;
@@ -84,8 +83,9 @@ const fanCardStyle = (i,card) => {
     position: 'absolute',
     left: `calc(50% + ${x}px)`,
     top: `-${y}px`,
-    transform: `translate(${x}px, ${y}px) rotate(${angle}deg)`
-    + (isHovered ? ' translateY(-10px) scale(1.05)' : ''),
+    transform:
+      `translate(${x}px, ${y}px) rotate(${angle}deg)` +
+      (isHovered ? ' translateY(-10px) scale(1.05)' : ''),
     opacity: 1,
     zIndex: isHovered ? 999 : 'auto',
     transition: 'transform 0.6s ease, opacity 0.3s ease',
@@ -93,25 +93,25 @@ const fanCardStyle = (i,card) => {
     boxShadow: isHovered ? '0 6px 20px rgba(0, 0, 0, 0.3)' : '',
   };
 };
-  
+
 const handleCardSelection = (card) => {
   props.handleCardClick(card.cardId);
-//   isWalletOpen.value = false;
-//   animatedCards.value = [];
+  //   isWalletOpen.value = false;
+  //   animatedCards.value = [];
   emit('update-message', '내 카드로 주변 혜택 매장을 검색합니다!');
 };
-  </script>
-  
-  <style scoped>
-  /* 타이틀 문구 */
-  .title {
+</script>
+
+<style scoped>
+/* 타이틀 문구 */
+.title {
   font-weight: bold;
   font-size: 14px;
   margin-bottom: 8px;
   text-align: center;
 }
 /* 카드지갑 */
-  .wallet-container {
+.wallet-container {
   position: fixed;
   bottom: 100px;
   left: 49%;
@@ -164,5 +164,4 @@ const handleCardSelection = (card) => {
   z-index: 999; 
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3); 
 } */
-  </style>
-  
+</style>
