@@ -69,7 +69,11 @@ const routes = [
   { path: '/card', name: 'CardEditPage', component: CardEditPage },
   { path: '/lab/fortune', component: FortuneCard },
   { path: '/payment', component: PaymentPage },
-  { path: '/allCardProduct', name: 'AllCardProductPage', component: AllCardProductPage },
+  {
+    path: '/allCardProduct',
+    name: 'AllCardProductPage',
+    component: AllCardProductPage,
+  },
   { path: '/CardDetail', name: 'CardDetail', component: CardDetailPage },
   {
     path: '/payment/qr',
@@ -80,7 +84,7 @@ const routes = [
     path: '/card-detail/:id', // 1. URL 파라미터 ':productId' 정의
     name: 'CardDetail',
     component: CardDetailPage,
-    props: true // 2. [핵심] 이 옵션을 true로 설정!
+    props: true, // 2. [핵심] 이 옵션을 true로 설정!
   },
   {
     path: '/notification',
@@ -97,18 +101,23 @@ const routes = [
   {
     path: '/mypage/mycouponpage',
     name: 'MyCouponPage',
-    component: MyCouponPage
+    component: MyCouponPage,
   },
   {
     path: '/mypage/mybookingpage',
     name: 'MyBookingPage',
-    component: MyBookingPage
+    component: MyBookingPage,
   },
   {
     path: '/mypage/mycardpage',
     name: 'MyCardPage',
-    component: MyCardPage
-  }
+    component: MyCardPage,
+  },
+  {
+    path: '/card',
+    name: 'CardEditPage',
+    component: CardEditPage,
+  },
 ];
 
 const router = createRouter({

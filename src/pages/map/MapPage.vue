@@ -1,6 +1,5 @@
 <script setup>
-
-import { onMounted, ref, watch,computed} from 'vue';
+import { onMounted, ref, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useMap } from '@/pages/map/map';
 import axios from 'axios';
@@ -8,9 +7,6 @@ import { calculator } from 'fontawesome';
 import PayNavigator from '@/pages/map/PayNavigator.vue';
 import memberApi from '@/api/memberApi';
 import WalletButton from '@/pages/map/WalletButton.vue';
-import { useRoute } from 'vue-router';
-import { onMounted } from 'vue';
-
 
 const route = useRoute();
 const mapDiv = ref(null);
@@ -22,9 +18,9 @@ const {
   selectedCard,
   categoryColorMap,
   categoryLabel,
-  handleSearch, 
+  handleSearch,
   handleCardClick,
-  
+
   moveToCurrentLocation,
   myCards,
   isMapReady,
@@ -55,8 +51,6 @@ watch(
     }
   }
 );
-
-
 
 // 페이 네비게이터 모드 관리용 변수
 const payNavigatorMode = ref(false);
@@ -95,9 +89,8 @@ watch(selectedCard, (newVal) => {
     <!-- 검색 및 MyCard UI -->
     <div class="controls-container">
       <div class="controls-box">
-        <p class="title">{{walletMessage}}</p>
+        <p class="title">{{ walletMessage }}</p>
 
-       
         <!-- 검색창 + 지갑 -->
         <div class="search-bar">
           <input
@@ -116,18 +109,32 @@ watch(selectedCard, (newVal) => {
         </div>
 
         <!-- 카드 리스트 보여주기 (클릭 시 누적 검색) -->
-         <!-- <div class="my-cards-wrapper"> 
+        <!-- <div class="my-cards-wrapper"> 
           <div v-for="card in myCards" :key="card.cardId" class="card-thumbnail" :class="{ active: selectedCard?.cardId === card.cardId }" @click="handleCardClick(card.cardId)">
             <img :src="card.image" class="card-image" :alt="card.cardName" />
           </div>
         </div> -->
-      </div> 
+      </div>
       <!-- 현재 위치/재검색 -->
       <div class="research-area">
-        <button @click="handleSearch" class="research-button">📍 현재 지도에서 재검색</button>
-        <button @click="moveToCurrentLocation" class="location-button" aria-label="현재 위치로 이동">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-              stroke="#ffcd39" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button @click="handleSearch" class="research-button">
+          📍 현재 지도에서 재검색
+        </button>
+        <button
+          @click="moveToCurrentLocation"
+          class="location-button"
+          aria-label="현재 위치로 이동"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            fill="none"
+            stroke="#ffcd39"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
             <path d="M21 3L3 10.53v.98l6.84 2.65L12.48 21h.98L21 3z"></path>
           </svg>
         </button>
@@ -135,68 +142,71 @@ watch(selectedCard, (newVal) => {
     </div>
   </div>
 
-    <!-- 하단 상세 정보 시트 -->
-<transition name="bottom-sheet">
-  <div v-if="selectedMerchant && !payNavigatorMode" class="bottom-sheet-container">
-    <div class="bottom-sheet-content">
-      <button @click="selectedMerchant = null" class="close-button">&times;</button>
-      <h2 class="merchant-name">{{ selectedMerchant.name }}</h2>
-      <p class="merchant-category">{{ categoryLabel }}</p>
+  <!-- 하단 상세 정보 시트 -->
+  <transition name="bottom-sheet">
+    <div
+      v-if="selectedMerchant && !payNavigatorMode"
+      class="bottom-sheet-container"
+    >
+      <div class="bottom-sheet-content">
+        <button @click="selectedMerchant = null" class="close-button">
+          &times;
+        </button>
+        <h2 class="merchant-name">{{ selectedMerchant.name }}</h2>
+        <p class="merchant-category">{{ categoryLabel }}</p>
 
-      <!-- 혜택 리스트 -->
-      <div class="benefits-list">
-        <h3 class="benefits-title">받을 수 있는 혜택</h3>
-        <!-- 혜택이 있을 경우 -->
-        <div
-          v-if="selectedMerchant.benefits && selectedMerchant.benefits.length"
-        >
+        <!-- 혜택 리스트 -->
+        <div class="benefits-list">
+          <h3 class="benefits-title">받을 수 있는 혜택</h3>
+          <!-- 혜택이 있을 경우 -->
           <div
-            v-for="benefit in selectedMerchant.benefits"
-            :key="benefit.cardName + benefit.storeName"
-            class="benefit-item"
-            :class="{ 'primary': benefit.isPrimary }"
-            @click="openPayNavigator"
+            v-if="selectedMerchant.benefits && selectedMerchant.benefits.length"
           >
-          
-          <img
-            v-if="benefit.cardImageUrl"
-            :src="benefit.cardImageUrl || selectedCard.image"
-            :alt="benefit.cardName"
-            class="benefit-card-image"
-            />
-            <div class="benefit-text">
-               <!-- 카드 이미지 -->
-            
-              <p class="benefit-desc">{{ benefit.description }}</p>
-              <p class="benefit-card">
-                {{ benefit.cardName }}
-                <template v-if="benefit.rateValue"> | {{ benefit.rateValue }}% 할인</template>
-                <template v-else-if="benefit.amountValue"> | {{ benefit.amountValue }}원 할인</template>
-              </p>
+            <div
+              v-for="benefit in selectedMerchant.benefits"
+              :key="benefit.cardName + benefit.storeName"
+              class="benefit-item"
+              :class="{ primary: benefit.isPrimary }"
+              @click="openPayNavigator"
+            >
+              <img
+                v-if="benefit.cardImageUrl"
+                :src="benefit.cardImageUrl || selectedCard.image"
+                :alt="benefit.cardName"
+                class="benefit-card-image"
+              />
+              <div class="benefit-text">
+                <!-- 카드 이미지 -->
+
+                <p class="benefit-desc">{{ benefit.description }}</p>
+                <p class="benefit-card">
+                  {{ benefit.cardName }}
+                  <template v-if="benefit.rateValue">
+                    | {{ benefit.rateValue }}% 할인</template
+                  >
+                  <template v-else-if="benefit.amountValue">
+                    | {{ benefit.amountValue }}원 할인</template
+                  >
+                </p>
+              </div>
+              <span v-if="benefit.isPrimary">🥇</span>
             </div>
-            <span v-if="benefit.isPrimary">🥇</span>
+
+            <button class="navigator-button" @click="openPayNavigator">
+              🥇 페이 네비게이터 실행하기
+            </button>
           </div>
-          
-          <button class="navigator-button" @click="openPayNavigator">
-            🥇 페이 네비게이터 실행하기
-          </button>
-        </div>
           <!-- 혜택이 없을 경우 -->
-      <div v-else class="no-benefits">
-        <p class="no-benefit-msg">해당 매장에서 받을 수 있는 혜택이 없습니다.</p>
-    </div>
+          <div v-else class="no-benefits">
+            <p class="no-benefit-msg">
+              해당 매장에서 받을 수 있는 혜택이 없습니다.
+            </p>
+          </div>
+        </div>
       </div>
-   
-       
     </div>
-  </div>
-</transition>
+  </transition>
 
-
-
-    
-
-  
   <!-- 🥇 페이 네비게이터 모드-->
   <transition name="bottom-sheet">
     <PayNavigator
@@ -211,5 +221,4 @@ watch(selectedCard, (newVal) => {
 <style>
 @import '@/assets/main.css';
 @import './map.css';
-
 </style>
