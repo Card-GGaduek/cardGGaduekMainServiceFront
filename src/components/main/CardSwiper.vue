@@ -2,36 +2,36 @@
   <div class="card-swiper-container">
     <div class="swiper-container">
       <Swiper
-          :slides-per-view="'auto'"
-          :centered-slides="true"
-          :space-between="16"
-          :loop="false"
-          :initial-slide="1"
-          @slideChange="onSlideChange"
-          class="card-swiper"
+        :slides-per-view="'auto'"
+        :centered-slides="true"
+        :space-between="16"
+        :loop="false"
+        :initial-slide="1"
+        @slideChange="onSlideChange"
+        class="card-swiper"
       >
         <SwiperSlide
-            v-for="(card, index) in cards"
-            :key="card.cardId"
-            class="swiper-slide-custom"
+          v-for="(card, index) in cards"
+          :key="card.cardId"
+          class="swiper-slide-custom"
         >
           <div class="card-container">
             <div
-                class="card"
-                :class="{
+              class="card"
+              :class="{
                 active: index === activeIndex,
                 inactive: index !== activeIndex,
                 flipped: flippedCards.has(index),
                 'no-animation': isSliding,
               }"
-                @click="toggleCardFlip(index)"
+              @click="toggleCardFlip(index)"
             >
               <div class="card-inner">
                 <div class="card-front">
                   <img
-                      :src="card.cardImageUrl"
-                      alt="카드 이미지"
-                      class="card-image"
+                    :src="card.cardImageUrl"
+                    alt="카드 이미지"
+                    class="card-image"
                   />
                 </div>
                 <div class="card-back">
@@ -41,69 +41,84 @@
                         {{ card.cardProductName }}
                       </h3>
                       <p class="card-back-company">
-                        카드사 <!-- 현재 MyCardDTO에 은행 정보가 없어서 고정값 -->
+                        카드사
+                        <!-- 현재 MyCardDTO에 은행 정보가 없어서 고정값 -->
                       </p>
                     </div>
 
                     <div class="benefits-section">
                       <div
-                          class="benefits-container"
-                          :class="{ 'expanded': expandedCards.has(index) }"
+                        class="benefits-container"
+                        :class="{ expanded: expandedCards.has(index) }"
                       >
                         <div
-                            v-for="(benefit, benefitIndex) in getDisplayBenefits(card.storeBenefitList, index)"
-                            :key="benefitIndex"
-                            class="benefit-item"
+                          v-for="(benefit, benefitIndex) in getDisplayBenefits(
+                            card.storeBenefitList,
+                            index
+                          )"
+                          :key="benefitIndex"
+                          class="benefit-item"
                         >
                           <div class="benefit-icon">
                             <span
-                                v-if="benefit.storeCategory === 'CONVENIENCE_STORE'"
-                                class="category-emoji"
-                            >🏪</span
+                              v-if="
+                                benefit.storeCategory === 'CONVENIENCE_STORE'
+                              "
+                              class="category-emoji"
+                              >🏪</span
                             >
                             <span
-                                v-else-if="benefit.storeCategory === 'COFFEE_SHOP'"
-                                class="category-emoji"
-                            >☕</span
+                              v-else-if="
+                                benefit.storeCategory === 'COFFEE_SHOP'
+                              "
+                              class="category-emoji"
+                              >☕</span
                             >
                             <span
-                                v-else-if="benefit.storeCategory === 'MOVIE_THEATER'"
-                                class="category-emoji"
-                            >🎬</span
+                              v-else-if="
+                                benefit.storeCategory === 'MOVIE_THEATER'
+                              "
+                              class="category-emoji"
+                              >🎬</span
                             >
                             <span
-                                v-else-if="benefit.storeCategory === 'GAS_STATION'"
-                                class="category-emoji"
-                            >⛽</span
+                              v-else-if="
+                                benefit.storeCategory === 'GAS_STATION'
+                              "
+                              class="category-emoji"
+                              >⛽</span
                             >
                             <span
-                                v-else-if="benefit.storeCategory === 'RESTAURANT'"
-                                class="category-emoji"
-                            >🍽️</span
+                              v-else-if="benefit.storeCategory === 'RESTAURANT'"
+                              class="category-emoji"
+                              >🍽️</span
                             >
                             <span
-                                v-else-if="benefit.storeCategory === 'HOTEL'"
-                                class="category-emoji"
-                            >🏨</span
+                              v-else-if="benefit.storeCategory === 'HOTEL'"
+                              class="category-emoji"
+                              >🏨</span
                             >
                             <span
-                                v-else-if="benefit.storeCategory === 'THEME_PARK'"
-                                class="category-emoji"
-                            >🎡</span
+                              v-else-if="benefit.storeCategory === 'THEME_PARK'"
+                              class="category-emoji"
+                              >🎡</span
                             >
                             <span v-else class="category-emoji">💳</span>
                           </div>
                           <span class="benefit-text">{{
-                              benefit.description
-                            }}</span>
+                            benefit.description
+                          }}</span>
                         </div>
                       </div>
 
                       <!-- 더보기/접기 버튼 -->
                       <div
-                          v-if="card.storeBenefitList && card.storeBenefitList.length > 2"
-                          class="more-benefits-button"
-                          @click.stop="toggleBenefitsExpand(index)"
+                        v-if="
+                          card.storeBenefitList &&
+                          card.storeBenefitList.length > 2
+                        "
+                        class="more-benefits-button"
+                        @click.stop="toggleBenefitsExpand(index)"
                       >
                         <span v-if="!expandedCards.has(index)">
                           더보기 (+{{ card.storeBenefitList.length - 2 }})
@@ -114,8 +129,8 @@
 
                     <!-- 혜택 가능한 매장 보기 버튼 -->
                     <div
-                        class="view-stores-button"
-                        @click.stop="goToStoreList(card.cardId)"
+                      class="view-stores-button"
+                      @click.stop="goToStoreList(card.cardId)"
                     >
                       <span>혜택 적용 가능한 매장 보기</span>
                     </div>
@@ -134,14 +149,13 @@
                 </div>
               </div>
             </div>
-
-            <!-- 카드 편집 텍스트 (비활성 카드에만 표시) -->
-            <div v-if="index !== activeIndex" class="card-edit-text">
-              카드 편집
-            </div>
           </div>
         </SwiperSlide>
       </Swiper>
+      <!-- 카드 편집 -->
+      <div style="display: flex; justify-content: center">
+        <button class="card-edit-text" @click="goToCardEdit">카드 편집</button>
+      </div>
     </div>
 
     <!-- 버튼들을 Swiper 밖으로 이동하여 고정 -->
@@ -198,16 +212,21 @@ const goToStoreList = (cardId) => {
   }
 };
 
+const goToCardEdit = () => {
+  router.push({ path: '/card' });
+};
+
 const loadCards = async () => {
   try {
     const result = await memberApi.getMyCard();
     cards.value = result;
     console.log('로드된 카드 데이터:', cards.value);
   } catch (err) {
-    const userMessage = err.userMessage ||
-        (err.code === 'ECONNABORTED'
-            ? '서버 응답이 지연되고 있습니다. 잠시 후 다시 시도해주세요.'
-            : '카드 정보를 불러오는데 실패했습니다.');
+    const userMessage =
+      err.userMessage ||
+      (err.code === 'ECONNABORTED'
+        ? '서버 응답이 지연되고 있습니다. 잠시 후 다시 시도해주세요.'
+        : '카드 정보를 불러오는데 실패했습니다.');
 
     alert(userMessage);
     console.error('카드 리스트 로드 실패:', err);
@@ -586,6 +605,8 @@ onMounted(() => {
   font-size: 12px;
   color: #666;
   text-align: center;
+  border: none;
+  background-color: white;
 }
 
 :deep(.swiper-wrapper) {

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { onMounted, ref, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useMap } from '@/pages/map/map';
 import PayNavigator from '@/pages/map/PayNavigator.vue';

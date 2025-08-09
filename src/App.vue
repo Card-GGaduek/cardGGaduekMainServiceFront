@@ -123,9 +123,9 @@ body {
 
 .title-section {
   position: absolute;
-  top: 100px;
+  top: 60px;
   left: 50%;
-  transform: translateX(-500px);
+  transform: translateX(-650px);
   text-align: left;
   z-index: 10;
 }
@@ -153,8 +153,8 @@ body {
 /* ✅ 검색창 스타일 추가 */
 .search-section {
   position: absolute;
-  top: 250px;
-  transform: translateX(-330px);
+  top: 195px;
+  transform: translateX(-480px);
   z-index: 10;
   width: 350px;
 }
@@ -172,7 +172,6 @@ body {
 
 .search-input {
   flex: 1;
-  margin-top: 15px;
   padding: 0 16px;
   border: none;
   font-size: 20px;
@@ -187,9 +186,8 @@ body {
 }
 
 .search-button {
-  width: 70px;
-  height: 70px;
-  margin-top: 15px;
+  width: 65px;
+  height: 65px;
   box-sizing: border-box;
   border: none;
   border-radius: 50%;
