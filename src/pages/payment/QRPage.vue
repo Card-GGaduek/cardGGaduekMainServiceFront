@@ -22,8 +22,7 @@ import { useUserStore } from '@/stores/userStore';
 import axios from 'axios';
 
 const userStore = useUserStore();
-userStore.setUser(3);
-userStore.setCard(5);
+userStore.setUser(7);
 
 const memberId = userStore.memberId;
 const cardId = userStore.selectedCardId;

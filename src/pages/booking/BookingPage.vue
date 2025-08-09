@@ -74,7 +74,7 @@ function handleBooking(benefit) {
 <template>
   <div class="benefit-page-bg">
     <div class="container benefit-page-container">
-      <header class="pt-4 mb-4">
+      <header class="pt-4">
         
       <img src="@/assets/logo/logo.jpg" alt="카드까득 로고" class="logo-img mb-5" />
         <h2 class="fw-bolder text-center">혜택도, 예약도 한 번에!</h2>
@@ -83,7 +83,7 @@ function handleBooking(benefit) {
         </p>
       </header>
 
-      <div class="scrollable-content">
+      <div>
         <div class="card main-category-card mb-4">
           <div class="card-body">
             <section
@@ -107,7 +107,7 @@ function handleBooking(benefit) {
           </div>
         </div>
 
-        <main class="benefit-list">
+        <main class="benefit-list scrollable-content">
           <div v-if="isLoading" class="text-center p-5">
             <div class="spinner-border" role="status"></div>
           </div>
@@ -181,9 +181,9 @@ function handleBooking(benefit) {
 }
 .benefit-page-bg {
   background-color: white;
+
 }
 .benefit-page-container {
-  max-width: 420px;
   background-color: white;
   height: 100vh;
   display: flex;
@@ -203,9 +203,11 @@ header {
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
+
 .category-item {
   cursor: pointer;
 }
+
 .category-item .icon-wrapper {
   width: 60px;
   height: 60px;
@@ -219,24 +221,12 @@ header {
   color: #6c757d;
   border: 2px solid #f0f0f0;
 }
+
 .category-item .icon-wrapper.active {
   border-color: #0d6efd;
   color: #0d6efd;
 }
 
-/* 서브 카테고리 탭 */
-.sub-category-tabs {
-  border-bottom: 2px solid #dee2e6;
-}
-.sub-category-tabs .nav-link {
-  border: none;
-  color: #6c757d;
-  font-weight: bold;
-}
-.sub-category-tabs .nav-link.active {
-  color: #000;
-  border-bottom: 2px solid #ff9900;
-}
 
 /* 혜택 카드 */
 .benefit-card {
