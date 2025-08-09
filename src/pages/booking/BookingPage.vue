@@ -11,7 +11,7 @@ const selectedCategory = ref("여행");
 const categories = ref([
   { name: "여행", icon: '🏨', apiValue: "HOTEL" },
   { name: "입장권", icon: '🎡', apiValue: "THEME_PARK" },
-  { name: "쇼핑", icon: '🛒', apiValue: "SHOPPING" },
+  { name: "쇼핑", icon: '🛒', apiValue: "RESTAURANT" },
   { name: "문화", icon: '🎬', apiValue: "MOVIE_THEATER" },
 ]);
 

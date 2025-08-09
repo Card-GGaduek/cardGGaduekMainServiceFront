@@ -1,12 +1,12 @@
 <script setup>
-import { ref, onMounted, watch, computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { ref, onMounted, watch, computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 // 실제 프로젝트의 설정된 axios 인스턴스를 가져옵니다.
 // import api from '@/utils/api';
 
 // api 객체가 없으므로, 임시로 axios를 사용합니다.
 // 실제 환경에서는 위의 api import를 사용하세요.
-import api from "@/api/index.js";
+import api from '@/api/index.js';
 
 const route = useRoute();
 const router = useRouter();
@@ -17,11 +17,11 @@ const roomName = ref(route.query.roomName);
 const checkIn = ref(route.query.checkIn);
 const checkOut = ref(route.query.checkOut);
 
-const guestName = ref("");
-const guestPhone = ref("");
-const emailId = ref("");
-const emailDomain = ref("");
-const requestText = ref("");
+const guestName = ref('');
+const guestPhone = ref('');
+const emailId = ref('');
+const emailDomain = ref('');
+const requestText = ref('');
 const numberOfGuests = ref(1);
 const selectedCouponId = ref(null);
 const selectedCardId = ref(null);
@@ -32,40 +32,40 @@ const userCoupons = ref([]);
 const isLoading = ref(true); // 전체 로딩 상태로 통합
 
 const errors = ref({
-  guestName: "",
-  guestPhone: "",
-  guestEmail: "",
+  guestName: '',
+  guestPhone: '',
+  guestEmail: '',
 });
 
 const guestEmail = computed(() => {
   if (emailId.value && emailDomain.value) {
     return `${emailId.value}@${emailDomain.value}`;
   }
-  return "";
+  return '';
 });
 
 // --- 함수 ---
 function validateForm() {
-  errors.value = { guestName: "", guestPhone: "", guestEmail: "" };
+  errors.value = { guestName: '', guestPhone: '', guestEmail: '' };
   let isValid = true;
 
   if (!guestName.value) {
-    errors.value.guestName = "이름을 입력해주세요.";
+    errors.value.guestName = '이름을 입력해주세요.';
     isValid = false;
   }
 
   const phoneRegex = /^\d{3}-\d{3,4}-\d{4}$/;
   if (!guestPhone.value) {
-    errors.value.guestPhone = "전화번호를 입력해주세요.";
+    errors.value.guestPhone = '전화번호를 입력해주세요.';
     isValid = false;
   } else if (!phoneRegex.test(guestPhone.value)) {
     errors.value.guestPhone =
-        "올바른 전화번호 형식 (010-1234-5678) 이 아닙니다.";
+      '올바른 전화번호 형식 (010-1234-5678) 이 아닙니다.';
     isValid = false;
   }
 
   if (!guestEmail.value) {
-    errors.value.guestEmail = "이메일을 입력해주세요.";
+    errors.value.guestEmail = '이메일을 입력해주세요.';
     isValid = false;
   }
 
@@ -108,7 +108,7 @@ async function submitBooking() {
 
   try {
     // [수정] .get({ params: ... }) -> .post(데이터) 로 변경
-    const response = await api.post("api/booking", bookingData);
+    const response = await api.post('api/booking', bookingData);
 
     const newBookingId = response.data.data || response.data;
 
@@ -136,16 +136,18 @@ async function submitBooking() {
         // 선택된 카드 정보
         cardId: selectedCardId.value,
         // 선택된 카드 정보와 확정된 할인 금액
-        selectedCardName: selectedCardId.value ? userCards.value.find(card => card.id === selectedCardId.value)?.name : null,
+        selectedCardName: selectedCardId.value
+          ? userCards.value.find((card) => card.id === selectedCardId.value)
+              ?.name
+          : null,
         selectedCardId: selectedCardId.value,
         // 확정된 할인 금액 - 이미 계산된 값을 그대로 전달
-        confirmedCardDiscount: priceDetails.value?.cardDiscountAmount || 0
-      }
+        confirmedCardDiscount: priceDetails.value?.cardDiscountAmount || 0,
+      },
     });
-
   } catch (error) {
-    console.error("예약 실패:", error);
-    alert(error.response?.data?.message || "예약 처리 중 오류가 발생했습니다.");
+    console.error('예약 실패:', error);
+    alert(error.response?.data?.message || '예약 처리 중 오류가 발생했습니다.');
   }
 }
 
@@ -164,10 +166,10 @@ async function fetchPrice() {
       couponProductId: selectedCouponId.value,
       cardId: selectedCardId.value,
     };
-    const response = await api.post("api/booking/price", priceData);
+    const response = await api.post('api/booking/price', priceData);
     priceDetails.value = response.data.data || response.data;
   } catch (error) {
-    console.error("가격 계산 실패:", error);
+    console.error('가격 계산 실패:', error);
     priceDetails.value = null; // 실패 시 가격 정보 초기화
   } finally {
     isLoading.value = false;
@@ -178,10 +180,10 @@ async function fetchPrice() {
 async function fetchUserCards() {
   try {
     // memberId 등 식별자를 파라미터로 넘길 수 있습니다.
-    const response = await api.get("api/card");
+    const response = await api.get('api/card');
     userCards.value = response.data.data || response.data;
   } catch (e) {
-    console.error("카드 목록 조회 실패", e);
+    console.error('카드 목록 조회 실패', e);
     // API 실패 시 목업 데이터 제공
   }
 }
@@ -189,29 +191,31 @@ async function fetchUserCards() {
 // [추가] 사용자 보유 쿠폰 목록 조회
 async function fetchUserCoupons() {
   try {
-    const response = await api.get("api/member/coupons");
+    const response = await api.get('api/member/coupons');
 
     // 서버로부터 받은 원본 데이터 배열을 먼저 변수에 담습니다.
-    const travelCoupons = response.data.data.memberCoupons.filter(coupon => coupon.couponCategory === 'TRAVEL');
+    const travelCoupons = response.data.data.memberCoupons.filter(
+      (coupon) => coupon.couponCategory === 'TRAVEL'
+    );
     userCoupons.value = travelCoupons;
-    console.log("1. [원본 데이터] 서버에서 받은 모습:", userCoupons.value);
+    console.log('1. [원본 데이터] 서버에서 받은 모습:', userCoupons.value);
   } catch (e) {
-    console.error("쿠폰 목록 조회 실패", e);
+    console.error('쿠폰 목록 조회 실패', e);
   }
 }
 
 watch(guestPhone, (newVal) => {
   // 숫자만 남기고, 형식에 맞게 하이픈(-) 추가
-  const cleaned = newVal.replace(/\D/g, "");
-  let formatted = "";
+  const cleaned = newVal.replace(/\D/g, '');
+  let formatted = '';
   if (cleaned.length <= 3) {
     formatted = cleaned;
   } else if (cleaned.length <= 7) {
     formatted = `${cleaned.slice(0, 3)}-${cleaned.slice(3)}`;
   } else {
     formatted = `${cleaned.slice(0, 3)}-${cleaned.slice(3, 7)}-${cleaned.slice(
-        7,
-        11
+      7,
+      11
     )}`;
   }
   guestPhone.value = formatted;
@@ -263,12 +267,12 @@ function increaseGuests() {
             <div class="mb-3">
               <label for="guestName" class="form-label">이름</label>
               <input
-                  type="text"
-                  class="form-control"
-                  :class="{ 'is-invalid': errors.guestName }"
-                  id="guestName"
-                  placeholder="ex. 홍길동"
-                  v-model="guestName"
+                type="text"
+                class="form-control"
+                :class="{ 'is-invalid': errors.guestName }"
+                id="guestName"
+                placeholder="ex. 홍길동"
+                v-model="guestName"
               />
               <div v-if="errors.guestName" class="invalid-feedback">
                 {{ errors.guestName }}
@@ -277,13 +281,13 @@ function increaseGuests() {
             <div class="mb-3">
               <label for="guestPhone" class="form-label">전화번호</label>
               <input
-                  type="text"
-                  class="form-control"
-                  :class="{ 'is-invalid': errors.guestPhone }"
-                  id="guestPhone"
-                  placeholder="010-1234-5678"
-                  v-model="guestPhone"
-                  maxlength="13"
+                type="text"
+                class="form-control"
+                :class="{ 'is-invalid': errors.guestPhone }"
+                id="guestPhone"
+                placeholder="010-1234-5678"
+                v-model="guestPhone"
+                maxlength="13"
               />
               <div v-if="errors.guestPhone" class="invalid-feedback">
                 {{ errors.guestPhone }}
@@ -293,22 +297,22 @@ function increaseGuests() {
               <label for="numberOfGuests" class="form-label">인원</label>
               <div class="input-group">
                 <button
-                    class="btn btn-outline-secondary"
-                    type="button"
-                    @click="decreaseGuests"
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  @click="decreaseGuests"
                 >
                   -
                 </button>
                 <input
-                    type="text"
-                    class="form-control text-center"
-                    :value="`${numberOfGuests}명`"
-                    readonly
+                  type="text"
+                  class="form-control text-center"
+                  :value="`${numberOfGuests}명`"
+                  readonly
                 />
                 <button
-                    class="btn btn-outline-secondary"
-                    type="button"
-                    @click="increaseGuests"
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  @click="increaseGuests"
                 >
                   +
                 </button>
@@ -317,15 +321,15 @@ function increaseGuests() {
             <div class="mb-3">
               <label for="guestEmail" class="form-label">이메일</label>
               <div
-                  class="input-group"
-                  :class="{ 'is-invalid': errors.guestEmail }"
+                class="input-group"
+                :class="{ 'is-invalid': errors.guestEmail }"
               >
                 <input
-                    type="text"
-                    class="form-control"
-                    id="guestEmail"
-                    placeholder="email"
-                    v-model="emailId"
+                  type="text"
+                  class="form-control"
+                  id="guestEmail"
+                  placeholder="email"
+                  v-model="emailId"
                 />
                 <span class="input-group-text">@</span>
                 <select class="form-select" v-model="emailDomain">
@@ -342,11 +346,11 @@ function increaseGuests() {
             <div>
               <label for="requestText" class="form-label">요청사항</label>
               <textarea
-                  class="form-control"
-                  id="requestText"
-                  rows="4"
-                  placeholder="업체에 요청하실 내용을 적어주세요."
-                  v-model="requestText"
+                class="form-control"
+                id="requestText"
+                rows="4"
+                placeholder="업체에 요청하실 내용을 적어주세요."
+                v-model="requestText"
               ></textarea>
             </div>
           </div>
@@ -356,9 +360,9 @@ function increaseGuests() {
           <select class="form-select mb-2" v-model="selectedCouponId">
             <option :value="null">쿠폰을 선택하세요</option>
             <option
-                v-for="coupon in userCoupons"
-                :key="coupon.id"
-                :value="coupon.id"
+              v-for="coupon in userCoupons"
+              :key="coupon.id"
+              :value="coupon.couponProductId"
             >
               {{ coupon.couponName }}
             </option>
@@ -382,28 +386,28 @@ function increaseGuests() {
             <div class="d-flex justify-content-between text-muted mb-2">
               <span>쿠폰 할인</span>
               <span
-              >-
+                >-
                 {{ priceDetails.couponDiscountAmount.toLocaleString() }}원</span
               >
             </div>
             <div class="d-flex justify-content-between text-muted mb-3">
               <span>카드 할인</span>
               <span
-              >-
+                >-
                 {{ priceDetails.cardDiscountAmount.toLocaleString() }}원</span
               >
             </div>
             <div class="d-flex justify-content-between align-items-center my-3">
               <span class="fw-bold">결제금액</span>
               <span class="fw-bold fs-4 text-warning"
-              >{{ priceDetails.finalPrice.toLocaleString() }}원</span
+                >{{ priceDetails.finalPrice.toLocaleString() }}원</span
               >
             </div>
           </div>
 
           <button
-              @click="submitBooking"
-              class="btn btn-warning w-100 p-3 fw-bold"
+            @click="submitBooking"
+            class="btn btn-warning w-100 p-3 fw-bold"
           >
             결제하고 예약 완료하기
           </button>
@@ -418,7 +422,6 @@ function increaseGuests() {
   background-color: #f8f9fa;
 }
 .page-container {
-  max-width: 420px;
   background-color: #f8f9fa;
   min-height: 100vh;
   display: flex;
@@ -435,8 +438,13 @@ function increaseGuests() {
   z-index: 10;
   border-bottom: 1px solid #eee;
 }
-.top-header .bi-arrow-left {
+.bi-arrow-left {
   position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.4rem;
+  color: #333;
 }
 .card {
   border: none;

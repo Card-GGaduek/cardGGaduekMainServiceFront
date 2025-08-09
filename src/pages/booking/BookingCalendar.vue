@@ -1,42 +1,54 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, defineProps, defineEmits } from 'vue';
+
+// --- Props & Emits ---
+
+const props = defineProps({
+  bookedRanges: {
+    type: Array,
+    default: () => []
+  }
+});
 
 const emit = defineEmits(['dates-selected']);
 
+
 // --- 상태 관리 ---
-const currentDate = ref(new Date()); // 달력이 현재 보여주는 월
+
+const currentDate = ref(new Date());
 const checkInDate = ref(null);
 const checkOutDate = ref(null);
 
+
 // --- 날짜 계산 ---
+
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 
 const fourMonthsLater = new Date();
 fourMonthsLater.setMonth(fourMonthsLater.getMonth() + 4);
-fourMonthsLater.setHours(23, 59, 59, 999); // 4개월째 되는 달의 마지막 순간까지 포함
+fourMonthsLater.setDate(new Date(fourMonthsLater.getFullYear(), fourMonthsLater.getMonth() + 1, 0).getDate());
+fourMonthsLater.setHours(23, 59, 59, 999);
+
 
 // --- Computed 속성 ---
+
 const year = computed(() => currentDate.value.getFullYear());
 const month = computed(() => currentDate.value.getMonth());
 const monthName = computed(() => 
   currentDate.value.toLocaleString('ko-KR', { month: 'long' })
 );
 
-// '이전 달' 버튼 비활성화 여부
 const isPrevMonthDisabled = computed(() => {
-  const prevMonth = new Date(year.value, month.value - 1, 1);
-  return prevMonth.getFullYear() < today.getFullYear() || 
-         (prevMonth.getFullYear() === today.getFullYear() && prevMonth.getMonth() < today.getMonth());
+  const currentMonthStart = new Date(year.value, month.value, 1);
+  return currentMonthStart <= today;
 });
 
-// '다음 달' 버튼 비활성화 여부
 const isNextMonthDisabled = computed(() => {
   const nextMonth = new Date(year.value, month.value + 1, 1);
   return nextMonth > fourMonthsLater;
 });
 
-// 달력 그리드 데이터 생성
 const calendarGrid = computed(() => {
   const firstDayOfMonth = new Date(year.value, month.value, 1).getDay();
   const daysInMonth = new Date(year.value, month.value + 1, 0).getDate();
@@ -51,9 +63,41 @@ const calendarGrid = computed(() => {
   return days;
 });
 
+
 // --- 함수 ---
+
+const isDateBooked = (date) => {
+  if (!date || !props.bookedRanges.length) return false;
+  
+  const checkTime = date.getTime();
+
+  for (const range of props.bookedRanges) {
+    if (range.status === 'CANCELED') continue;
+
+    // 💡 변경점: 날짜 문자열을 시간대 문제 없이 안전하게 파싱합니다.
+    const startParts = range.checkInDate.split('-').map(Number);
+    const endParts = range.checkOutDate.split('-').map(Number);
+
+    // new Date(YYYY, MM-1, DD) 형식으로 생성하여 항상 자정(00:00:00) 기준으로 만듭니다.
+    const startTime = new Date(startParts[0], startParts[1] - 1, startParts[2]).getTime();
+    const endTime = new Date(endParts[0], endParts[1] - 1, endParts[2]).getTime();
+    
+    if (checkTime >= startTime && checkTime <= endTime) {
+      return true;
+    }
+  }
+  return false;
+};
+
+const isDateUnavailable = (date) => {
+  if (!date) return true;
+  if (date < today || date > fourMonthsLater) return true;
+  if (isDateBooked(date)) return true;
+  return false;
+};
+
 function selectDate(date) {
-  if (!date || date < today || date > fourMonthsLater) return;
+  if (isDateUnavailable(date)) return;
 
   if (!checkInDate.value || (checkInDate.value && checkOutDate.value)) {
     checkInDate.value = date;
@@ -81,6 +125,7 @@ function isDateInRange(date) {
   const time = date.getTime();
   return time > checkInDate.value.getTime() && time < checkOutDate.value.getTime();
 }
+
 </script>
 
 <template>
@@ -111,7 +156,7 @@ function isDateInRange(date) {
         class="day-cell"
         :class="{
           'not-day': !day,
-          'is-past': day && (day < today || day > fourMonthsLater),
+          'is-unavailable': isDateUnavailable(day),
           'selected': day && checkInDate && day.getTime() === checkInDate.getTime() && !checkOutDate,
           'check-in': day && checkInDate && day.getTime() === checkInDate.getTime(),
           'check-out': day && checkOutDate && day.getTime() === checkOutDate.getTime(),
@@ -125,7 +170,6 @@ function isDateInRange(date) {
 </template>
 
 <style scoped>
-/* 전체적인 스타일은 이전과 동일 */
 .calendar-wrapper { padding: 0.5rem; border-radius: 8px; background-color: #fff; border: 1px solid #eee; }
 .calendar-header { padding: 0 0.5rem; }
 .calendar-header .fs-5 { font-size: 1.1rem !important; }
@@ -133,14 +177,9 @@ function isDateInRange(date) {
 .day-name { font-weight: normal; font-size: 0.9rem; color: #adb5bd; }
 .day-cell { padding: 8px 0; font-size: 0.9rem; font-weight: 500; cursor: pointer; border-radius: 50%; color: #495057; }
 .not-day { cursor: default; }
-
-/* 선택된 날짜 (체크인/체크아웃) */
 .selected, .check-in, .check-out { background-color: #ffc107; color: #fff; font-weight: bold; }
-/* 선택 범위 안의 날짜 */
 .in-range { background-color: #fff3cd; border-radius: 0; }
-/* 비활성화된 날짜 */
-.is-past { color: #ced4da; cursor: not-allowed; text-decoration: line-through; }
-.is-past:hover { background-color: transparent !important; }
-/* 비활성화된 버튼 */
+.is-unavailable { color: #ced4da; cursor: not-allowed; text-decoration: line-through; }
+.is-unavailable:hover { background-color: transparent !important; }
 button:disabled i { color: #e9ecef; cursor: not-allowed; }
 </style>
