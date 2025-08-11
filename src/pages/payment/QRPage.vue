@@ -12,10 +12,9 @@
         </div>
         <p v-else>QR 코드 생성 중...</p>
 
-
         <div class="timer">
           {{ minutes }}:{{ seconds.toString().padStart(2, '0') }}
-          <button @click="regenerateQRCode" class="reload-button">
+          <button @click="refreshPage" class="reload-button">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M1 4V10H7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M23 20V14H17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -23,14 +22,8 @@
             </svg>
           </button>
         </div>
-      <div class="timer">
-        {{ minutes }}:{{ seconds.toString().padStart(2, '0') }}
-        <span @click="regenerateQRCode" class="reload"
-          ><i class="bi bi-arrow-clockwise"></i
-        ></span>
       </div>
     </div>
-  </div>
   </div>
 </template>
 
@@ -42,12 +35,8 @@ import SubHeader from '@/layout/SubHeader.vue';
 import memberApi from '@/api/memberApi';
 import axios from 'axios';
 
-
 const router = useRouter();
 const authStore = useAuthStore();
-
-const memberId = userStore.memberId;
-const cardId = userStore.selectedCardId;
 
 const selectedCard = ref(null);
 const qrImage = ref('');
@@ -179,8 +168,15 @@ const startTimer = () => {
 };
 
 const regenerateQRCode = () => {
+  console.log('QR 코드 새로고침 시작');
   generateQRCode();
   startTimer();
+};
+
+// 화살표 클릭 시 페이지 새로고침
+const refreshPage = () => {
+  console.log('페이지 새로고침');
+  window.location.reload();
 };
 
 onMounted(async () => {
@@ -195,21 +191,23 @@ onMounted(async () => {
 
 <style scoped>
 .qr-wrapper {
-  min-height: calc(100vh - 150px); /* SubHeader 높이를 고려해서 조정 */
+  height: calc(100vh - 60px); /* SubHeader 높이를 고려해서 조정 */
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px 0;
   overflow: hidden; /* 스크롤 방지 */
 }
 
 .qr-container {
   text-align: center;
+  max-width: 100%;
+  padding: 0 20px;
 }
 
 .qr-text {
   font-size: 1.2rem;
   margin-bottom: 1rem;
+  line-height: 1.4;
 }
 
 .qr-box {
@@ -217,12 +215,15 @@ onMounted(async () => {
   border: 2px solid #ccc;
   border-radius: 8px;
   margin-bottom: 1rem;
+  max-width: 280px;
+  width: 100%;
 }
 
 .qr-img {
   width: 100%;
   height: 100%;
   display: block;
+  max-width: 280px;
 }
 
 .timer {
