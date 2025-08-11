@@ -7,9 +7,6 @@
         혜택 비교하고, 더 유리한 카드로 바꿔보세요.
       </p>
     </div>
-    <router-link to="/AllCardProduct" class="view-all-link">
-      전체 보기 &gt;
-    </router-link>
   </div>
   <div class="recommended-cards-list">
     <!-- 로딩 상태 -->
@@ -18,7 +15,7 @@
       <p class="loading-text">
         카드 정보를 불러오는 중...
         <span v-if="retryCount > 0"
-          >(재시도 {{ retryCount }}/{{ maxRetries }})</span
+        >(재시도 {{ retryCount }}/{{ maxRetries }})</span
         >
       </p>
     </div>
@@ -29,20 +26,20 @@
       <button class="retry-btn" @click="retryLoad">다시 시도</button>
     </div>
 
-    <!-- 카드 목록 -->
+    <!-- 카드 목록 (최대 3개만 표시) -->
     <div v-else-if="topBenefitCards.length > 0" class="recommended-cards-list">
       <div
-        v-for="(card, index) in displayedCards"
-        :key="card.id"
-        class="recommended-card-item"
-        @click="goToCardDetail(card.id)"
+          v-for="(card, index) in displayedCards"
+          :key="card.id"
+          class="recommended-card-item"
+          @click="goToCardDetail(card.id)"
       >
         <div class="rank-number">{{ index + 1 }}</div>
         <div class="card-image-container">
           <img
-            :src="card.cardImageUrl"
-            :alt="card.cardProductName"
-            class="recommended-card-image"
+              :src="card.cardImageUrl"
+              :alt="card.cardProductName"
+              class="recommended-card-image"
           />
         </div>
         <div class="card-details">
@@ -55,17 +52,11 @@
         </div>
       </div>
 
+      <!-- 전체 보기 버튼 -->
       <div class="view-more-container">
-        <button
-          v-if="!showAll && topBenefitCards.length > 3"
-          class="view-more-btn"
-          @click="toggleShowAll"
-        >
-          혜택 카드 더보기 >
-        </button>
-        <button v-if="showAll" class="view-more-btn" @click="toggleShowAll">
-          접기 <
-        </button>
+        <router-link to="/AllCardProduct" class="view-all-btn">
+          전체 보기 &gt;
+        </router-link>
       </div>
     </div>
 
@@ -82,7 +73,6 @@ import { getTopBenefitCards } from '@/api/cardproduct';
 import { useRouter } from 'vue-router';
 
 const topBenefitCards = ref([]);
-const showAll = ref(false);
 const loading = ref(false);
 const error = ref(false);
 const errorMessage = ref('');
@@ -90,19 +80,10 @@ const retryCount = ref(0);
 const maxRetries = 3;
 const router = useRouter();
 
-// 표시할 카드들 계산 (최대 10개까지만)
+// 항상 최대 3개만 표시
 const displayedCards = computed(() => {
-  const maxCards = Math.min(topBenefitCards.value.length, 10);
-  if (showAll.value) {
-    return topBenefitCards.value.slice(0, maxCards);
-  }
   return topBenefitCards.value.slice(0, 3);
 });
-
-// 더보기/접기 토글
-const toggleShowAll = () => {
-  showAll.value = !showAll.value;
-};
 
 // 혜택 좋은 카드 데이터 로드 (재시도 로직 포함)
 const loadTopBenefitCards = async (isRetry = false) => {
@@ -118,9 +99,9 @@ const loadTopBenefitCards = async (isRetry = false) => {
     // 타임아웃을 점진적으로 증가
     const timeoutMs = Math.min(15000 + retryCount.value * 10000, 60000); // 15초 ~ 60초
     console.log(
-      `API 호출 시도 ${retryCount.value + 1}/${
-        maxRetries + 1
-      }, 타임아웃: ${timeoutMs}ms`
+        `API 호출 시도 ${retryCount.value + 1}/${
+            maxRetries + 1
+        }, 타임아웃: ${timeoutMs}ms`
     );
 
     const response = await getTopBenefitCards();
@@ -194,11 +175,10 @@ onMounted(() => {
 
 .section-header {
   text-align: left;
-  margin-bottom: 20px;
 }
 
 .section-title {
-  display: flexbox;
+  display: flex;
   font-size: 18px;
   font-weight: bold;
   color: #333;
@@ -291,7 +271,6 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  transition: max-height 0.3s ease-out;
 }
 
 .recommended-card-item {
@@ -309,13 +288,18 @@ onMounted(() => {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
+
 .view-all-link {
   color: #007bff;
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 500;
-  white-space: nowrap; /* "전체 보기" 텍스트가 줄바꿈되지 않도록 합니다. */
-  flex-shrink: 0; /* 공간이 부족해도 링크 크기가 줄어들지 않도록 합니다. */
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.view-all-link:hover {
+  color: #0056b3;
 }
 
 .rank-number {
@@ -376,21 +360,22 @@ onMounted(() => {
 
 .view-more-container {
   text-align: center;
-  margin-top: 20px;
+  margin-bottom: 30px;
 }
 
-.view-more-btn {
-  background: none;
-  border: none;
-  color: #666;
+.view-all-btn {
+  display: inline-block;
+  color: #787878;
+  text-decoration: none;
   font-size: 14px;
-  cursor: pointer;
-  padding: 0px 0px;
+  font-weight: 500;
+  padding: 0px 16px;
   border-radius: 20px;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
-.view-more-btn:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+.view-all-btn:hover {
+  background-color: rgba(0, 123, 255, 0.1);
+  color: #0056b3;
 }
 </style>
