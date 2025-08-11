@@ -54,7 +54,7 @@ import { useAuthStore } from './stores/auth';
 
 const route = useRoute();
 const router = useRouter();
-const hiddenPaths = ['/lab/fortune', '/login'];
+const hiddenPaths = ['/lab/fortune', '/login', '/payment/qr'];
 const hideNavbar = computed(() => hiddenPaths.includes(route.path));
 
 // 검색
