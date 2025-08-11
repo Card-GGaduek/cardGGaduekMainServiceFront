@@ -3,6 +3,7 @@ import { ref, onMounted, reactive } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
 import memberApi from '@/api/memberApi';
+import MainHeader from '@/layout/MainHeader.vue';
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -83,15 +84,16 @@ const goToMyCards = () => {
 </script>
 
 <template>
+  <MainHeader :user-name="myPageInfo.name"/>
   <div class="page-container">
-    <header class="d-flex justify-content-between align-items-center p-3">
+    <!-- <header class="d-flex justify-content-between align-items-center p-3">
       <img src="@/assets/logo/logo.jpg" alt="카드까득 로고" class="logo-img" />
       <div class="d-flex align-items-center">
         <span class="fw-bold me-2">{{ myPageInfo.name }}님</span>
         <i class="bi bi-person-circle fs-2"></i>
       </div>
-    </header>
-
+    </header> -->
+    
     <main class="scrollable-content">
       <div class="d-flex text-center mb-4">
         <div class="card info-box flex-fill ms-2">

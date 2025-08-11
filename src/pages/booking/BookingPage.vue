@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router"; // 1. authStore 가져오기
 import api from '@/api/index.js';
+import MainHeader from "@/layout/MainHeader.vue";
 
 const router = useRouter(); 
 const benefits = ref([]);
@@ -11,7 +12,7 @@ const selectedCategory = ref("여행");
 const categories = ref([
   { name: "여행", icon: '🏨', apiValue: "HOTEL" },
   { name: "입장권", icon: '🎡', apiValue: "THEME_PARK" },
-  { name: "쇼핑", icon: '🛒', apiValue: "RESTAURANT" },
+  { name: "쇼핑", icon: '🛒', apiValue: "SHOPPING" },
   { name: "문화", icon: '🎬', apiValue: "MOVIE_THEATER" },
 ]);
 
@@ -72,19 +73,18 @@ function handleBooking(benefit) {
 </script>
 
 <template>
+  <MainHeader/>
   <div class="benefit-page-bg">
     <div class="container benefit-page-container">
-      <header class="pt-4">
-        
-      <img src="@/assets/logo/logo.jpg" alt="카드까득 로고" class="logo-img mb-5" />
-        <h2 class="fw-bolder text-center">혜택도, 예약도 한 번에!</h2>
+      
+        <h3 class="fw-bolder text-center mt-3">혜택도, 예약도 한 번에!</h3>
         <p class="text-muted small text-center">
           상황을 선택하고,<br />혜택을 가장 많이 받는 카드로 예약하세요!
         </p>
-      </header>
+      
 
       <div>
-        <div class="card main-category-card mb-4">
+        <div class="card main-category-card">
           <div class="card-body">
             <section
               class="main-categories d-flex justify-content-around text-center"
@@ -100,8 +100,8 @@ function handleBooking(benefit) {
                   :class="{ active: selectedCategory === category.name }"
                 >
                   <i :class="category.icon">{{ category.icon }}</i>
+                  <span class="small">{{ category.name }}</span>
                 </div>
-                <span class="small">{{ category.name }}</span>
               </div>
             </section>
           </div>
@@ -176,32 +176,33 @@ function handleBooking(benefit) {
 
 <style scoped>
 /* 전체 페이지 스타일 */
-.logo-img {
-  height: 40px;
-}
 .benefit-page-bg {
   background-color: white;
-
 }
+
 .benefit-page-container {
   background-color: white;
   height: 100vh;
   display: flex;
   flex-direction: column;
 }
+
 header {
   flex-shrink: 0;
 }
+
 .scrollable-content {
   flex-grow: 1;
   overflow-y: auto;
   padding: 0 12px;
 }
+
 /* 카드 스타일 */
 .main-category-card {
   border: none;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin: 0;
+  /* border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); */
 }
 
 .category-item {
@@ -209,36 +210,51 @@ header {
 }
 
 .category-item .icon-wrapper {
-  width: 60px;
-  height: 60px;
+  width: 78.05px;
+  height: 85px;
   background-color: #fff;
-  border-radius: 18px;
+  border-radius: 16px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-bottom: 8px;
-  font-size: 1.5rem;
+  margin-bottom: 2;
   color: #6c757d;
-  border: 2px solid #f0f0f0;
+
+  /* ↓↓↓ 1. 평소 상태의 그림자 (퍼짐 값은 0) ↓↓↓ */
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.12);
+
+  /* ↓↓↓ 3. box-shadow 속성에 전환 효과 적용 ↓↓↓ */
+  transition: box-shadow 0.3s ease-in-out, color 0.3s ease-in-out;
 }
 
-.category-item .icon-wrapper.active {
-  border-color: #0d6efd;
-  color: #0d6efd;
+.icon-wrapper i {
+  /* 이 값을 조절하여 아이콘 크기를 키우세요. */
+  font-size: 2rem; /* 예: 1.5rem -> 2rem으로 변경 */
+  
 }
 
+.icon-wrapper.active {
+  /* 아이콘/텍스트 색상 변경 */
+
+  /* ↓↓↓ 2. 테두리 모양의 그림자 (x, y, blur는 0 / 퍼짐 값은 2px) ↓↓↓ */
+  box-shadow: 0 0 0 5px #FFCD39;
+}
 
 /* 혜택 카드 */
 .benefit-card {
   border: none;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  font-size: 14px;
 }
+
 .benefit-card img {
-  width: 120px;
+  width: 80px;
   height: 80px;
   object-fit: cover;
 }
+
 .text-highlight {
   color: #ff9900;
 }
