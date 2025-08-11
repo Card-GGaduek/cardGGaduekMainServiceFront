@@ -1,6 +1,9 @@
 <template>
   <div class="analysis-page">
-    <SubHeader title="지출 내역" :showBack="true" />
+    <MainHeader/>
+    <div class="title">
+      <h5>지출 내역</h5>
+      </div>
     <TabNav :activeTab="activeTab" @change="onTabChange" />
 
     <!-- 카드 실적 -->
@@ -37,13 +40,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import SubHeader from '@/layout/SubHeader.vue'
 import TabNav from '@/components/analysis/TabNav.vue'
 import CardSlider from '@/components/analysis/CardSlider.vue'
 import MonthlySpending from '@/components/analysis/MonthlySpending.vue'
 import CategorySpending from '@/components/analysis/CategorySpending.vue'
 import CardRecommend from '@/components/analysis/CardRecommend.vue'
 import { getCardPerformance, getCardTransactions } from '@/api/analysisindex.js'
+import MainHeader from '@/layout/MainHeader.vue'
 
 const router = useRouter()
 const activeTab = ref('cardPerformance')
@@ -104,6 +107,11 @@ onMounted(loadAll)
 
 <style scoped>
 .card-section { margin-top: 24px; }
+.title{
+  margin-top:0.5rem;
+  text-align: center;
+  margin-bottom:1rem;
+}
 .loading-container,
 .error-container,
 .empty-container {
