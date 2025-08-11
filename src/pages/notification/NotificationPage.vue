@@ -1,112 +1,125 @@
 <template>
-  <div class="notification-page">
-    <!-- 상단 헤더 -->
-    <div class="fixed-header">
-      <SubHeader title="알림" />
-    </div>
+  <div class="notification-wrapper">
+    <SubHeader title="알림" />
+    <div class="notification-scroll">
+      <div class="notification-page">
+        <!-- 로딩 상태 -->
+        <div v-if="loading" class="loading-container">
+          <div class="loading-spinner"></div>
+          <p class="loading-text">알림을 불러오는 중...</p>
+        </div>
 
-    <!-- 로딩 상태 -->
-    <div v-if="loading" class="loading-container">
-      <div class="loading-spinner"></div>
-      <p class="loading-text">알림을 불러오는 중...</p>
-    </div>
+        <!-- 에러 상태 -->
+        <div v-else-if="error" class="error-container">
+          <div class="error-icon">⚠️</div>
+          <p class="error-text">{{ errorMessage }}</p>
+          <button class="retry-btn" @click="fetchNotifications">
+            다시 시도
+          </button>
+        </div>
 
-    <!-- 에러 상태 -->
-    <div v-else-if="error" class="error-container">
-      <div class="error-icon">⚠️</div>
-      <p class="error-text">{{ errorMessage }}</p>
-      <button class="retry-btn" @click="fetchNotifications">다시 시도</button>
-    </div>
+        <!-- 알림 카드 리스트 -->
+        <div v-else-if="notifications.length > 0" class="notification-list">
+          <div
+            class="notification-card"
+            v-for="item in notifications"
+            :key="item.id"
+          >
+            <p class="message">{{ item.title }}</p>
+            <p class="description">{{ item.message }}</p>
+            <a v-if="item.linkUrl" :href="item.linkUrl" target="_blank">
+              <img
+                v-if="item.imageUrl"
+                :src="item.imageUrl"
+                alt="알림 이미지"
+                class="notification-image"
+              />
+            </a>
+          </div>
+        </div>
 
-    <!-- 알림 카드 리스트 -->
-    <div v-else-if="notifications.length > 0" class="notification-list">
-      <div
-          class="notification-card"
-          v-for="item in notifications"
-          :key="item.id"
-      >
-        <p class="message">{{ item.title }}</p>
-        <p class="description">{{ item.message }}</p>
-        <a v-if="item.linkUrl" :href="item.linkUrl" target="_blank">
-          <img
-              v-if="item.imageUrl"
-              :src="item.imageUrl"
-              alt="알림 이미지"
-              class="notification-image"
-          />
-        </a>
+        <!-- 알림이 없는 경우 -->
+        <div v-else class="no-notifications">
+          <div class="no-notifications-icon">🔔</div>
+          <p class="no-notifications-text">새로운 알림이 없습니다</p>
+        </div>
       </div>
-    </div>
-
-    <!-- 알림이 없는 경우 -->
-    <div v-else class="no-notifications">
-      <div class="no-notifications-icon">🔔</div>
-      <p class="no-notifications-text">새로운 알림이 없습니다</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import SubHeader from '@/layout/SubHeader.vue'
-import { getMyNotifications } from '@/api/notificationApi'
+import { ref, onMounted } from 'vue';
+import SubHeader from '@/layout/SubHeader.vue';
+import { getMyNotifications } from '@/api/notificationApi';
 
-const notifications = ref([])
-const loading = ref(false)
-const error = ref(false)
-const errorMessage = ref('')
+const notifications = ref([]);
+const loading = ref(false);
+const error = ref(false);
+const errorMessage = ref('');
 
 const fetchNotifications = async () => {
-  loading.value = true
-  error.value = false
-  errorMessage.value = ''
+  loading.value = true;
+  error.value = false;
+  errorMessage.value = '';
 
   try {
-    const res = await getMyNotifications()
-    notifications.value = res.data?.data || res.data || []
+    const res = await getMyNotifications();
+    notifications.value = res.data?.data || res.data || [];
   } catch (err) {
-    console.error('알림 불러오기 실패:', err)
-    error.value = true
+    console.error('알림 불러오기 실패:', err);
+    error.value = true;
 
     // 더 구체적인 에러 처리
     if (err.response?.status === 404) {
-      errorMessage.value = 'API 엔드포인트를 찾을 수 없습니다. 백엔드 설정을 확인해주세요.'
+      errorMessage.value =
+        'API 엔드포인트를 찾을 수 없습니다. 백엔드 설정을 확인해주세요.';
     } else if (err.response?.status === 401) {
-      errorMessage.value = '로그인이 필요합니다.'
+      errorMessage.value = '로그인이 필요합니다.';
       // 로그인 페이지로 리다이렉트 로직 추가 가능
       // router.push('/login')
     } else if (err.response?.status >= 500) {
-      errorMessage.value = '서버에 문제가 발생했습니다.'
+      errorMessage.value = '서버에 문제가 발생했습니다.';
     } else if (err.code === 'ECONNABORTED') {
-      errorMessage.value = '서버 응답이 지연되고 있습니다.'
+      errorMessage.value = '서버 응답이 지연되고 있습니다.';
     } else if (err.message === '사용자 정보를 가져올 수 없습니다.') {
-      errorMessage.value = '사용자 정보를 확인할 수 없습니다. 다시 로그인해주세요.'
+      errorMessage.value =
+        '사용자 정보를 확인할 수 없습니다. 다시 로그인해주세요.';
     } else {
-      errorMessage.value = '알림을 불러오는데 실패했습니다.'
+      errorMessage.value = '알림을 불러오는데 실패했습니다.';
     }
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 onMounted(() => {
-  fetchNotifications()
-})
+  fetchNotifications();
+});
 </script>
 
 <style scoped>
+.notification-wrapper {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.notification-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 .notification-page {
   background-color: #f8f9fa;
   min-height: 100vh;
   padding-top: 0;
   padding-bottom: 80px;
-}
-
-/* 헤더 고정 */
-.fixed-header {
-  position: sticky;
-  top: 0;
-  z-index: 999;
 }
 
 /* 로딩 상태 */
@@ -129,8 +142,12 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-text {
