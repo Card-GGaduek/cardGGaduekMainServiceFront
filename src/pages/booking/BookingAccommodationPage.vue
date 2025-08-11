@@ -1,9 +1,9 @@
 <script setup>
-import { ref, onMounted } from "vue";
-import BookingCalendar from "@/pages/booking/BookingCalendar.vue"; // 1. 달력 컴포넌트 import
-import { useRoute, useRouter } from "vue-router";
+import { ref, onMounted } from 'vue';
+import BookingCalendar from '@/pages/booking/BookingCalendar.vue'; // 1. 달력 컴포넌트 import
+import { useRoute, useRouter } from 'vue-router';
 import api from '@/api/index.js';
-import { useAuthStore } from "@/stores/auth";
+import { useAuthStore } from '@/stores/auth';
 
 const route = useRoute();
 const router = useRouter();
@@ -16,17 +16,26 @@ const accommodation = ref(null);
 
 const existingBookings = ref([]);
 
+// 체크인, 체크아웃 시간 형식 HH:mm:ss -> HH:mm
+const toHHMM = (t) => {
+  if (!t) return '';
+
+  const parts = String(t).split(':');
+  if (parts.length >= 2) return `${parts[0]}:${parts[1]}`;
+  return String(t);
+};
+
 async function fetchUserCards() {
   try {
     // 기존 코드 삭제
     if (!memberId) {
-      console.error("로그인 정보가 없습니다.");
+      console.error('로그인 정보가 없습니다.');
       return;
     }
     const response = await axios.get(`/api/card`);
     userCards.value = response.data.data || response.data;
   } catch (error) {
-    console.error("보유 카드 목록 조회 실패:", error);
+    console.error('보유 카드 목록 조회 실패:', error);
   }
 }
 
@@ -34,40 +43,40 @@ async function fetchAccommodationDetail() {
   if (!accommodationId) return;
   try {
     const response = await api.get(`/api/accommodations/${accommodationId}`);
-    console.log("API 응답 성공:", response.data);
+    console.log('API 응답 성공:', response.data);
 
     // 💡 변경점: response.data 대신 response.data.data를 할당
     accommodation.value = response.data.data;
   } catch (error) {
-    console.error("숙소 상세 정보 조회 실패:", error);
+    console.error('숙소 상세 정보 조회 실패:', error);
   }
 
   try {
     const responseBooking = await api.get(`api/booking/${accommodationId}`);
-    
+
     existingBookings.value = responseBooking.data.data;
     console.log(existingBookings);
   } catch (error) {
-    console.error("기존 예약 목록 조회 실패", error);
+    console.error('기존 예약 목록 조회 실패', error);
   }
 }
 
 function handleDatesSelected(dates) {
   selectedDates.value = dates;
-  console.log("선택된 체크인:", dates.checkIn);
-  console.log("선택된 체크아웃:", dates.checkOut);
+  console.log('선택된 체크인:', dates.checkIn);
+  console.log('선택된 체크아웃:', dates.checkOut);
 }
 
 function handleBooking(room) {
   // 날짜가 선택되지 않았으면 경고
   if (!selectedDates.value || !selectedDates.value.checkIn) {
-    alert("체크인 날짜를 먼저 선택해주세요.");
+    alert('체크인 날짜를 먼저 선택해주세요.');
     return;
   }
 
   // 최종 예약 페이지로 이동하면서 쿼리 파라미터로 정보 전달
   router.push({
-    name: "FinalBookingPage",
+    name: 'FinalBookingPage',
     query: {
       roomId: room.id,
       roomName: room.name,
@@ -81,8 +90,8 @@ function handleBooking(room) {
 function formatDate(date) {
   if (!date) return null;
   const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  const day = date.getDate().toString().padStart(2, "0");
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
 onMounted(() => {
@@ -103,11 +112,12 @@ onMounted(() => {
     <section class="main-image-section">
       <h3 class="fw-bold">{{ accommodation.name }}</h3>
       <p class="mb-0 small">
-        <i class="bi bi-clock me-2"></i>체크인 {{ accommodation.checkInTime }}
+        <i class="bi bi-clock me-2"></i>체크인
+        {{ toHHMM(accommodation.checkInTime) }}
       </p>
       <p class="mb-0 small">
         <i class="bi bi-clock me-2"></i>체크아웃
-        {{ accommodation.checkOutTime }}
+        {{ toHHMM(accommodation.checkOutTime) }}
       </p>
       <img
         src="@/assets/accommodations/롯데호텔서울3.jpg"

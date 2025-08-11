@@ -10,7 +10,9 @@
 
       <div class="timer">
         {{ minutes }}:{{ seconds.toString().padStart(2, '0') }}
-        <span @click="regenerateQRCode" class="reload">🔄</span>
+        <span @click="regenerateQRCode" class="reload"
+          ><i class="bi bi-arrow-clockwise"></i
+        ></span>
       </div>
     </div>
   </div>
@@ -22,7 +24,7 @@ import { useUserStore } from '@/stores/userStore';
 import axios from 'axios';
 
 const userStore = useUserStore();
-userStore.setUser(3);
+userStore.setUser(1);
 userStore.setCard(5);
 
 const memberId = userStore.memberId;
