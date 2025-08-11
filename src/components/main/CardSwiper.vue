@@ -186,8 +186,15 @@ const expandedCards = ref(new Set()); // 혜택이 확장된 카드들
 const router = useRouter();
 
 // 이용내역 조회 페이지로 이동
+// 이용내역 조회 페이지로 이동
 const goToAnalysis = () => {
-  router.push({ name: 'Analysis' });
+  const current = cards.value[activeIndex.value];
+  if (!current) return;
+
+  router.push({
+    name: 'Analysis',
+    query: { cardProductId: current.cardProductId },
+  });
 };
 
 // 결제 페이지로 이동
@@ -285,7 +292,7 @@ const toggleCardFlip = (index) => {
 
 onMounted(() => {
   loadCards();
-});
+})
 </script>
 
 <style scoped>
