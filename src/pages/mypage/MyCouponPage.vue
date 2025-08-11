@@ -4,6 +4,7 @@ import { reactive, onMounted } from 'vue';
 // import { useRouter } from 'vue-router'; // 현재 코드에서는 직접 사용되지 않음
 import memberApi from '@/api/memberApi';
 import router from '@/router';
+import MainHeader from '@/layout/MainHeader.vue';
 
 // 1. myPageInfo 상태 변수 선언
 // reactive를 사용하여 객체 내부의 속성들이 변경될 때 화면이 자동으로 업데이트되도록 합니다.
@@ -34,16 +35,17 @@ onMounted(async () => {
 });
 </script>
 <template>
-  <div class="pt-4 logo-container">
+  <!-- <div class="pt-4 logo-container">
     <img src="@/assets/logo/logo.jpg" alt="카드까득 로고" class="logo-img" />
-  </div>
+  </div> -->
 
-  <header class="page-header pt-4 mb-4">
+  <!-- <header class="page-header pt-4 mb-4">
     <button @click="router.back()" class="back-button">&larr;</button>
     <h1 class="page-title">내 쿠폰함</h1>
     <div class="placeholder"></div>
-  </header>
+  </header> -->
 
+  <MainHeader class="d-flex"/>
   <main class="coupon-list-container">
     <div v-if="myPageInfo.couponList.length === 0" class="empty-message">
       <p>텅 비었어요!</p>
