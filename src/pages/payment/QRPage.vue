@@ -12,6 +12,7 @@
         </div>
         <p v-else>QR 코드 생성 중...</p>
 
+
         <div class="timer">
           {{ minutes }}:{{ seconds.toString().padStart(2, '0') }}
           <button @click="regenerateQRCode" class="reload-button">
@@ -22,6 +23,11 @@
             </svg>
           </button>
         </div>
+      <div class="timer">
+        {{ minutes }}:{{ seconds.toString().padStart(2, '0') }}
+        <span @click="regenerateQRCode" class="reload"
+          ><i class="bi bi-arrow-clockwise"></i
+        ></span>
       </div>
     </div>
   </div>
@@ -35,8 +41,12 @@ import SubHeader from '@/layout/SubHeader.vue';
 import memberApi from '@/api/memberApi';
 import axios from 'axios';
 
+
 const router = useRouter();
 const authStore = useAuthStore();
+
+const memberId = userStore.memberId;
+const cardId = userStore.selectedCardId;
 
 const selectedCard = ref(null);
 const qrImage = ref('');

@@ -102,7 +102,7 @@ onMounted(async () => {
   overflow-y: auto;
   overflow-x: hidden;
   /* NavBar 높이만큼 하단 여백 확보 */
-  padding-bottom: 80px;
+  /* padding-bottom: 80px; */
 }
 
 .lab-page {
