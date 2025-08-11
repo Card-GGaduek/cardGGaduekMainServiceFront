@@ -80,6 +80,7 @@ watch(
   { immediate: true }
 );
 
+
 // (B) 라우트 키워드는 있는데 맵이 늦게 준비되는 경우
 onMapReady(() => {
   if (arrivalSearched.value) return;
@@ -89,6 +90,7 @@ onMapReady(() => {
   keyword.value = kk;
   handleSearch();
 });
+
 
 // 2. 카드 스와이퍼에서 넘어올 경우
 // 카드 매장 누적 검색

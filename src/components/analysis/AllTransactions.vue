@@ -24,8 +24,7 @@
         v-for="tx in sortedTransactions"
         :key="tx.id"
         class="tx-item"
-        @click="goToSlider(tx.cardId)"
-      >
+        @click="goToSlider(tx.cardId)">
         <div class="tx-info">
           <span class="datetime">{{ formatDate(tx.transDate) }} {{ formatTime(tx.transDate) }}</span>
           <span class="store">{{ tx.storeName }}</span>

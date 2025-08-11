@@ -31,5 +31,10 @@ export const getCardTransactions = () =>
 export const getMonthlySpending = () => apiClient.get(`/api/members/summary`);
 
 //카테고리별 불러오기
-export const getCategorySummary = (memberId) =>
+export const getCategorySummary = () =>
   apiClient.get(`/api/members/cardCateSummary`);
+
+//카드추천
+export const getRecommendations = () =>
+  apiClient.get(`/api/recommendations`);
+

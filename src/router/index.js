@@ -13,7 +13,7 @@ import LabPage from '@/pages/lab/LabPage.vue';
 import FortuneCard from '@/pages/lab/FortuneCard.vue';
 import LoginPage from '@/pages/login/LoginPage.vue';
 import JoinPage from '@/pages/login/JoinPage.vue';
-import AllTransactions from '@/components/analysis/AllTransactions.vue';
+import AllTransactions from '@/pages/analysis/AllTransactions.vue';
 import CardEditPage from '@/pages/card/CardEditPage.vue';
 import { useAuthStore } from '@/stores/auth';
 import NaverCallback from '@/pages/login/NaverCallback.vue';
@@ -45,12 +45,15 @@ const routes = [
   { path: '/map2', name: 'MapPage2', component: MapPage2 }, 
   { path: '/analysis', name: 'Analysis', component: AnalysisPage },
   {
-    path: '/analysis/all-transactions',
+    path: '/analysis/allTransactions',
     name: 'AllTransactions',
     component: AllTransactions,
-    props: (route) => ({
-      cardId: route.query.cardId ? Number(route.query.cardId) : null,
-    }),
+    props: route => ({
+      // 쿼리 param 이름을 cardId 로 통일
+      cardId: route.query.cardId
+        ? Number(route.query.cardId)
+        : null
+    })
   },
   { path: '/mypage', name: 'MyPage', component: MyPage },
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFoundPage },
