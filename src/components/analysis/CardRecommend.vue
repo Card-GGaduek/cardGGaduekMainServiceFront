@@ -125,14 +125,12 @@ function formatCurrency(val) {
 </script>
 
 <style scoped>
-/* 레이아웃 */
 .p-4 { padding: 1rem; }
 .loading { text-align: center; padding: 2rem 0; color: #666; }
 .mb-4 { margin-bottom: 1rem; }
 .mb-6 { margin-bottom: 1.5rem; }
 .mb-8 { margin-bottom: 2rem; }
 
-/* 절약 금액 */
 .saving .amount {
   color: #d9534f;
   font-size: 1.5rem;
@@ -144,7 +142,6 @@ function formatCurrency(val) {
   text-align:center;
 }
 
-/* 콤보 박스 */
 .combo-box {
   background: #fff;
   border-radius: 0.75rem;
@@ -157,7 +154,6 @@ function formatCurrency(val) {
   color: black;
 }
 
-/* VS 텍스트 */
 .vs-wrap { text-align: center; }
 .vs-text {
   font-size: 1.5rem;
@@ -165,38 +161,46 @@ function formatCurrency(val) {
   color: #d9534f;
 }
 
-/* 카드 한 줄 정렬 */
+/* 카드 한 줄 정렬: 아이템을 같은 높이로 늘리기 */
 .cards-row {
   display: flex;
   justify-content: center;
   gap: 2rem;
+  align-items: stretch;          /* ⭐ 동일 높이로 스트레치 */
 }
-
-/* 카드 아이템 */
+/* 카드 아이템: 세로 레이아웃 + 버튼을 아래로 밀 수 있게 */
 .card-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100px;
 }
+
 .card-item img {
   width: 100px;
   height: 60px;
   object-fit: cover;
   border-radius: 0.375rem;
 }
+
 .card-name {
   margin-top: 0.5rem;
-  font-size: 0.6rem;      
+  font-size: 0.6rem;
   line-height: 1.2;
   text-align: center;
-  white-space: normal;     
-  word-break: keep-all;   
+
+  /* 줄바꿈/줄수 제한 */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;        
+  -webkit-box-orient: vertical;
   overflow: hidden;
+  white-space: normal;
+  word-break: keep-all;
+  min-height: 2.4em;            
 }
 
 .btn {
-  margin-top: 0.5rem;
+  margin-top: auto;             
   padding: 0.25rem 0.75rem;
   font-size: 0.75rem;
   border-radius: 9999px;
@@ -206,7 +210,6 @@ function formatCurrency(val) {
   cursor: pointer;
 }
 
-/* 할인 상세 모달 */
 .detail-modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
