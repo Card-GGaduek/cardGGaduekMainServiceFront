@@ -187,12 +187,14 @@ function formatCurrency(val) {
 }
 .card-name {
   margin-top: 0.5rem;
-  font-size: 0.65rem;
+  font-size: 0.6rem;      
+  line-height: 1.2;
   text-align: center;
-  white-space: nowrap;
+  white-space: normal;     
+  word-break: keep-all;   
   overflow: hidden;
-  text-overflow: ellipsis;
 }
+
 .btn {
   margin-top: 0.5rem;
   padding: 0.25rem 0.75rem;
