@@ -1,7 +1,9 @@
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { onMounted, ref, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useMap } from '@/pages/map/map';
+import axios from 'axios';
+import { calculator } from 'fontawesome';
 import PayNavigator from '@/pages/map/PayNavigator.vue';
 
 //25.08.11 컴포넌트 추가
@@ -68,28 +70,19 @@ const arrivalSearched = ref(false);
 // 라우트 keyword → 초기 검색
 watch(
   () => route.query.keyword,
-  (k) => {
-    const kk = String(k ?? '').trim();
+  (newVal) => {
+    const kk = String(newVal ?? '').trim();
     if (!kk || arrivalSearched.value) return;
+
     if (isMapReady.value) {
       arrivalSearched.value = true;
       keyword.value = kk;
       handleSearch();
     }
-  },
-  { immediate: true }
+  }
 );
 
-
-// (B) 라우트 키워드는 있는데 맵이 늦게 준비되는 경우
-onMapReady(() => {
-  if (arrivalSearched.value) return;
-  const kk = String(route.query.keyword ?? '').trim();
-  if (!kk) return;
-  arrivalSearched.value = true;
-  keyword.value = kk;
-  handleSearch();
-});
+ 
 
 
 // 2. 카드 스와이퍼에서 넘어올 경우
@@ -98,14 +91,15 @@ onMapReady(() => {
 //   isSearching.value ? '매장을 검색중입니다' : walletMessage.value
 // );
 watch(
-  () => route.query.cardId,
-  (newCardId) => {
-    if (route.query.autoSearch && newCardId) {
-      console.log('자동 실행 - cardId:', newCardId);
-      if (newCardId) handleCardClick(Number(newCardId));
+  () => route.query.keyword,
+  (newKeyword) => {
+    if (newKeyword && newKeyword !== keyword.value) {
+      onMapReady(() => {
+        keyword.value = newKeyword;
+        handleSearch();
+      });
     }
-  },
-  { immediate: false }
+  }
 );
 
 // 3. 셀렉트 카드 옵션 선택 후 카테고리 검색
@@ -248,13 +242,6 @@ watch(selectedCard, (newVal) => {
     <!-- </div>
   </div> -->
 
-  <!-- 혜택 가능한 매장이 없을 때 알림 -->
-  <transition name="fade">
-    <div v-if="noBenefitAlert" class="no-benefit-alert">
-      조건에 맞는 혜택 가능한 매장이 없습니다.
-    </div>
-  </transition>
-
   <!-- 하단 상세 정보 시트 -->
   <transition name="bottom-sheet">
     <div
@@ -262,13 +249,11 @@ watch(selectedCard, (newVal) => {
       class="bottom-sheet-container"
     >
       <div class="bottom-sheet-content">
-        <div class="sheet-handle" role="presentation" aria-hidden="true"></div>
         <button @click="selectedMerchant = null" class="close-button">
           &times;
         </button>
-        <p class="merchant-name">
-          {{ selectedMerchant.name }}
-        </p>
+        <h2 class="merchant-name">{{ selectedMerchant.name }}</h2>
+        <p class="merchant-category">{{ categoryLabel }}</p>
 
         <!-- 혜택 리스트 -->
         <div class="benefits-list">
@@ -343,5 +328,4 @@ watch(selectedCard, (newVal) => {
 <style>
 @import '@/assets/main.css';
 @import './map.css';
-@import './alym.css';
 </style>

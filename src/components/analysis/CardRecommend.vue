@@ -5,13 +5,17 @@
       <!-- 절약 금액 -->
       <div class="saving mb-6 text-center">
         <p class="text-lg">
-          총 <span class="amount">{{ formatCurrency(data.additionalSaving) }}원</span>을 절약할 수 있어요!
+          총 <span class="amount">{{ formatCurrency(data.additionalSaving) }}원</span> 을 절약할 수 있어요!
         </p>
+      </div>
+      <div class="recommend">
+      <p>추천 혜택 합계 : {{ formatCurrency(data.recommendation?.aggregateBenefit || 0) }}원</p>
+      <p>현재 혜택 합계 : {{ formatCurrency(data.current?.aggregateBenefit || 0) }}원</p>
       </div>
 
       <!-- 추천 조합 카드 -->
       <div class="combo-box mb-8">
-        <h2 class="combo-title mb-4">추천 조합 카드</h2>
+        <h2 class="combo-title mb-4">추천 카드</h2>
         <div class="cards-row">
           <div
             v-for="card in recommendedCards"
@@ -24,15 +28,11 @@
           </div>
         </div>
       </div>
-      <p>추천 조합 혜택 합계: {{ formatCurrency(data.recommendation?.aggregateBenefit || 0) }}원</p>
-
-
-      <p>현재 조합 혜택 합계: {{ formatCurrency(data.current?.aggregateBenefit || 0) }}원</p>
-
+    
       <!-- VS -->
-      <div class="vs-wrap mb-8">
+      <!-- <div class="vs-wrap mb-8">
         <span class="vs-text">VS</span>
-      </div>
+      </div> -->
 
       <!-- 현재 카드 -->
       <div class="combo-box">
@@ -136,22 +136,25 @@ function formatCurrency(val) {
 .saving .amount {
   color: #d9534f;
   font-size: 1.5rem;
-  font-weight: 500;
+  font-weight: 700;
 }
 .text-lg { font-size: 1.25rem; }
+
+.recommend{
+  text-align:center;
+}
 
 /* 콤보 박스 */
 .combo-box {
   background: #fff;
   border-radius: 0.75rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.07);
   padding: 1rem;
 }
 .combo-title {
   text-align: center;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #333;
+  font-size: 1rem;
+  color: black;
 }
 
 /* VS 텍스트 */

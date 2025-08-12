@@ -1,6 +1,9 @@
 <template>
   <div class="analysis-page">
-    <SubHeader title="지출 내역" :showBack="true" />
+    <MainHeader/>
+    <div class="title">
+      <h5>지출 내역</h5>
+      </div>
     <TabNav :activeTab="activeTab" @change="onTabChange" />
 
     <!-- 카드 실적 -->
@@ -17,7 +20,7 @@
         <p>등록된 카드가 없습니다.</p>
       </div>
       <div v-else>
-        <CardSlider :cards="cards" />
+        <CardSlider :cards="cards" :initialProductId="initialProductId" />
       </div>
     </div>
 
@@ -36,7 +39,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'   // ✅ useRoute 추가
 import SubHeader from '@/layout/SubHeader.vue'
 import TabNav from '@/components/analysis/TabNav.vue'
 import CardSlider from '@/components/analysis/CardSlider.vue'
@@ -44,12 +47,15 @@ import MonthlySpending from '@/components/analysis/MonthlySpending.vue'
 import CategorySpending from '@/components/analysis/CategorySpending.vue'
 import CardRecommend from '@/components/analysis/CardRecommend.vue'
 import { getCardPerformance, getCardTransactions } from '@/api/analysisindex.js'
+import MainHeader from '@/layout/MainHeader.vue'
 
 const router = useRouter()
+const route = useRoute()                           // ✅ route 선언
 const activeTab = ref('cardPerformance')
 const cards     = ref([])
 const loading   = ref(false)
 const error     = ref(null)
+const initialProductId = ref(null)   // ⭐ 추가
 
 /* 탭 변경 */
 function onTabChange(tabKey) {
@@ -73,7 +79,7 @@ async function loadAll() {
     const perfData = perfRes.data.data
     const txData   = txRes.data.data
 
-    cards.value = perfData.map(cd => {
+    let allCards = perfData.map(cd => {            // ✅ let allCards 로 변경
       const card = {
         cardProductId: cd.cardProductId,
         owner:         cd.ownerName,
@@ -86,11 +92,20 @@ async function loadAll() {
       const found = txData.find(t => t.cardProductId === cd.cardProductId)
       if (found) {
         card.transactions = found.transactions
-          .sort((a, b) => new Date(b.transDate) - new Date(a.transDate))
-          .slice(0, 3)
+            .sort((a, b) => new Date(b.transDate) - new Date(a.transDate))
+            .slice(0, 3)
       }
       return card
     })
+
+    // 🔹 쿼리 파라미터로 필터 (cardProductId만 사용)
+    if (route.query.cardProductId) {
+      allCards = allCards.filter(
+          c => String(c.cardProductId) === String(route.query.cardProductId)
+      )
+    }
+
+    cards.value = allCards
   } catch (e) {
     console.error(e)
     error.value = e.message || '데이터 로드 실패'
@@ -99,11 +114,21 @@ async function loadAll() {
   }
 }
 
-onMounted(loadAll)
+onMounted(() => {
+  initialProductId.value = route.query.cardProductId
+      ? Number(route.query.cardProductId)
+      : null
+  loadAll()
+})
 </script>
 
 <style scoped>
 .card-section { margin-top: 24px; }
+.title{
+  margin-top:0.5rem;
+  text-align: center;
+  margin-bottom:1rem;
+}
 .loading-container,
 .error-container,
 .empty-container {

@@ -54,7 +54,8 @@ import { useAuthStore } from './stores/auth';
 
 const route = useRoute();
 const router = useRouter();
-const hideNavbar = computed(() => route.path === '/lab/fortune');
+const hiddenPaths = ['/lab/fortune', '/login', '/join','/payment/qr'];
+const hideNavbar = computed(() => hiddenPaths.includes(route.path));
 
 // 검색
 const keyword = ref('');
@@ -98,6 +99,7 @@ body {
   justify-content: center;
   align-items: flex-start;
   overflow: hidden;
+  position: relative;
 }
 
 .app-container {
@@ -123,15 +125,15 @@ body {
 
 .title-section {
   position: absolute;
-  top: 100px;
+  top: clamp(32px, 8vh, 84px);
   left: 50%;
-  transform: translateX(-500px);
+  transform: translateX(-43vw);
   text-align: left;
   z-index: 10;
 }
 
 .title-section h3 {
-  font-size: 40px;
+  font-size: 2.5rem;
   font-weight: 600;
   color: #cc5500;
   margin: 0;
@@ -140,7 +142,7 @@ body {
 }
 
 .title-section h2 {
-  font-size: 52px;
+  font-size: 3.25rem;
   font-weight: 800;
   background: linear-gradient(90deg, #ff7f50, #d62828);
   -webkit-background-clip: text;
@@ -153,59 +155,65 @@ body {
 /* ✅ 검색창 스타일 추가 */
 .search-section {
   position: absolute;
-  top: 250px;
-  transform: translateX(-330px);
+  top: calc(clamp(32px, 8vh, 84px) + clamp(120px, 12vh, 120px));
+  transform: translateX(-34vw);
   z-index: 10;
   width: 350px;
 }
 
 .search-bar {
-  display: flex;
-  align-items: center;
+  position: relative; /* ⬅️ 버튼의 기준이 됨 */
   height: 70px;
   border: 4px solid #ff7f50;
   border-radius: 50px;
   overflow: hidden;
-  background-color: white;
+  background-color: #fff;
   box-shadow: 0 2px 8px rgba(255, 127, 80, 0.1);
 }
 
+/* 인풋이 버튼 밑으로 들어가지 않게 오른쪽 여백 확보 */
 .search-input {
-  flex: 1;
-  margin-top: 15px;
+  width: 100%;
+  height: 100%;
   padding: 0 16px;
-  border: none;
+  padding-right: 92px; /* 버튼(62) + 여백(10) + 테두리(4*2) 보정 */
   font-size: 20px;
-  outline: none;
-  background-color: transparent;
+  background: transparent;
   color: #333;
-  box-shadow: none;
 }
 
 .search-input::placeholder {
   color: #aaa;
 }
 
+.search-input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
 .search-button {
-  width: 70px;
-  height: 70px;
-  margin-top: 15px;
-  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  width: 62px;
+  height: 62px;
   border: none;
   border-radius: 50%;
   background: linear-gradient(135deg, #ff7f50, #d62828);
-  color: white;
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   font-size: 30px;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease;
 }
 
 .search-button:hover {
   background: linear-gradient(135deg, #ff9060, #f04747);
   transform: scale(1.05);
+  transform: translateY(-50%);
 }
 
 /* ✨ Animation Effects */
