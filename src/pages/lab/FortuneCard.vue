@@ -87,9 +87,11 @@ onMounted(async () => {
   height: 100vh;
   overflow-y: auto;
   overflow-x: hidden;
+  margin-top: 10px;
+
   /* 스크롤바 숨기기 */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .fortune-scroll-container::-webkit-scrollbar {
@@ -135,7 +137,7 @@ onMounted(async () => {
   font-size: 28px;
   font-weight: bold;
   text-align: center;
-  margin-top: -15px;
+  margin-top: -20px;
 }
 
 /* 본문 콘텐츠 */
@@ -186,11 +188,11 @@ onMounted(async () => {
   max-width: 80%;
   max-height: 100%;
   object-fit: contain;
-  /* margin-bottom: 6px; */
   display: block;
 }
 
 .fortune-item-name {
+  margin-top: 20px;
   font-size: 18px;
   font-weight: 500;
 }

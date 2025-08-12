@@ -1,6 +1,7 @@
 <!-- App.vue -->
 <template>
   <div class="app-wrapper">
+    <!-- 타이틀 문구 -->
     <div class="title-section">
       <h3 class="title-line">카드가 가득</h3>
       <h2 class="subtitle-line">혜택이 까득</h2>
@@ -21,6 +22,7 @@
       </div>
     </div>
 
+    <!-- 노션 이동 버튼 -->
     <a
       href="https://www.notion.so/PJT_13_WeFin-22c014feab4d805e952ae019598b7895"
       target="_blank"
@@ -31,6 +33,8 @@
       <span>카드까득의<br />정보가 까득!</span>
       <div class="arrow">›</div>
     </a>
+
+    <!-- 앱 화면 -->
     <div class="app-container">
       <!-- ✅ 스크롤 가능한 콘텐츠 영역 -->
       <div
@@ -54,7 +58,7 @@ import { useAuthStore } from './stores/auth';
 
 const route = useRoute();
 const router = useRouter();
-const hiddenPaths = ['/lab/fortune', '/login', '/join','/payment/qr'];
+const hiddenPaths = ['/lab/fortune', '/login', '/join', '/payment/qr'];
 const hideNavbar = computed(() => hiddenPaths.includes(route.path));
 
 // 검색
@@ -152,7 +156,7 @@ body {
   letter-spacing: -1px;
 }
 
-/* ✅ 검색창 스타일 추가 */
+/* 검색창 스타일 */
 .search-section {
   position: absolute;
   top: calc(clamp(32px, 8vh, 84px) + clamp(120px, 12vh, 120px));
@@ -162,7 +166,7 @@ body {
 }
 
 .search-bar {
-  position: relative; /* ⬅️ 버튼의 기준이 됨 */
+  position: relative;
   height: 70px;
   border: 4px solid #ff7f50;
   border-radius: 50px;
@@ -176,7 +180,7 @@ body {
   width: 100%;
   height: 100%;
   padding: 0 16px;
-  padding-right: 92px; /* 버튼(62) + 여백(10) + 테두리(4*2) 보정 */
+  padding-right: 92px;
   font-size: 20px;
   background: transparent;
   color: #333;
@@ -245,7 +249,6 @@ body {
 
 .notion-button {
   position: absolute;
-  /* left: calc(50% -550px); */
   bottom: 40px;
   z-index: 10;
 

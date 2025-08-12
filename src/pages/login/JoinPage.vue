@@ -316,8 +316,6 @@ const signup = async () => {
 .row-append {
   display: grid;
   grid-template-columns: 1fr auto;
-  /* column-gap: 8px; */
-  /* align-items: center; */
   margin-right: 10px;
 }
 .mt8 {
