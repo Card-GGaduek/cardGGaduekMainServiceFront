@@ -73,6 +73,10 @@ function applyForCard() {
     alert("카드 신청 링크가 준비되지 않았습니다.");
   }
 }
+function formatPrice(price) {
+    if(price === null || price === undefined) return "";
+    return price.toLocaleString("ko-KR");
+}
 </script>
 
 <template>
@@ -104,13 +108,13 @@ function applyForCard() {
           <div class="info-item">
             <div class="info-icon">💰</div>
             <div class="info-label">연회비</div>
-            <div class="info-value">{{ cardDetail.annualFee }}원</div>
+            <div class="info-value">{{ formatPrice(cardDetail.annualFee) }}원</div>
           </div>
           <div class="info-item">
             <div class="info-icon">📅</div>
             <div class="info-label">전월실적</div>
             <div class="info-value">
-              {{ cardDetail.requiredMonthlySpent }}원 이상
+              {{ formatPrice(cardDetail.requiredMonthlySpent) }}원 이상
             </div>
           </div>
         </section>
