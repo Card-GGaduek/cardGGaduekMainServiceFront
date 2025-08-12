@@ -3,7 +3,10 @@
     <!-- 카드가 없을 때 메시지 -->
     <div v-if="cards.length === 0" class="no-cards-message">
       <p class="no-cards-text">등록된 카드가 없습니다</p>
-      <button class="link-card-button">카드 연동하기</button>
+      <button class="link-card-button" @click="goToCardLink">
+        카드 연동하기
+      </button>
+
     </div>
 
     <!-- 카드가 있을 때만 스와이퍼 표시 -->
@@ -166,12 +169,13 @@
             <div
                 class="card add-card"
                 :class="{
-                active: activeIndex === cards.length,
-                inactive: activeIndex !== cards.length,
-              }"
+    active: activeIndex === cards.length,
+    inactive: activeIndex !== cards.length,
+  }"
                 @click="goToCardLink"
             >
-              <div class="add-card-content">
+
+            <div class="add-card-content">
                 <div class="add-card-icon">
                   <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
                     <circle cx="20" cy="20" r="20" fill="white"/>
@@ -254,6 +258,13 @@ const goToStoreList = (cardId) => {
     console.error('페이지 이동 실패:', error);
   }
 };
+
+const goToCardLink = () => {
+  router.push({ name: 'CardSelectPage' }); // name으로 이동
+  // 또는 path로 이동 가능
+  // router.push('/card/select');
+};
+
 
 const goToCardEdit = () => {
   router.push({ path: '/card' });

@@ -25,9 +25,11 @@
 
       <!-- 하단 연결 버튼 -->
       <div class="bottom">
-        <button class="connect" :disabled="!selected" @click="submit">
-          연결하기
-        </button>
+        <div class="bottom-inner">
+          <button class="connect" :disabled="!selected" @click="submit">
+            연결하기
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -35,8 +37,8 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-// 이미지 경로는 질문에 준 파일명 그대로 사용
 import KB from '@/assets/cardselect/국민카드.jpg'
 import HYUNDAI from '@/assets/cardselect/현대카드.jpg'
 import SAMSUNG from '@/assets/cardselect/삼성카드.png'
@@ -46,6 +48,8 @@ import WOORI from '@/assets/cardselect/우리카드.png'
 import LOTTE from '@/assets/cardselect/롯데카드.jpg'
 import HANA from '@/assets/cardselect/하나카드.png'
 import SubHeader from "@/layout/SubHeader.vue";
+
+const router = useRouter()
 
 const issuers = [
   { id: 'KB', name: 'KB국민카드', logo: KB },
@@ -58,18 +62,18 @@ const issuers = [
   { id: 'HANA', name: '하나카드', logo: HANA },
 ]
 
-// Set 대신 단일 값으로 변경
 const selected = ref(null)
-const emit = defineEmits(['submit'])
 
-// 하나만 선택되도록 수정
 function select(id) {
   selected.value = selected.value === id ? null : id
 }
 
 function submit() {
   if (selected.value) {
-    emit('submit', selected.value)
+    router.push({
+      name: 'ConnectLoginPage',
+      query: { issuerId: selected.value } // 카드사 id를 쿼리로 전달
+    })
   }
 }
 </script>
@@ -88,7 +92,7 @@ function submit() {
   margin-bottom: 12px;
 }
 .title-1 {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 800;
   color: #222;
   line-height: 1.35;
@@ -135,21 +139,26 @@ function submit() {
   font-weight: 500;
 }
 
-/* 하단 고정 버튼 */
+/* 하단 고정 버튼 - 수정된 부분 */
 .bottom {
   position: fixed;
   bottom: 0;
-  left: 0;
-  right: 0;
+  left: 50%;
+  transform: translateX(-50%);       /* 가운데 정렬 */
+  width: 100%;
+  max-width: 430px;                   /* 컨텐츠 폭 제한 */
   padding: 20px 16px;
   background: linear-gradient(to top, #f5f7fb 60%, transparent);
   z-index: 100;
 }
-.connect {
+
+.bottom-inner {
   width: 100%;
   max-width: 520px;
-  margin: 0 auto;
-  display: block;
+}
+
+.connect {
+  width: 100%;
   height: 44px;
   border: 0;
   border-radius: 12px;
@@ -170,13 +179,23 @@ function submit() {
 }
 
 /* 모바일 대응 */
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .card-select {
     padding: 16px 12px 88px;
   }
 
   .bottom {
     padding: 20px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-select {
+    padding: 16px 8px 88px;
+  }
+
+  .bottom {
+    padding: 20px 8px;
   }
 
   .tile {
@@ -190,6 +209,17 @@ function submit() {
 
   .tile span {
     font-size: 12px;
+  }
+}
+
+@media (max-width: 320px) {
+  .bottom {
+    padding: 16px 4px;
+  }
+
+  .connect {
+    font-size: 14px;
+    height: 40px;
   }
 }
 </style>

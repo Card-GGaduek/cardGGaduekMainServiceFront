@@ -24,6 +24,7 @@ import MyBookingPage from '@/pages/mypage/MyBookingPage.vue';
 import MyCardPage from '@/pages/mypage/MyCardPage.vue';
 import MapPage2 from '@/pages/map/MapPage2.vue';
 import CardSelectPage from '@/pages/cardconnect/CardSelectPage.vue';
+import ConnectLoginPage from "@/pages/cardconnect/ConnectLoginPage.vue";
 const routes = [
   {
     path: '/',
@@ -128,6 +129,11 @@ const routes = [
     path: '/card/select',
     name: 'CardSelectPage',
     component: CardSelectPage
+  },
+  {
+    path: '/card/connectlogin',
+    name: 'ConnectLoginPage',
+    component: ConnectLoginPage
   },
 ];
 
