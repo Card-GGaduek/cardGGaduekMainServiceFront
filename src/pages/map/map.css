@@ -23,7 +23,7 @@
   /* top: var(--header-height); */
   overflow: visible !important;
   bottom: var(--bottom-gap);
-  height: 100vh;
+  height: 120vh;
   left: 0;
   right: 0;
 
@@ -258,11 +258,9 @@
 /* 위치 버튼 스타일 */
 .location-button {
   position: fixed;
-  cursor: pointer;
-  left: 190px;
+  left: 15px;
   bottom: 90px;
   z-index: 9999;
-  right: 50px;
   width: 50px;
   height: 50px;
   border-radius: 50%;
@@ -274,88 +272,36 @@
   align-items: center;
   cursor: pointer;
 }
-.location-icon {
+.location-button svg {
   stroke: #ffcd39;
 }
-.location-icon:hover {
+.location-button:hover svg {
   stroke: #f59e0b;
 }
 
-.research-area {
-  margin-bottom: 16px; /* 하단 여백 */
-}
 
 .research-button {
-  position: fixed;
-  top: 100px;
-  left: 305px;
+  position: absolute;
+  top: 170px;
+  left: 135px;
   z-index: 9999;
-  background-color: var(--primary-color);
-  color: white;
+  white-space: nowrap;
+  background-color: #fff;
+  color: #ffcd39;
   border: none;
   margin-top: 0.7rem;
   border-radius: 20px;
-  padding: 12px 20px;
-  font-size: 16px;
-  font-weight: bold;
+  padding: 4px 15px;
+  font-size: 14px;
+  font-weight: 700;
   box-shadow: var(--shadow);
   cursor: pointer;
 }
 .research-button:hover {
-  background-color: #ffcd39;
+  background-color: #f59e0b;
 }
 
-.my-cards-wrapper {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 1rem;
-  flex-wrap: wrap;
-}
-.card-thumbnail {
-  width: 80px;
-  height: auto;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-.card-thumbnail:hover {
-  transform: scale(1.05);
-}
-.card-thumbnail.active {
-  border: 3px solid #3b82f6;
-  transform: scale(1.05);
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
-}
-.card-image {
-  width: 100%;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
 
-/* 기존 selected card 스타일 유지 */
-.selected-card-box {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-.selected-card-img {
-  width: 80px;
-  height: auto;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-}
-.selected-card-info {
-  display: flex;
-  flex-direction: column;
-}
-.card-name {
-  font-weight: bold;
-  font-size: 1.1rem;
-}
-.card-category {
-  font-size: 0.9rem;
-  color: gray;
-}
 
 /* 하단 시트(상세) — 노랑/빨강 그라데이션 테마 */
 /* 드래그 핸들 */
@@ -401,7 +347,7 @@
   top: 12px;
   right: 12px;
   font-size: 24px;
-  color: var(--accent);
+  color: #ffd43b;
   background: none;
   border: none;
   cursor: pointer;
@@ -411,7 +357,7 @@
   font-size: 20px;
   font-weight: 800;
   margin: 2px 0 4px;
-  color: var(--text-strong);
+  color: #374151;
 }
 
 .merchant-category {
@@ -426,7 +372,7 @@
 .benefits-title {
   font-size: 16px;
   font-weight: 800;
-  color: var(--text-strong);
+  color: #374151;
   margin: 8px 0 10px;
   padding-bottom: 6px;
   border-bottom: 2px solid rgba(0, 0, 0, 0.06);
@@ -467,7 +413,7 @@
 }
 .benefit-desc {
   font-weight: 700;
-  color: var(--accent);
+  color: #ff6b6b;
   font-size: 15px;
   line-height: 1.3;
 }
