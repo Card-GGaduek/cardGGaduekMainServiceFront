@@ -129,13 +129,25 @@ const goToPayment = () => {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   opacity: 0.95;
 }
+.bottom-sheet-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 9999 !important;
+}
 .bottom-sheet-content {
-  padding: 10px 10px 20px;
+  padding: 10px 10px 20px; 
+  /* max-width: ; */
 }
 .navigator-title {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: bold;
-  color: #ff6b6b;
+  color: #ffd43b;
+  
   margin-bottom: 16px;
   text-align: center;
 }
@@ -144,7 +156,7 @@ const goToPayment = () => {
   background: none;
   border: none;
   font-size: 28px;
-  color: #ff6b6b;
+  color: #ffd43b;
   float: right;
   cursor: pointer;
 }

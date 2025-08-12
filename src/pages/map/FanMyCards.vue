@@ -50,8 +50,8 @@
     const angle = start + spread * index
     const radius = 100                           // 원호 반경(px)
     const rad = (Math.PI / 180) * angle
-    const x = Math.sin(rad) * radius
-    const y = Math.cos(rad) * radius
+    const x = Math.sin(rad) * radius - 20
+    const y = Math.cos(rad) * radius - 10
   
     const isHovered = hoveredId.value === props.myCards[index]?.cardId
   
@@ -66,7 +66,7 @@
   // 클릭 → 카드만 선택(검색 안 함)
   function onPick(cardId) {
     try {
-      props.handleCardClick(Number(cardId), { autoSearch: false }) // [map.js 연결]
+      props.handleCardClick(Number(cardId), { autoSearch: true }) // [map.js 연결]
     } catch (e) {
       console.error('handleCardClick 호출 실패:', e)
     }
@@ -76,7 +76,9 @@
   <style scoped>
   .fan-dock {
     position: fixed;        /* 화면 하단 고정 */
-    left: 47%;
+    width: 420px;
+    height: 180px;         /* 부채꼴 높이 */
+    left: 49%;
     top: 86%;
     transform: translateX(-50%);
     z-index: 1000;
@@ -84,7 +86,7 @@
   }
   
   .fan-stage {
-    position: relative;
+    position: fixed;
     width: 420px;           /* 카드 개수에 따라 자동 래핑되지만, 기본 폭을 줘 중심 배치 */
     height: 180px;          /* 부채꼴 높이 */
     pointer-events: auto;   /* 카드 클릭 가능 */

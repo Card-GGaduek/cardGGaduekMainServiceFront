@@ -15,6 +15,25 @@ export function useMap(mapDiv) {
 
   const keyword = ref(route.query.keyword || '');
   const selectedCard = ref(null);
+
+  /* 25.08.12 추가 */
+  // 카드 검색 로직 분리 
+  const topSelectedCard = ref(null); // 상단 선택 카드 (카테고리 검색용)
+  const bottomSelectedCard = ref(null); // 하단 선택 카드 (매장 검색용)
+
+  // 상단 드롭다운 "선택 카드의 혜택 카테고리만 적용"
+  // const topFilteredCategories = computed(() => {
+  //   if(!topSelectedCard.value){
+  //     alert('카드를 먼저 선택해주세요.');
+  //     return [];
+  //   }
+  //   if(!topSelectedCard.value.storeCategories?.length) {
+  //     alert('카테고리를 선택해주세요.');
+  //     return [];
+  //   }
+  //   return allCategories.f
+  // })
+
   const selectedCardCategory = ref('');
   const selectedMerchant = ref(null);
   const selectedStoreName = ref('');
@@ -33,6 +52,7 @@ export function useMap(mapDiv) {
 
   // 색상/라벨 매핑
   const categoryColorMap = {
+    CAFE : { label: '카페', color: '#8B4513' },
     COFFEE_SHOP: { label: '카페', color: '#8B4513' },
     CONVENIENCE_STORE: { label: '편의점', color: '#32CD32' },
     MOVIE_THEATER: { label: '영화관', color: '#8A2BE2' },
@@ -266,7 +286,7 @@ export function useMap(mapDiv) {
         showNoBenefitMessage();
         return;
       }
-
+      places.forEach(createMarker);
       // 혜택 풀 준비(캐시)
       const allCards = await getStoreBenefits();
       const allBenefits = cardsToBenefits(allCards);
@@ -367,7 +387,7 @@ export function useMap(mapDiv) {
         return;
       }
 
-      isSearching.value = true;
+     
 
       // 상세 머지
       if (!cardDetailsMap.value[cardId]) {
@@ -387,9 +407,7 @@ export function useMap(mapDiv) {
       router.replace({ query: { ...route.query, cardId } });
     } catch (error) {
       console.error('카드 상세 정보를 불러오지 못했습니다:', error);
-    } finally {
-      isSearching.value = false; // 항상 꺼지도록
-    }
+    } 
   };
 
   // 3) 가맹점명 단일 검색
