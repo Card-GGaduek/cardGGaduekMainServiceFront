@@ -177,7 +177,9 @@ const getCategoryIcon = (category) => {
     'SHOPPING': '🛍️',
     'HOSPITAL': '🏥',
     'EDUCATION': '📚',
-    'TRANSPORT': '🚌'
+    'TRANSPORT': '🚌',
+    'FOOD': '🍚',
+    'CULTURE':'🎫'
   };
   return iconMap[category] || '💳';
 };
