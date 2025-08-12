@@ -35,7 +35,6 @@ export default {
   name: 'PaymentComplete',
   components: {
     SubHeader,
-    NavBar
   },
   methods: {
     goBack() {
