@@ -33,8 +33,7 @@ export function useMap(mapDiv) {
 
   // 색상/라벨 매핑
   const categoryColorMap = {
-    COFFEE_SHOP: { label: '커피전문점', color: '#8B4513' },
-    CAFE: { label: '커피전문점', color: '#8B4513' },
+    COFFEE_SHOP: { label: '카페', color: '#8B4513' },
     CONVENIENCE_STORE: { label: '편의점', color: '#32CD32' },
     MOVIE_THEATER: { label: '영화관', color: '#8A2BE2' },
     RESTAURANT: { label: '음식점', color: '#FF6347' },
@@ -48,6 +47,25 @@ export function useMap(mapDiv) {
     const key = selectedMerchant.value.primaryType.toUpperCase();
     return categoryColorMap[key]?.label || selectedMerchant.value.primaryType;
   });
+
+  const iconMap = {
+    COFFEE_SHOP: 'bi-cup-hot',
+    CAFE: 'bi-cup-hot',
+    CONVENIENCE_STORE: 'bi-shop',
+    MOVIE_THEATER: 'bi-film',
+    RESTAURANT: 'bi-egg-fried',
+    GAS_STATION: 'bi-fuel-pump',
+    THEME_PARK: 'bi-tree',
+    HOTEL: 'bi-building',
+  };
+  
+  const categoriesForUI = computed(() =>
+    Object.entries(categoryColorMap).map(([key, v]) => ({
+      key,                         // [map.js 연결] searchStoresByCategory(key)로 전달되는 키
+      label: v.label,              // 표기 라벨
+      icon: iconMap[key] || null,  // 아이콘(선택)
+    }))
+  );
 
   const showNoBenefitMessage = () => {
     if (hasShownAlert.value) return;
@@ -199,6 +217,16 @@ export function useMap(mapDiv) {
     markers.value.push(marker);
   };
 
+  // 검색 마커 지우기 유틸
+  const clearMarkers = () => {
+    try {
+      markers.value.forEach(m => m.setMap(null));
+    } catch (e) {
+      console.warn('clearMarkers error:', e);
+    }
+    markers.value = [];
+  };
+
   // 1) 키워드 검색(누적 아님)
   const handleSearch = async () => {
     if (!map.value) return;
@@ -235,6 +263,7 @@ export function useMap(mapDiv) {
       const places = response.data?.data?.places || [];
       if (!places.length) {
         console.warn('검색된 매장이 없습니다.');
+        showNoBenefitMessage();
         return;
       }
 
@@ -319,7 +348,8 @@ export function useMap(mapDiv) {
   };
 
   // 2-2) 카드 클릭 시: 카테고리 누적검색
-  const handleCardClick = async (cardId) => {
+  const handleCardClick = async (cardId,options = {}) => {
+    const { autoSearch = true } = options;
     try {
       const matchedCard = myCards.value.find((c) => c.cardId === cardId);
       if (!matchedCard) return;
@@ -348,7 +378,7 @@ export function useMap(mapDiv) {
       selectedCard.value = detail ? { ...matchedCard, ...detail } : matchedCard;
 
       // 카테고리 누적 검색
-      if (matchedCard.storeCategories?.length) {
+      if (autoSearch && matchedCard.storeCategories?.length) {
         for (const category of matchedCard.storeCategories) {
           await searchStoresByCategory(category);
         }
@@ -565,6 +595,7 @@ export function useMap(mapDiv) {
     noBenefitAlert,
     selectedStoreName,
     isSearching,
+    categoriesForUI,
 
     // methods
     initMap,
@@ -576,5 +607,6 @@ export function useMap(mapDiv) {
     searchByStoreName,
     moveToCurrentLocation,
     showNoBenefitMessage,
+    clearMarkers,
   };
 }
