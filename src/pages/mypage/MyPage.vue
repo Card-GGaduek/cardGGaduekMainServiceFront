@@ -123,7 +123,6 @@ const goToMyCards = () => {
             class="list-group-item d-flex justify-content-between align-items-center"
           >
             <span><i class="bi bi-person-vcard-fill me-2"></i>내 정보</span>
-            <a href="#" class="small text-decoration-none">내 정보 변경 ></a>
           </li>
           <li class="list-group-item" @click="goToMyCards">
             <i class="bi bi-credit-card-fill me-2"></i>내 카드

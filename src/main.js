@@ -1,5 +1,6 @@
 import './assets/main.css';
 import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-icons/font/bootstrap-icons.css'; // 선웅 추가 지도 디자인 수정용
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import App from './App.vue';
@@ -15,3 +16,4 @@ console.log('[main.js] 앱 초기화 완료 - Auth Store의 load()에서 토큰 
 
 app.use(router);
 app.mount('#app');
+
