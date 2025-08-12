@@ -25,6 +25,8 @@ import MyCardPage from '@/pages/mypage/MyCardPage.vue';
 import MapPage2 from '@/pages/map/MapPage2.vue';
 import CardSelectPage from '@/pages/cardconnect/CardSelectPage.vue';
 import ConnectLoginPage from "@/pages/cardconnect/ConnectLoginPage.vue";
+import completePage from "@/pages/payment/CompletePage.vue";
+import CompletePage from "@/pages/payment/CompletePage.vue";
 const routes = [
   {
     path: '/',
@@ -134,6 +136,11 @@ const routes = [
     path: '/card/connectlogin',
     name: 'ConnectLoginPage',
     component: ConnectLoginPage
+  },
+  {
+    path: '/payment/completepage',
+    name: 'CompletePage',
+    component: CompletePage  // 여기도 변경
   },
 ];
 
