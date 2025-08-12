@@ -125,11 +125,30 @@ const openPayNavigator = () => {
   console.log('🟢 openPayNavigator 실행');
   console.log('selectedCard:', selectedCard.value);
   console.log('selectedMerchant:', selectedMerchant.value);
+
   payNavigatorMode.value = true;
   
 };
 const closePayNavigator = () => {
   payNavigatorMode.value = false;
+};
+
+/**
+ * 혜택 카드 클릭 시:
+ * - benefit.cardProductId 기준으로 내가 가진 카드 찾기
+ * - selectedCard에 반영(마커/검색은 건드리지 않음: autoSearch/마커 클리어 없음)
+ * - 페이 네비게이터 열기
+ */
+ const onClickBenefit = (benefit) => {
+  // 내가 가진 카드 중 해당 혜택의 카드 상품과 일치하는 카드 찾기
+  const owned = myCards.value.find(c => c.cardProductId === benefit.cardProductId);
+  if (owned) {
+    // 지도 마커를 지우지 않기 위해 handleCardClick 대신 직접 선택만 반영
+    // (상세 정보 병합이 필요하면 map.js에서 이미 selectedCardFull()로 처리)
+    selectedCard.value = owned;
+  }
+  // 카드가 없어도 네비게이터는 열 수 있지만, 보통은 owned가 있을 때 열립니다.
+  payNavigatorMode.value = true;
 };
 // // 🔍 selectedMerchant 변경 추적
 // watch(selectedMerchant, (newVal) => {
@@ -213,7 +232,7 @@ const closePayNavigator = () => {
               :key="benefit.cardName + benefit.storeName"
               class="benefit-item"
               :class="{ primary: benefit.isPrimary }"
-              @click="openPayNavigator"
+              @click="onClickBenefit(benefit)"
             >
               <img
                 v-if="benefit.cardImageUrl"
