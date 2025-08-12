@@ -51,6 +51,127 @@ export function useMap(mapDiv) {
   const mapReadyCallbacks = ref([]);
 
   // 08.12 변경: 카테고리 정규화
+  // brands/*.png 를 빌드 시 모두 불러와 slug(파일명) -> URL 맵을 만든다
+const iconModules = import.meta.glob('../../assets/brands/*.png', {
+  eager: true,
+  import: 'default', // 각 png의 번들 URL 문자열을 바로 받음
+});
+const BRAND_ICON_MAP = {};
+for (const [path, url] of Object.entries(iconModules)) {
+  const slug = path.split('/').pop().replace(/\.png$/i, '').toLowerCase(); // starbucks
+  BRAND_ICON_MAP[slug] = url; // '/assets/starbucks.abc123.png'
+}
+  // [2] 한글/영문 혼용 브랜드명을 파일명 슬러그로 변환
+  // [map.js] brandSlug 교체
+function brandSlug(name = '') {
+  // 1) 정규화 (brandSlug 내부에서 자체 정규화)
+  const s = String(name)
+    .normalize('NFKC').toLowerCase()
+    .replace(/\s+/g, '')
+    .replace(/\(.*?\)|\[.*?\]/g, '')
+    .replace(/주유소|지점|점|본점|센터|몰|백화점|마트|스토어/g, '')
+    .replace(/[·⋅•･・]/g, '')
+    .replace(/&/g, 'and')
+    .replace(/-|_/g, '')
+    .replace(/[^\p{Letter}\p{Number}]/gu, '');
+
+  // 2) 완전일치 별칭 (값은 반드시 소문자 파일명과 동일)
+  const ALIAS_EQ = {
+    '스타벅스': 'starbucks',
+    '투썸플레이스': 'twosomeplace',
+    '폴바셋': 'paulbassett',
+    '커피빈': 'coffeebean',
+    '미니스톱': 'ministop',
+    '이마트24': 'emart24',
+    '씨유': 'cu',
+    '세븐일레븐': '7eleven',
+    '메가박스': 'megabox',
+    '롯데시네마': 'lottecinema',
+    '씨지브이': 'cgv',
+    '지에스칼텍스': 'gscaltex',
+    '지에스25': 'gs25',
+    '에스케이주유소': 'sk',
+    '현대오일뱅크': 'hyundaioil',
+    '에스오일': 'soil',
+    '롯데리아': 'lotteria',
+    '맥도날드': 'macdonald',   
+    '버거킹': 'buggerking',     
+  };
+  if (ALIAS_EQ[s]) return ALIAS_EQ[s];
+
+  // 3) 부분포함 별칭 (브랜드+지점명 대응)
+  const CONTAINS = [
+    ['스타벅스', 'starbucks'],
+    ['CU', 'cu'],
+    ['투썸', 'twosomeplace'],
+    ['폴바셋', 'paulbassett'],
+    ['커피빈', 'coffeebean'],
+    ['세븐일레븐', '7eleven'],
+    ['이마트24', 'emart24'],
+    ['메가박스', 'megabox'],
+    ['롯데시네마', 'lotte'],
+    ['cgv', 'cgv'],
+    ['gs칼텍스', 'gscaltex'],
+    ['gs25', 'gs25'],
+    ['sk주유소', 'sk'],
+    ['현대오일뱅크', 'hyundaioil'],
+    ['s-oil', 'soil'],
+    ['에스오일', 'soil'],
+    ['버거킹', 'buggerking'],
+    ['맥도날드', 'macdonald'],
+    ['롯데리아', 'lotteria'],
+  ];
+  for (const [needle, slug] of CONTAINS) {
+    const n = needle
+      .normalize('NFKC').toLowerCase()
+      .replace(/\s+/g, '')
+      .replace(/[^\p{Letter}\p{Number}]/gu, '');
+    if (s.includes(n)) return slug;
+  }
+
+  // 4) 아무 매칭도 없으면 정규화된 s(소문자) 반환 → 파일명이 그대로면 잡힙니다.
+  return s;
+}
+  // [3] place에서 로고 URL을 찾아오는 규칙
+//  - 1순위: place.benefits[0].storeName
+//  - 2순위: 모든 benefit의 brand 후보 중 place.name과 가장 유사한 것
+//  - 3순위: place.name 자체로 slug 추출
+function resolveBrandIcon(place) {
+  const cand = [];
+
+  // benefits가 있으면 우선 사용
+  if (Array.isArray(place?.benefits) && place.benefits.length) {
+    for (const b of place.benefits) {
+      if (b?.storeName) cand.push(brandSlug(b.storeName));
+    }
+  }
+
+  // place.name도 후보에 추가
+  if (place?.name) cand.push(brandSlug(place.name));
+
+  // 후보 중 첫 번째 매칭되는 아이콘 반환
+  for (const key of cand) {
+    if (BRAND_ICON_MAP[key]) return BRAND_ICON_MAP[key];
+  }
+  return null; // 없으면 컬러 점 마커로 폴백
+}
+
+// [4] 마커 HTML 생성기: 원형 테두리 안에 PNG 표시
+function buildBrandMarkerHTML(imgUrl) {
+  // 30x30 컨테이너, 내부 이미지 24x24
+  return `
+    <div style="
+      width:30px;height:30px;border-radius:50%;
+      background:#fff;display:flex;align-items:center;justify-content:center;
+      box-shadow:0 2px 6px rgba(0,0,0,.2); border:2px solid #fff;
+    ">
+      <img src="${imgUrl}" alt="brand" style="
+        width:24px;height:24px;object-fit:contain; image-rendering:auto;
+      " />
+    </div>
+  `;
+}
+
   const CATEGORY_CANON = {
     // 카페
     'cafe': 'COFFEE_SHOP',
@@ -241,16 +362,37 @@ export function useMap(mapDiv) {
       place.locationDTO.latitude,
       place.locationDTO.longitude
     );
-    const typeKey = toCanon(place.primaryType);
-    const markerColor = categoryColorMap[typeKey]?.color || '#888888';
+    // const typeKey = toCanon(place.primaryType);
+    // const markerColor = categoryColorMap[typeKey]?.color || '#888888';
+
+    // 로고 아이콘 우선, 없으면 기존 색 점 마커 폴백
+      const iconUrl = resolveBrandIcon(place);
+      let iconOpt;
+      
+      if (iconUrl) {
+        iconOpt = {
+          content: buildBrandMarkerHTML(iconUrl),
+          anchor: new window.naver.maps.Point(15, 15),
+        };
+      } else {
+        const typeKey = toCanon(place.primaryType);
+        const markerColor = categoryColorMap[typeKey]?.color || '#888888';
+        iconOpt = {
+          content: `<div style="background-color:${markerColor};width:22px;height:22px;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,.2);"></div>`,
+          anchor: new window.naver.maps.Point(11, 11),
+        };
+      }
 
     const marker = new window.naver.maps.Marker({
       position,
       map: map.value,
-      icon: {
-        content: `<div style="background-color:${markerColor};width:22px;height:22px;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,.2);"></div>`,
-        anchor: new window.naver.maps.Point(11, 11),
-      },
+      icon: 
+      // {
+      //   content: `<div style="background-color:${markerColor};width:22px;height:22px;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,.2);"></div>`,
+      //   anchor: new window.naver.maps.Point(11, 11),
+      // },
+      iconOpt,
+      clickable: true,
     });
 
     window.naver.maps.Event.addListener(marker, 'click', () => {
