@@ -15,6 +15,11 @@
       />
       <span class="notification-badge">N</span>
     </div>
+
+    <div v-if="userName" class="d-flex align-items-center">
+      <span class="fw-bold me-2">{{ userName }}님</span>
+      <i class="bi bi-person-circle fs-2"></i>
+    </div>
   </header>
 </template>
 
@@ -27,6 +32,11 @@ defineProps({
   showNotification: {
     type: Boolean,
     default: false,
+  },
+  userName: {
+    type: String,     // 데이터 타입은 문자열(String)
+    required: true    // 이 prop은 필수 값임
+    // default: '고객' // required: false일 경우 기본값을 설정할 수 있습니다.
   },
 });
 

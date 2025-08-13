@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import memberApi from '@/api/memberApi'; // 실제 API 경로에 맞게 수정해주세요.
+import MainHeader from "@/layout/MainHeader.vue";
 
 const router = useRouter();
 
@@ -32,15 +33,16 @@ onMounted(async () => {
 
 <template>
   <div class="page-container">
-    <div class="pt-4 logo-container">
+    <!-- <div class="pt-4 logo-container">
       <img src="@/assets/logo/logo.jpg" alt="카드까득 로고" class="logo-img" />
-    </div>
-    <header class="page-header">
+    </div> -->
+    <!-- <header class="page-header">
       <button @click="router.back()" class="back-button">&larr;</button>
       <h1 class="page-title">내 카드</h1>
       <div class="placeholder"></div>
-    </header>
+    </header> -->
 
+    <MainHeader/>
     <main class="content-area">
       <div v-if="isLoading" class="feedback-view">
         <div class="spinner-border" role="status"></div>

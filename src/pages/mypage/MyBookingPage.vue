@@ -4,6 +4,7 @@ import { ref, onMounted, reactive } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import memberApi from "@/api/memberApi";
+import MainHeader from "@/layout/MainHeader.vue";
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -52,15 +53,15 @@ const getStatusText = (status) => {
 
 <template>
   <div class="page-container">
-    <div class="pt-4 logo-container">
+    <!-- <div class="pt-4 logo-container">
       <img src="@/assets/logo/logo.jpg" alt="카드까득 로고" class="logo-img" />
     </div>
     <header class="page-header">
       <button @click="router.back()" class="back-button">&larr;</button>
       <h1 class="page-title">내 예약내역</h1>
       <div class="placeholder"></div>
-    </header>
-
+    </header> -->
+    <MainHeader/>
     <main class="content-area">
       <div
         v-if="myPageInfo.bookingList.length === 0 || myPageInfo.booking"
@@ -77,7 +78,7 @@ const getStatusText = (status) => {
         >
           <div class="summary-view">
             <img
-              src="@/assets/accommodations/롯데호텔서울1.jpg"
+              src="@/assets/accommodations/제목 없음 1.png"
               alt="예약 이미지"
               class="thumbnail-image"
             />

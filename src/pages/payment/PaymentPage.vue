@@ -204,7 +204,6 @@ const currentCardDiscount = computed(() => {
   return 0;
 });
 
-
 // 현재 최종 결제 금액 계산 (실시간으로 변경)
 const currentFinalAmount = computed(() => {
   const original = originalPrice.value;
@@ -268,7 +267,6 @@ const isSelectedCardFromBooking = (card) => {
   return nameMatch || idMatch;
 };
 
-
 // 함수들
 const fetchUserCards = async () => {
   try {
@@ -315,7 +313,6 @@ const onSlideChange = (swiper) => {
   nextTick(() => {
     console.log('Active card index:', activeCardIndex.value);
     console.log('Selected card:', selectedCard.value);
-    console.log('Has benefit:', selectedCard.value ? isCardHasBenefit(selectedCard.value) : false);
     console.log('Current card discount:', currentCardDiscount.value);
     console.log('Current final amount:', currentFinalAmount.value);
   });
@@ -382,7 +379,7 @@ const requestPayment = () => {
   });
 };
 
-// 결제 결과 처리
+// 결제 결과 처리 (예약 처리 제거, 결제 검증만)
 const handlePaymentResult = async (rsp, merchantUid) => {
   if (rsp.success) {
     try {
@@ -390,36 +387,64 @@ const handlePaymentResult = async (rsp, merchantUid) => {
       const response = await fetch("http://localhost:8080/payment/complete", {
         method: "POST",
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Accept": "application/json"
         },
         body: new URLSearchParams({
           imp_uid: rsp.imp_uid,
           merchant_uid: rsp.merchant_uid,
-          amount: currentFinalAmount.value, // 실제 결제된 금액 전송
-          category: 'ACCOMMODATION'
+          amount: currentFinalAmount.value,
+          category: 'ACCOMMODATION',
+          memberId: 7,
+          cardId: selectedCard.value.cardId,
+          storeName: bookingData.value.roomName || productName.value
         })
       });
+
+      // 응답 Content-Type 점검
+      const ct = response.headers.get('content-type') || '';
+      const isJson = ct.includes('application/json');
+
+      // 상태코드/본문 로깅
+      if (!response.ok) {
+        const raw = isJson ? await response.json().catch(() => ({})) : await response.text();
+        console.error("[payment/complete] HTTP", response.status, raw);
+
+        if (response.status === 401 || response.status === 403) {
+          alert("인증 또는 권한 문제로 결제 검증이 거부됐습니다. 로그인 상태와 CORS/CSRF 설정을 확인해주세요.");
+        } else if (response.status === 415) {
+          alert("서버가 전송한 Content-Type을 지원하지 않습니다. (415) 백엔드 consumes/produces 확인 필요");
+        } else {
+          alert("서버 오류로 결제 검증에 실패했습니다. (" + response.status + ")");
+        }
+        return;
+      }
+
+      // JSON 아니면 원문 확인
+      if (!isJson) {
+        const raw = await response.text();
+        console.error("[payment/complete] Non-JSON response:", raw);
+        alert("결제 검증 응답이 JSON이 아닙니다. 백엔드에서 JSON을 반환하도록 설정해주세요.");
+        return;
+      }
 
       const result = await response.json();
 
       if (result.success) {
-        // 결제 성공 후 예약 생성
-        try {
-          const bookingResponse = await createBooking(rsp.imp_uid);
-
-          alert("✅ 결제 및 예약이 성공적으로 완료되었습니다!");
-
-          router.push({
-            path: '/booking/complete',
-            query: {
-              bookingId: bookingResponse.data || 'unknown',
-              impUid: rsp.imp_uid
-            }
-          });
-        } catch (bookingError) {
-          console.error('예약 생성 실패:', bookingError);
-          alert("⚠️ 결제는 완료되었지만 예약 처리 중 오류가 발생했습니다. 고객센터로 문의해주세요.");
-        }
+        // 결제 성공 - CompletePage로 이동 (알림창 제거)
+        router.push({
+          path: '/payment/completepage',
+          query: {
+            impUid: rsp.imp_uid,
+            amount: currentFinalAmount.value,
+            productName: productName.value,
+            roomName: bookingData.value.roomName,
+            // 필요한 다른 예약 정보들도 전달 가능
+            checkIn: bookingData.value.checkIn,
+            checkOut: bookingData.value.checkOut,
+            name: bookingData.value.name
+          }
+        });
       } else {
         alert("⚠️ 결제는 되었지만 거래 저장에 실패했습니다: " + result.message);
       }
@@ -431,38 +456,6 @@ const handlePaymentResult = async (rsp, merchantUid) => {
     alert("❌ 결제 실패: " + rsp.error_msg);
     router.back();
   }
-};
-
-// 예약 생성 API 호출
-const createBooking = async (impUid) => {
-  const response = await fetch('/api/booking', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      roomId: bookingData.value.roomId,
-      checkInDate: bookingData.value.checkIn,
-      checkOutDate: bookingData.value.checkOut,
-      name: bookingData.value.name,
-      phone: bookingData.value.phone,
-      email: bookingData.value.email,
-      requestText: bookingData.value.requestText,
-      numberOfGuests: bookingData.value.numberOfGuests,
-      couponProductId: bookingData.value.couponProductId,
-      cardId: selectedCard.value.cardId,
-      paymentId: impUid,
-      // 실제 적용된 할인 정보도 함께 전송
-      appliedCardDiscount: currentCardDiscount.value,
-      finalPaymentAmount: currentFinalAmount.value
-    })
-  });
-
-  if (!response.ok) {
-    throw new Error('예약 생성 실패');
-  }
-
-  return await response.json();
 };
 
 // activeCardIndex 변경을 감지하여 가격 업데이트 강제 실행

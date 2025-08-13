@@ -71,8 +71,8 @@ function goBack() { router.back(); }
 <style scoped>
 /* 전체적인 모바일 화면 레이아웃 */
 .mobile-screen {
-  max-width: 420px;
-  min-width: 320px;
+  
+  
   height: 100vh;
   margin: 0 auto;
   display: flex;
@@ -118,6 +118,7 @@ function goBack() { router.back(); }
   background-clip: text;
   color: transparent;
 }
+
 .back-button {
   background: none;
   border: none;

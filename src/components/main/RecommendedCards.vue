@@ -271,6 +271,9 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  width: 100%;
+  max-width: 400px;   /* 원하는 폭으로 조절: 320~420px 추천 */
+  margin: 0 auto;     /* 중앙 정렬 */
 }
 
 .recommended-card-item {

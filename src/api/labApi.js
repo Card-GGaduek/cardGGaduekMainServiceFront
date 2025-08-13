@@ -18,6 +18,7 @@ export default {
     const { data } = await api.get(`${BASE_URL}`);
     return data;
   },
+
   // 0. 실험실 통합 API
   async getLabOverview() {
     const { data } = await api.get(`${BASE_URL}`);

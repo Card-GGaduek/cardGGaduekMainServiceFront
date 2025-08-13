@@ -8,6 +8,9 @@ const memberApi = {
   getMyCard: async () => {
     return await axiosInstance.get('/card/my');
   },
+
+  createBooking: async (payload) => axiosInstance.post('/booking', payload),
+
 };
 
 export default memberApi;
