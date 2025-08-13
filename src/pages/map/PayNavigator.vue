@@ -31,7 +31,7 @@
         <div class="discount-result">
           <p v-if="discountedAmount !== null" class="result">
             할인 적용 후 예상 결제 금액은
-            <strong>{{ discountedAmount }}원</strong> 입니다.
+            <strong>{{ discountedAmount }}원</strong> 입니다. 
           </p>
           <button
             v-if="discountedAmount !== null"
