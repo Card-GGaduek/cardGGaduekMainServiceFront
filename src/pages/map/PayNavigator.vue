@@ -20,8 +20,12 @@
           type="number"
           class="amount-input"
           placeholder="매장에서 사용할 금액을 입력해 주세요"
+          @keyup.enter="calculatorDiscount"
+          :autofocus="true"
         />
-        <button class="calculator-button" @click="calculatorDiscount">
+        <button class="calculator-button" 
+        @click="calculatorDiscount"
+        >
           할인 금액 계산
         </button>
         <div class="discount-result">

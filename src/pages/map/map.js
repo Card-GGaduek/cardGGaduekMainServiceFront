@@ -81,8 +81,9 @@ function brandSlug(name = '') {
     '투썸플레이스': 'twosomeplace',
     '폴바셋': 'paulbassett',
     '커피빈': 'coffeebean',
+    '이디야': 'ediya',
     '미니스톱': 'ministop',
-    '이마트24': 'emart24',
+    '이24': 'emart24',
     '씨유': 'cu',
     '세븐일레븐': '7eleven',
     '메가박스': 'megabox',
@@ -95,7 +96,12 @@ function brandSlug(name = '') {
     '에스오일': 'soil',
     '롯데리아': 'lotteria',
     '맥도날드': 'macdonald',   
-    '버거킹': 'buggerking',     
+    'kfc': 'kfc',
+    '버거킹': 'buggerking',
+    '아웃백스테이크하우스': 'outback',
+    '애슐리': 'ashley',
+    '애슐리퀸즈': 'ashleyqueens',
+    '롯데호텔': 'lottehotel',
   };
   if (ALIAS_EQ[s]) return ALIAS_EQ[s];
 
@@ -103,23 +109,31 @@ function brandSlug(name = '') {
   const CONTAINS = [
     ['스타벅스', 'starbucks'],
     ['CU', 'cu'],
+    ['미니스톱', 'ministop'],
     ['투썸', 'twosomeplace'],
     ['폴바셋', 'paulbassett'],
     ['커피빈', 'coffeebean'],
+    ['이디야', 'ediya'],
     ['세븐일레븐', '7eleven'],
-    ['이마트24', 'emart24'],
+    ['이24', 'emart24'],
     ['메가박스', 'megabox'],
     ['롯데시네마', 'lotte'],
     ['cgv', 'cgv'],
     ['gs칼텍스', 'gscaltex'],
     ['gs25', 'gs25'],
     ['sk주유소', 'sk'],
+    ['sk', 'sk'],
     ['현대오일뱅크', 'hyundaioil'],
     ['s-oil', 'soil'],
     ['에스오일', 'soil'],
     ['버거킹', 'buggerking'],
     ['맥도날드', 'macdonald'],
     ['롯데리아', 'lotteria'],
+    ['kfc', 'kfc'],
+    ['아웃백스테이크하우스', 'outback'],
+    ['애슐리', 'ashley'],
+    ['애슐리퀸즈', 'ashleyqueens'],
+    ['롯데호텔', 'lottehotel'],
   ];
   for (const [needle, slug] of CONTAINS) {
     const n = needle
@@ -145,13 +159,17 @@ function resolveBrandIcon(place) {
       if (b?.storeName) cand.push(brandSlug(b.storeName));
     }
   }
-
+  
   // place.name도 후보에 추가
   if (place?.name) cand.push(brandSlug(place.name));
-
+  
   // 후보 중 첫 번째 매칭되는 아이콘 반환
   for (const key of cand) {
     if (BRAND_ICON_MAP[key]) return BRAND_ICON_MAP[key];
+    else{
+      console.warn(`브랜드 아이콘 없음: ${key}`);
+      console.warn(`대상 place:`, place);
+    }
   }
   return null; // 없으면 컬러 점 마커로 폴백
 }
@@ -179,12 +197,23 @@ function buildBrandMarkerHTML(imgUrl) {
   
     // 편의점
     'convenience_store': 'CONVENIENCE_STORE',
+    'grocery_store': 'CONVENIENCE_STORE',
   
     // 영화관
     'movie_theater': 'MOVIE_THEATER',
   
     // 음식점
     'restaurant': 'RESTAURANT',
+    'food': 'RESTAURANT',
+    'food_court': 'RESTAURANT',
+    'fast_food': 'RESTAURANT',
+    'dining': 'RESTAURANT',
+    'diner': 'RESTAURANT',
+    'pub': 'RESTAURANT',
+    'bar': 'RESTAURANT',
+    'cafe_restaurant': 'RESTAURANT',
+    'fast_food_restaurant': 'RESTAURANT',
+    'buffet_restaurant': 'RESTAURANT',
 
     // 주유소
     'gas_station': 'GAS_STATION',
@@ -512,6 +541,7 @@ function buildBrandMarkerHTML(imgUrl) {
 
     if (!brandNames.length) {
     console.warn('선택 카테고리에 브랜드형 혜택이 없습니다.');
+    showNoBenefitMessage();
     return;
     }
 
