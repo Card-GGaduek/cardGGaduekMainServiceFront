@@ -110,15 +110,17 @@ async function submitBooking() {
   try {
     // [수정] .get({ params: ... }) -> .post(데이터) 로 변경
     const response = await api.post('api/booking', bookingData);
-
-    const newBookingId = response.data.data || response.data;
+    //
+    // const newBookingId = response.data.data || response.data;
+    const newBookingId = response?.data?.data?.bookingId;
+    if (!newBookingId) { alert('예약번호 수신 실패'); return; }
 
     // [수정] 예약 성공 시 결제 페이지로 이동하도록 변경
     // 예약 정보와 결제 정보를 query parameter로 전달
     router.push({
       path: '/payment',
       query: {
-        bookingId: newBookingId,
+        bookingId: String(newBookingId),
         roomId: roomId.value,
         roomName: roomName.value,
         checkIn: checkIn.value,

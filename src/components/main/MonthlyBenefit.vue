@@ -28,7 +28,7 @@
     <!-- 정상 데이터 표시 -->
     <div v-else class="benefit-summary-card">
       <div class="summary-header">
-        <h3 class="month-title">{{ currentMonth }} 혜택으로 받은 총 혜택</h3>
+        <h3 class="month-title">{{ currentMonth }} 한 달간 받은 혜택</h3>
         <div class="total-amount">{{ formatCurrency(totalBenefitAmount) }}원</div>
       </div>
 
@@ -179,7 +179,8 @@ const getCategoryIcon = (category) => {
     'EDUCATION': '📚',
     'TRANSPORT': '🚌',
     'FOOD': '🍚',
-    'CULTURE':'🎫'
+    'CULTURE':'🎫',
+    'ACCOMODATION':'💒',
   };
   return iconMap[category] || '💳';
 };
@@ -192,12 +193,15 @@ const getCategoryName = (category) => {
     'MOVIE_THEATER': '문화생활',
     'GAS_STATION': '주유소',
     'RESTAURANT': '음식점',
+    'FOOD': '음식점',
     'HOTEL': '숙박',
     'THEME_PARK': '테마파크',
     'SHOPPING': '쇼핑',
     'HOSPITAL': '병원',
     'EDUCATION': '교육',
-    'TRANSPORT': '교통'
+    'TRANSPORT': '교통',
+    'CULTURE': '문화',
+    'ACCOMODATION': '예약'
   };
   return nameMap[category] || category;
 };

@@ -17,7 +17,7 @@
       <h2 class="completion-title">예약이 완료되었습니다</h2>
       <p class="completion-message">
         예약내용은 홈 > 마이페이지 > 예약 내역에서<br>
-        화깅ㄴ하실 수 있습니다.
+        확인하실 수 있습니다.
       </p>
 
       <!-- 완료 버튼 -->
