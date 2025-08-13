@@ -130,17 +130,17 @@ const routes = [
   {
     path: '/card/select',
     name: 'CardSelectPage',
-    component: CardSelectPage
+    component: CardSelectPage,
   },
   {
     path: '/card/connectlogin',
     name: 'ConnectLoginPage',
-    component: ConnectLoginPage
+    component: ConnectLoginPage,
   },
   {
     path: '/payment/completepage',
     name: 'CompletePage',
-    component: CompletePage  // 여기도 변경
+    component: CompletePage,  // 여기도 변경
   },
 ];
 
