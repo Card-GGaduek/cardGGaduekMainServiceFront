@@ -1,12 +1,12 @@
+<!-- AllTransactions.vue -->
 <template>
-  <MainHeader/>
   <div class="all-transactions">
-    <!-- 상단 헤더 -->
-    <div class="header">
-      <button class="back-btn" @click="goBack">←</button>
-      <div class="title"><h5>지출 내역</h5></div>
-      <div class="spacer"></div>
-    </div>
+    <!-- 상단 서브헤더 -->
+    <SubHeader
+      title="지출 내역"
+      :back-to="{ name: 'Analysis', query: { cardId: selectedCardId } }"
+      class="local-subheader"
+    />
 
     <!-- 최근 거래 + 카드 선택 -->
     <div class="sub-header">
@@ -38,7 +38,9 @@
     <div class="tx-list">
       <div v-for="tx in sortedTransactions" :key="tx.id" class="tx-item">
         <div class="tx-info">
-          <span class="datetime">{{ formatDate(tx.transDate) }} {{ formatTime(tx.transDate) }}</span>
+          <span class="datetime">
+            {{ formatDate(tx.transDate) }} {{ formatTime(tx.transDate) }}
+          </span>
           <span class="store">{{ tx.storeName }}</span>
         </div>
         <span class="amount">-{{ formatAmount(tx.amount) }}원</span>
@@ -47,7 +49,9 @@
 
     <!-- 상태 메시지 -->
     <p v-if="loading" class="status-msg">불러오는 중...</p>
-    <p v-else-if="!loading && sortedTransactions.length === 0" class="status-msg">거래 내역이 없습니다.</p>
+    <p v-else-if="!loading && sortedTransactions.length === 0" class="status-msg">
+      거래 내역이 없습니다.
+    </p>
   </div>
 </template>
 
@@ -55,7 +59,7 @@
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getCardTransactions } from '@/api/analysisindex.js'
-import MainHeader from '@/layout/MainHeader.vue'
+import SubHeader from '@/layout/SubHeader.vue'
 
 const router = useRouter()
 const route  = useRoute()
@@ -68,8 +72,8 @@ const loading        = ref(false)
 /* 커스텀 드롭다운 제어 */
 const open = ref(false)
 const dropdownRef = ref(null)
-const selectedCardName = computed(() =>
-  cardList.value.find(c => c.cardProductId === selectedCardId.value)?.cardName ?? ''
+const selectedCardName = computed(
+  () => cardList.value.find(c => c.cardProductId === selectedCardId.value)?.cardName ?? ''
 )
 function toggleOpen(){ open.value = !open.value }
 function closeOnOutside(e){
@@ -131,13 +135,7 @@ function formatDate(dt) {
 function formatTime(dt) { return dt.split(' ')[1].slice(0,5) }
 function formatAmount(v) { return v.toLocaleString() }
 
-/* 뒤로가기: 히스토리 없으면 대체 경로 */
-function goBack() {
-  if (window.history.length > 1) router.back()
-  else router.push({ name: 'Analysis', query: { cardId: selectedCardId.value } })
-}
-
-/* 쿼리 동기화 */
+/* 쿼리 → 상태 동기화 */
 watch(() => route.query.cardId, val => {
   if (val) selectedCardId.value = Number(val)
 })
@@ -149,36 +147,44 @@ watch(() => route.query.cardId, val => {
   background: #fff;
   min-height: 100vh;
 }
+/* 기준 컨테이너 */
+.local-subheader { position: relative; }
 
-/* 헤더 */
-.header {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
+/* 헤더 레이아웃 */
+.local-subheader :deep(header.py-1.px-3) {
+  display: flex;
   align-items: center;
-  gap: .75rem;
-  margin-bottom: 1rem;
-  margin-left:-1rem;
-  position: relative;
-  z-index: 3;
-}
-.back-btn {
-  background: none;
-  border: none;
-  font-size: 1.25rem;
-  cursor: pointer;
-  margin-left:1.3rem;
-  margin-top:-1rem;
-  position: relative;
-  z-index: 5;
-}
-.title {
-  flex: 1;
-  margin-bottom:0.5rem;
-  text-align: center;
-  margin-left:-2.5rem;
+  justify-content: center;    /* 제목 중앙 */
+  height: 48px;
+  padding: 0 48px;            /* ← 화살표/오른쪽 여유 확보 */
+  background: #fff;
+  border-bottom: 1px solid #f2f2f2;
+  position: sticky; top: 0; z-index: 20;
 }
 
-/* 서브헤더 */
+/* 뒤로가기 버튼은 왼쪽 고정 */
+.local-subheader :deep(.back-button) {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translate(-2px, -50%); 
+  font-size: 22px;
+  background: none;
+  border: 0;
+}
+
+/* 제목: 중앙 + 폭 확보 + 부트스트랩 마진 제거 */
+.local-subheader :deep(.title),
+.local-subheader :deep(.title.ms-2) {
+  display: block;             /* 또는 flex: 1 */
+  width: 100%;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0 !important;
+  margin-left: 0 !important;  /* ← ms-2를 확실히 무력화 */
+}
+
 .sub-header{
   display:flex;
   align-items:center;
@@ -187,23 +193,23 @@ watch(() => route.query.cardId, val => {
   margin-bottom:.5rem;
 }
 .recent-trans{
-  font-size: 1.25rem;
-  margin-bottom: 0.9rem;
+  font-size: 1.2rem;
+  margin: 1rem 0;
 }
 
-/* 커스텀 셀렉트 */
+/* ---------- 커스텀 드롭다운 ---------- */
 .card-select{
   position: relative;
-  margin-top:-0.7rem;
-  display: inline-block;            
+  margin-top:0.1rem;
+  display: inline-block;
   box-sizing: border-box;
 }
 .select-btn{
   height: 36px;
-  min-width: 220px;                
+  min-width: 220px;
   width: 100%;
   text-align: left;
-  padding: 0 0.5rem 0 .9rem;    
+  padding: 0 0.5rem 0 .9rem;
   border: 1px solid #D9D9D9;
   border-radius: 10px;
   background: #fff;
@@ -214,7 +220,6 @@ watch(() => route.query.cardId, val => {
   position: relative;
   box-sizing: border-box;
 }
-/* 화살표 */
 .select-btn::after{
   content: "";
   position: absolute;
@@ -226,16 +231,12 @@ watch(() => route.query.cardId, val => {
   background-size: 12px 8px;
   pointer-events: none;
 }
-
-/* 옵션 팝업: 버튼과 너비 정확히 일치 */
 .options{
   position: absolute;
-  left: 0;                          /* 버튼 왼쪽과 정렬 */
-  right: 0;                         /* 버튼 오른쪽과 정렬 */
+  left: 0;
+  right: 0;
   top: calc(100% + 6px);
   width: 100%;
-  min-width: 100%;
-  max-width: 100%;
   max-height: 320px;
   overflow: auto;
   padding: .4rem 0;
@@ -262,7 +263,7 @@ watch(() => route.query.cardId, val => {
 .option.selected .label{ font-weight: 600; }
 .check{ font-size: 1rem; }
 
-/* 리스트 */
+/* ---------- 리스트 ---------- */
 .tx-list { margin-top: 1rem; }
 .tx-item {
   display: flex;
@@ -273,9 +274,5 @@ watch(() => route.query.cardId, val => {
 .tx-info { display: flex; flex-direction: column; }
 .datetime { font-size: 0.875rem; color: #666; }
 .store    { font-size: 1rem; }
-.amount   {
-  font-weight: 600;
-  color: #d9534f;
-  margin-top:1.3rem;
-}
+.amount   { font-weight: 600; color: #d9534f; margin-top:1.3rem; }
 </style>
