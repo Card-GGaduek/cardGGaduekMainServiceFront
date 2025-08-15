@@ -7,6 +7,7 @@ import { useRoute, useRouter } from 'vue-router';
 // api 객체가 없으므로, 임시로 axios를 사용합니다.
 // 실제 환경에서는 위의 api import를 사용하세요.
 import api from '@/api/index.js';
+import SubHeader from '@/layout/SubHeader.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -109,15 +110,17 @@ async function submitBooking() {
   try {
     // [수정] .get({ params: ... }) -> .post(데이터) 로 변경
     const response = await api.post('api/booking', bookingData);
-
-    const newBookingId = response.data.data || response.data;
+    //
+    // const newBookingId = response.data.data || response.data;
+    const newBookingId = response?.data?.data?.bookingId;
+    if (!newBookingId) { alert('예약번호 수신 실패'); return; }
 
     // [수정] 예약 성공 시 결제 페이지로 이동하도록 변경
     // 예약 정보와 결제 정보를 query parameter로 전달
     router.push({
       path: '/payment',
       query: {
-        bookingId: newBookingId,
+        bookingId: String(newBookingId),
         roomId: roomId.value,
         roomName: roomName.value,
         checkIn: checkIn.value,
@@ -241,20 +244,20 @@ function increaseGuests() {
 
 <template>
   <div class="booking-confirm-page">
-    <div class="container page-container p-0">
-      <header class="top-header d-flex align-items-center p-3">
+    <div class="container page-container">
+      <!-- <header class="top-header d-flex align-items-center p-3">
         <button @click="router.back()" class="btn border-0 p-0 text-dark">
           <i class="bi bi-arrow-left fs-4"></i>
         </button>
         <h5 class="fw-bold m-0 flex-grow-1 text-center">예약하기</h5>
-      </header>
-
+      </header> -->
+      <SubHeader title="예약하기" class="fw-bold"/>
       <main class="scrollable-content p-3">
         <section class="card summary-card mb-4">
           <div class="card-body">
             <h5 class="card-title fw-bold">{{ roomName }}</h5>
-            <p class="card-text text-muted">
-              <span class="fw-bold">일정</span> {{ checkIn }} ~ {{ checkOut }}
+            <p class="card-text text-muted fw-bold">
+              <span class="header-box">일정</span> {{ checkIn }} ~ {{ checkOut }}
             </p>
           </div>
         </section>
@@ -419,10 +422,10 @@ function increaseGuests() {
 
 <style scoped>
 .booking-confirm-page {
-  background-color: #f8f9fa;
+  background-color: white;
 }
 .page-container {
-  background-color: #f8f9fa;
+  background-color: white;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -449,6 +452,7 @@ function increaseGuests() {
 .card {
   border: none;
   border-radius: 12px;
+  border: 1px solid black;
 }
 .form-label {
   font-weight: bold;
@@ -460,6 +464,7 @@ function increaseGuests() {
   border: 1px solid #dee2e6;
   background-color: #fff;
 }
+
 .btn-warning {
   background-color: #ffc107;
   border: none;
@@ -470,5 +475,9 @@ function increaseGuests() {
 }
 .invalid-feedback {
   font-size: 0.8rem;
+}
+
+.header-box{
+  color: #B4B4B4;
 }
 </style>

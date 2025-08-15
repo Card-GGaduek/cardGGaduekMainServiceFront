@@ -20,14 +20,18 @@
           type="number"
           class="amount-input"
           placeholder="매장에서 사용할 금액을 입력해 주세요"
+          @keyup.enter="calculatorDiscount"
+          :autofocus="true"
         />
-        <button class="calculator-button" @click="calculatorDiscount">
+        <button class="calculator-button" 
+        @click="calculatorDiscount"
+        >
           할인 금액 계산
         </button>
         <div class="discount-result">
           <p v-if="discountedAmount !== null" class="result">
             할인 적용 후 예상 결제 금액은
-            <strong>{{ discountedAmount }}원</strong> 입니다.
+            <strong>{{ discountedAmount }}원</strong> 입니다. 
           </p>
           <button
             v-if="discountedAmount !== null"
@@ -129,13 +133,25 @@ const goToPayment = () => {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   opacity: 0.95;
 }
+.bottom-sheet-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 9999 !important;
+}
 .bottom-sheet-content {
-  padding: 10px 10px 20px;
+  padding: 10px 10px 20px; 
+  /* max-width: ; */
 }
 .navigator-title {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: bold;
-  color: #ff6b6b;
+  color: #ffd43b;
+  
   margin-bottom: 16px;
   text-align: center;
 }
@@ -144,7 +160,7 @@ const goToPayment = () => {
   background: none;
   border: none;
   font-size: 28px;
-  color: #ff6b6b;
+  color: #ffd43b;
   float: right;
   cursor: pointer;
 }

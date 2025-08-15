@@ -29,7 +29,12 @@
             <div class="fortune-section-title">행운의 아이템</div>
             <hr class="fortune-divider" />
             <div class="fortune-item">
-              <img :src="fortune.luckyItemImageUrl" alt="행운 아이템 이미지" />
+              <div class="fortune-item-media">
+                <img
+                  :src="fortune.luckyItemImageUrl"
+                  alt="행운 아이템 이미지"
+                />
+              </div>
               <div class="fortune-item-name">{{ fortune.luckyItem }}</div>
             </div>
           </div>
@@ -82,9 +87,11 @@ onMounted(async () => {
   height: 100vh;
   overflow-y: auto;
   overflow-x: hidden;
+  margin-top: 10px;
+
   /* 스크롤바 숨기기 */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .fortune-scroll-container::-webkit-scrollbar {
@@ -105,6 +112,7 @@ onMounted(async () => {
 
 /* 닫기 버튼 */
 .close-button {
+  color: black;
   position: absolute;
   top: 16px;
   right: 16px;
@@ -129,7 +137,7 @@ onMounted(async () => {
   font-size: 28px;
   font-weight: bold;
   text-align: center;
-  margin-top: 20px;
+  margin-top: -20px;
 }
 
 /* 본문 콘텐츠 */
@@ -166,15 +174,25 @@ onMounted(async () => {
   text-align: center;
 }
 
-.fortune-item img {
-  width: 100%;
-  max-width: 300px;
+.fortune-item-media {
+  height: clamp(160px, 35vw, 220px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.fortune-item-media img {
+  width: auto;
   height: auto;
+  max-width: 80%;
+  max-height: 100%;
   object-fit: contain;
-  margin-bottom: 6px;
+  display: block;
 }
 
 .fortune-item-name {
+  margin-top: 20px;
   font-size: 18px;
   font-weight: 500;
 }

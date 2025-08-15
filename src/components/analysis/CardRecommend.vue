@@ -5,13 +5,17 @@
       <!-- 절약 금액 -->
       <div class="saving mb-6 text-center">
         <p class="text-lg">
-          총 <span class="amount">{{ formatCurrency(data.additionalSaving) }}원</span>을 절약할 수 있어요!
+          총 <span class="amount">{{ formatCurrency(data.additionalSaving) }}원</span> 을 절약할 수 있어요!
         </p>
+      </div>
+      <div class="recommend">
+      <p>추천 혜택 합계 : {{ formatCurrency(data.recommendation?.aggregateBenefit || 0) }}원</p>
+      <p>현재 혜택 합계 : {{ formatCurrency(data.current?.aggregateBenefit || 0) }}원</p>
       </div>
 
       <!-- 추천 조합 카드 -->
       <div class="combo-box mb-8">
-        <h2 class="combo-title mb-4">추천 조합 카드</h2>
+        <h2 class="combo-title mb-4">추천 카드</h2>
         <div class="cards-row">
           <div
             v-for="card in recommendedCards"
@@ -24,15 +28,11 @@
           </div>
         </div>
       </div>
-      <p>추천 조합 혜택 합계: {{ formatCurrency(data.recommendation?.aggregateBenefit || 0) }}원</p>
-
-
-      <p>현재 조합 혜택 합계: {{ formatCurrency(data.current?.aggregateBenefit || 0) }}원</p>
-
+    
       <!-- VS -->
-      <div class="vs-wrap mb-8">
+      <!-- <div class="vs-wrap mb-8">
         <span class="vs-text">VS</span>
-      </div>
+      </div> -->
 
       <!-- 현재 카드 -->
       <div class="combo-box">
@@ -125,36 +125,35 @@ function formatCurrency(val) {
 </script>
 
 <style scoped>
-/* 레이아웃 */
 .p-4 { padding: 1rem; }
 .loading { text-align: center; padding: 2rem 0; color: #666; }
 .mb-4 { margin-bottom: 1rem; }
 .mb-6 { margin-bottom: 1.5rem; }
 .mb-8 { margin-bottom: 2rem; }
 
-/* 절약 금액 */
 .saving .amount {
   color: #d9534f;
   font-size: 1.5rem;
-  font-weight: 500;
+  font-weight: 700;
 }
 .text-lg { font-size: 1.25rem; }
 
-/* 콤보 박스 */
+.recommend{
+  text-align:center;
+}
+
 .combo-box {
   background: #fff;
   border-radius: 0.75rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.07);
   padding: 1rem;
 }
 .combo-title {
   text-align: center;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #333;
+  font-size: 1rem;
+  color: black;
 }
 
-/* VS 텍스트 */
 .vs-wrap { text-align: center; }
 .vs-text {
   font-size: 1.5rem;
@@ -162,36 +161,46 @@ function formatCurrency(val) {
   color: #d9534f;
 }
 
-/* 카드 한 줄 정렬 */
+/* 카드 한 줄 정렬: 아이템을 같은 높이로 늘리기 */
 .cards-row {
   display: flex;
   justify-content: center;
   gap: 2rem;
+  align-items: stretch;          /* ⭐ 동일 높이로 스트레치 */
 }
-
-/* 카드 아이템 */
+/* 카드 아이템: 세로 레이아웃 + 버튼을 아래로 밀 수 있게 */
 .card-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100px;
 }
+
 .card-item img {
   width: 100px;
   height: 60px;
   object-fit: cover;
   border-radius: 0.375rem;
 }
+
 .card-name {
   margin-top: 0.5rem;
-  font-size: 0.65rem;
+  font-size: 0.6rem;
+  line-height: 1.2;
   text-align: center;
-  white-space: nowrap;
+
+  /* 줄바꿈/줄수 제한 */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;        
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: keep-all;
+  min-height: 2.4em;            
 }
+
 .btn {
-  margin-top: 0.5rem;
+  margin-top: auto;             
   padding: 0.25rem 0.75rem;
   font-size: 0.75rem;
   border-radius: 9999px;
@@ -201,7 +210,6 @@ function formatCurrency(val) {
   cursor: pointer;
 }
 
-/* 할인 상세 모달 */
 .detail-modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;

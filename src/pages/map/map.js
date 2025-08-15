@@ -15,6 +15,25 @@ export function useMap(mapDiv) {
 
   const keyword = ref(route.query.keyword || '');
   const selectedCard = ref(null);
+
+  /* 25.08.12 추가 */
+  // 카드 검색 로직 분리 
+  const topSelectedCard = ref(null); // 상단 선택 카드 (카테고리 검색용)
+  const bottomSelectedCard = ref(null); // 하단 선택 카드 (매장 검색용)
+
+  // 상단 드롭다운 "선택 카드의 혜택 카테고리만 적용"
+  // const topFilteredCategories = computed(() => {
+  //   if(!topSelectedCard.value){
+  //     alert('카드를 먼저 선택해주세요.');
+  //     return [];
+  //   }
+  //   if(!topSelectedCard.value.storeCategories?.length) {
+  //     alert('카테고리를 선택해주세요.');
+  //     return [];
+  //   }
+  //   return allCategories.f
+  // })
+
   const selectedCardCategory = ref('');
   const selectedMerchant = ref(null);
   const selectedStoreName = ref('');
@@ -31,10 +50,188 @@ export function useMap(mapDiv) {
   const isMapReady = ref(false);
   const mapReadyCallbacks = ref([]);
 
+  // 08.12 변경: 카테고리 정규화
+  // brands/*.png 를 빌드 시 모두 불러와 slug(파일명) -> URL 맵을 만든다
+const iconModules = import.meta.glob('../../assets/brands/*.png', {
+  eager: true,
+  import: 'default', // 각 png의 번들 URL 문자열을 바로 받음
+});
+const BRAND_ICON_MAP = {};
+for (const [path, url] of Object.entries(iconModules)) {
+  const slug = path.split('/').pop().replace(/\.png$/i, '').toLowerCase(); // starbucks
+  BRAND_ICON_MAP[slug] = url; // '/assets/starbucks.abc123.png'
+}
+  // [2] 한글/영문 혼용 브랜드명을 파일명 슬러그로 변환
+  // [map.js] brandSlug 교체
+function brandSlug(name = '') {
+  // 1) 정규화 (brandSlug 내부에서 자체 정규화)
+  const s = String(name)
+    .normalize('NFKC').toLowerCase()
+    .replace(/\s+/g, '')
+    .replace(/\(.*?\)|\[.*?\]/g, '')
+    .replace(/주유소|지점|점|본점|센터|몰|백화점|마트|스토어/g, '')
+    .replace(/[·⋅•･・]/g, '')
+    .replace(/&/g, 'and')
+    .replace(/-|_/g, '')
+    .replace(/[^\p{Letter}\p{Number}]/gu, '');
+
+  // 2) 완전일치 별칭 (값은 반드시 소문자 파일명과 동일)
+  const ALIAS_EQ = {
+    '스타벅스': 'starbucks',
+    '투썸플레이스': 'twosomeplace',
+    '폴바셋': 'paulbassett',
+    '커피빈': 'coffeebean',
+    '이디야': 'ediya',
+    '미니스톱': 'ministop',
+    '이24': 'emart24',
+    '씨유': 'cu',
+    '세븐일레븐': '7eleven',
+    '메가박스': 'megabox',
+    '롯데시네마': 'lottecinema',
+    '씨지브이': 'cgv',
+    '지에스칼텍스': 'gscaltex',
+    '지에스25': 'gs25',
+    '에스케이주유소': 'sk',
+    '현대오일뱅크': 'hyundaioil',
+    '에스오일': 'soil',
+    '롯데리아': 'lotteria',
+    '맥도날드': 'macdonald',   
+    'kfc': 'kfc',
+    '버거킹': 'buggerking',
+    '아웃백스테이크하우스': 'outback',
+    '애슐리': 'ashley',
+    '애슐리퀸즈': 'ashleyqueens',
+    '롯데호텔': 'lottehotel',
+  };
+  if (ALIAS_EQ[s]) return ALIAS_EQ[s];
+
+  // 3) 부분포함 별칭 (브랜드+지점명 대응)
+  const CONTAINS = [
+    ['스타벅스', 'starbucks'],
+    ['CU', 'cu'],
+    ['미니스톱', 'ministop'],
+    ['투썸', 'twosomeplace'],
+    ['폴바셋', 'paulbassett'],
+    ['커피빈', 'coffeebean'],
+    ['이디야', 'ediya'],
+    ['세븐일레븐', '7eleven'],
+    ['이24', 'emart24'],
+    ['메가박스', 'megabox'],
+    ['롯데시네마', 'lotte'],
+    ['cgv', 'cgv'],
+    ['gs칼텍스', 'gscaltex'],
+    ['gs25', 'gs25'],
+    ['sk주유소', 'sk'],
+    ['sk', 'sk'],
+    ['현대오일뱅크', 'hyundaioil'],
+    ['s-oil', 'soil'],
+    ['에스오일', 'soil'],
+    ['버거킹', 'buggerking'],
+    ['맥도날드', 'macdonald'],
+    ['롯데리아', 'lotteria'],
+    ['kfc', 'kfc'],
+    ['아웃백스테이크하우스', 'outback'],
+    ['애슐리', 'ashley'],
+    ['애슐리퀸즈', 'ashleyqueens'],
+    ['롯데호텔', 'lottehotel'],
+  ];
+  for (const [needle, slug] of CONTAINS) {
+    const n = needle
+      .normalize('NFKC').toLowerCase()
+      .replace(/\s+/g, '')
+      .replace(/[^\p{Letter}\p{Number}]/gu, '');
+    if (s.includes(n)) return slug;
+  }
+
+  // 4) 아무 매칭도 없으면 정규화된 s(소문자) 반환 → 파일명이 그대로면 잡힙니다.
+  return s;
+}
+  // [3] place에서 로고 URL을 찾아오는 규칙
+//  - 1순위: place.benefits[0].storeName
+//  - 2순위: 모든 benefit의 brand 후보 중 place.name과 가장 유사한 것
+//  - 3순위: place.name 자체로 slug 추출
+function resolveBrandIcon(place) {
+  const cand = [];
+
+  // benefits가 있으면 우선 사용
+  if (Array.isArray(place?.benefits) && place.benefits.length) {
+    for (const b of place.benefits) {
+      if (b?.storeName) cand.push(brandSlug(b.storeName));
+    }
+  }
+  
+  // place.name도 후보에 추가
+  if (place?.name) cand.push(brandSlug(place.name));
+  
+  // 후보 중 첫 번째 매칭되는 아이콘 반환
+  for (const key of cand) {
+    if (BRAND_ICON_MAP[key]) return BRAND_ICON_MAP[key];
+    else{
+      console.warn(`브랜드 아이콘 없음: ${key}`);
+      console.warn(`대상 place:`, place);
+    }
+  }
+  return null; // 없으면 컬러 점 마커로 폴백
+}
+
+// [4] 마커 HTML 생성기: 원형 테두리 안에 PNG 표시
+function buildBrandMarkerHTML(imgUrl) {
+  // 30x30 컨테이너, 내부 이미지 24x24
+  return `
+    <div style="
+      width:30px;height:30px;border-radius:50%;
+      background:#fff;display:flex;align-items:center;justify-content:center;
+      box-shadow:0 2px 6px rgba(0,0,0,.2); border:2px solid #fff;
+    ">
+      <img src="${imgUrl}" alt="brand" style="
+        width:24px;height:24px;object-fit:contain; image-rendering:auto;
+      " />
+    </div>
+  `;
+}
+
+  const CATEGORY_CANON = {
+    // 카페
+    'cafe': 'COFFEE_SHOP',
+    'coffee_shop': 'COFFEE_SHOP',
+  
+    // 편의점
+    'convenience_store': 'CONVENIENCE_STORE',
+    'grocery_store': 'CONVENIENCE_STORE',
+  
+    // 영화관
+    'movie_theater': 'MOVIE_THEATER',
+  
+    // 음식점
+    'restaurant': 'RESTAURANT',
+    'food': 'RESTAURANT',
+    'food_court': 'RESTAURANT',
+    'fast_food': 'RESTAURANT',
+    'dining': 'RESTAURANT',
+    'diner': 'RESTAURANT',
+    'pub': 'RESTAURANT',
+    'bar': 'RESTAURANT',
+    'cafe_restaurant': 'RESTAURANT',
+    'fast_food_restaurant': 'RESTAURANT',
+    'buffet_restaurant': 'RESTAURANT',
+
+    // 주유소
+    'gas_station': 'GAS_STATION',
+  
+    // 놀이공원
+    'amusement_park': 'THEME_PARK',
+  
+    // 호텔/숙소
+    'lodging': 'HOTEL',
+  };
+
+  const toCanon = (s = '') => {
+    const norm = String(s).trim().toLowerCase().replace(/[\s-]+/g, '_');
+    return CATEGORY_CANON[norm] || norm.toUpperCase();
+  };
   // 색상/라벨 매핑
   const categoryColorMap = {
-    COFFEE_SHOP: { label: '커피전문점', color: '#8B4513' },
-    CAFE: { label: '커피전문점', color: '#8B4513' },
+    COFFEE_SHOP: { label: '카페', color: '#8B4513' },
     CONVENIENCE_STORE: { label: '편의점', color: '#32CD32' },
     MOVIE_THEATER: { label: '영화관', color: '#8A2BE2' },
     RESTAURANT: { label: '음식점', color: '#FF6347' },
@@ -45,9 +242,28 @@ export function useMap(mapDiv) {
 
   const categoryLabel = computed(() => {
     if (!selectedMerchant.value?.primaryType) return '';
-    const key = selectedMerchant.value.primaryType.toUpperCase();
+    const key = toCanon(selectedMerchant.value.primaryType); // 08.12 변경
     return categoryColorMap[key]?.label || selectedMerchant.value.primaryType;
   });
+
+  const iconMap = {
+    COFFEE_SHOP: 'bi-cup-hot',
+    CAFE: 'bi-cup-hot',
+    CONVENIENCE_STORE: 'bi-shop',
+    MOVIE_THEATER: 'bi-film',
+    RESTAURANT: 'bi-egg-fried',
+    GAS_STATION: 'bi-fuel-pump',
+    THEME_PARK: 'bi-tree',
+    HOTEL: 'bi-building',
+  };
+  
+  const categoriesForUI = computed(() =>
+    Object.entries(categoryColorMap).map(([key, v]) => ({
+      key,                         // [map.js 연결] searchStoresByCategory(key)로 전달되는 키
+      label: v.label,              // 표기 라벨
+      icon: iconMap[key] || null,  // 아이콘(선택)
+    }))
+  );
 
   const showNoBenefitMessage = () => {
     if (hasShownAlert.value) return;
@@ -76,7 +292,9 @@ export function useMap(mapDiv) {
     const sc = selectedCard.value;
     if (!sc) return null;
     const detail = cardDetailsMap.value?.[sc.cardId];
+    console.log('selectedCardFull:', sc, detail);
     return detail ? { ...sc, ...detail } : sc;
+    
   };
 
   // 지도 초기화
@@ -173,16 +391,37 @@ export function useMap(mapDiv) {
       place.locationDTO.latitude,
       place.locationDTO.longitude
     );
-    const typeKey = place.primaryType?.toUpperCase();
-    const markerColor = categoryColorMap[typeKey]?.color || '#888888';
+    // const typeKey = toCanon(place.primaryType);
+    // const markerColor = categoryColorMap[typeKey]?.color || '#888888';
+
+    // 로고 아이콘 우선, 없으면 기존 색 점 마커 폴백
+      const iconUrl = resolveBrandIcon(place);
+      let iconOpt;
+      
+      if (iconUrl) {
+        iconOpt = {
+          content: buildBrandMarkerHTML(iconUrl),
+          anchor: new window.naver.maps.Point(15, 15),
+        };
+      } else {
+        const typeKey = toCanon(place.primaryType);
+        const markerColor = categoryColorMap[typeKey]?.color || '#888888';
+        iconOpt = {
+          content: `<div style="background-color:${markerColor};width:22px;height:22px;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,.2);"></div>`,
+          anchor: new window.naver.maps.Point(11, 11),
+        };
+      }
 
     const marker = new window.naver.maps.Marker({
       position,
       map: map.value,
-      icon: {
-        content: `<div style="background-color:${markerColor};width:22px;height:22px;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,.2);"></div>`,
-        anchor: new window.naver.maps.Point(11, 11),
-      },
+      icon: 
+      // {
+      //   content: `<div style="background-color:${markerColor};width:22px;height:22px;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,.2);"></div>`,
+      //   anchor: new window.naver.maps.Point(11, 11),
+      // },
+      iconOpt,
+      clickable: true,
     });
 
     window.naver.maps.Event.addListener(marker, 'click', () => {
@@ -197,6 +436,16 @@ export function useMap(mapDiv) {
     });
 
     markers.value.push(marker);
+  };
+
+  // 검색 마커 지우기 유틸
+  const clearMarkers = () => {
+    try {
+      markers.value.forEach(m => m.setMap(null));
+    } catch (e) {
+      console.warn('clearMarkers error:', e);
+    }
+    markers.value = [];
   };
 
   // 1) 키워드 검색(누적 아님)
@@ -235,9 +484,10 @@ export function useMap(mapDiv) {
       const places = response.data?.data?.places || [];
       if (!places.length) {
         console.warn('검색된 매장이 없습니다.');
+        showNoBenefitMessage();
         return;
       }
-
+      
       // 혜택 풀 준비(캐시)
       const allCards = await getStoreBenefits();
       const allBenefits = cardsToBenefits(allCards);
@@ -271,55 +521,100 @@ export function useMap(mapDiv) {
   const searchStoresByCategory = async (category) => {
     if (!map.value) return;
 
+    // 08.12 추가
+    const sc = selectedCardFull();
+    if (!sc) {
+    alert('먼저 카드를 선택해주세요.');
+    return;
+    }
+
+    const canon = toCanon(category);
+
+     // 1) 이 카드의 혜택 중, 선택 카테고리와 일치하며 매장명이 있는 것만 추출
+    const brandNames = [
+    ...new Set(
+      (sc.storeBenefitList || [])
+        .filter(b => toCanon(b.storeCategory) === canon && (b.storeName || '').trim())
+        .map(b => b.storeName.trim())
+      ),
+    ];
+
+    if (!brandNames.length) {
+    console.warn('선택 카테고리에 브랜드형 혜택이 없습니다.');
+    showNoBenefitMessage();
+    return;
+    }
+
     const bounds = map.value.getBounds();
     const sw = bounds.getSW();
     const ne = bounds.getNE();
 
-    const requestBody = {
-      textQuery: category,
-      languageCode: 'ko',
-      locationRestriction: {
-        rectangle: {
-          low: { latitude: sw.y, longitude: sw.x },
-          high: { latitude: ne.y, longitude: ne.x },
+    // 08.12 추가
+    const requests = brandNames.map((brand) => {
+      const requestBody = {
+        textQuery: brand,
+        languageCode: 'ko',
+        locationRestriction: {
+          rectangle: {
+            low: { latitude: sw.y, longitude: sw.x },
+            high: { latitude: ne.y, longitude: ne.x },
+          },
         },
-      },
-    };
+      };
+      return axios.post('http://localhost:8080/api/place', requestBody)
+      .then(res => ({ brand, places: res.data?.data?.places || [] }))
+      .catch(() => ({ brand, places: [] }));
+      });
 
     try {
-      const response = await axios.post(
-        'http://localhost:8080/api/place',
-        requestBody
-      );
-      const places = response.data?.data?.places || [];
+      const results = await Promise.all(requests);
 
+      // 08.12 추가
+      // 4) 장소 합치기(중복 제거) + 이 카드의 해당 브랜드 혜택만 달아줌
       const allCards = await getStoreBenefits();
       const allBenefits = cardsToBenefits(allCards);
-      const sc = selectedCardFull();
+      const norm = (s = '') => normalizeName(s);
 
-      const benefitPlaces = [];
+      const seen = new Set();
+      const mergedPlaces = [];
+
+      for (const { brand, places } of results) {
+      const brandKey = norm(brand);
+
       for (const place of places) {
-        const matched = allBenefits.filter((b) =>
-          place.name.includes(b.storeName)
-        );
-        const filtered = sc
-          ? matched.filter((b) => b.cardProductId === sc.cardProductId)
-          : matched;
-        if (filtered.length) {
-          place.benefits = filtered;
-          benefitPlaces.push(place);
-        }
-      }
+        if (toCanon(place.primaryType) !== canon) continue;
+        // 브랜드명 매칭(양방향 포함)
+        const placeKey = norm(place.name || '');
+        if (!(placeKey.includes(brandKey) || brandKey.includes(placeKey))) continue;
 
-      if (!benefitPlaces.length) return;
-      benefitPlaces.forEach(createMarker);
+        // 중복 제거(좌표 기준)
+        const sig = `${place.locationDTO?.latitude}|${place.locationDTO?.longitude}`;
+        if (seen.has(sig)) continue;
+        seen.add(sig);
+
+        // 이 카드 + 이 카테고리 + 이 브랜드의 혜택만 부여
+        const benefits = (sc.storeBenefitList || []).filter(
+          b =>
+            toCanon(b.storeCategory) === canon &&
+            norm(b.storeName) && (placeKey.includes(norm(b.storeName)) || norm(b.storeName).includes(placeKey)) &&
+            b.cardProductId === sc.cardProductId
+        );
+
+        place.benefits = benefits;
+        mergedPlaces.push(place);
+      }
+    }
+
+    if (!mergedPlaces.length) return;
+    mergedPlaces.forEach(createMarker);
     } catch (error) {
-      console.error('카테고리 검색 실패:', error);
+      console.error('카테고리/브랜드 검색 실패:', error);
     }
   };
 
   // 2-2) 카드 클릭 시: 카테고리 누적검색
-  const handleCardClick = async (cardId) => {
+  const handleCardClick = async (cardId,options = {}) => {
+    const { autoSearch = true } = options;
     try {
       const matchedCard = myCards.value.find((c) => c.cardId === cardId);
       if (!matchedCard) return;
@@ -337,7 +632,7 @@ export function useMap(mapDiv) {
         return;
       }
 
-      isSearching.value = true;
+     
 
       // 상세 머지
       if (!cardDetailsMap.value[cardId]) {
@@ -348,7 +643,7 @@ export function useMap(mapDiv) {
       selectedCard.value = detail ? { ...matchedCard, ...detail } : matchedCard;
 
       // 카테고리 누적 검색
-      if (matchedCard.storeCategories?.length) {
+      if (autoSearch && matchedCard.storeCategories?.length) {
         for (const category of matchedCard.storeCategories) {
           await searchStoresByCategory(category);
         }
@@ -357,9 +652,7 @@ export function useMap(mapDiv) {
       router.replace({ query: { ...route.query, cardId } });
     } catch (error) {
       console.error('카드 상세 정보를 불러오지 못했습니다:', error);
-    } finally {
-      isSearching.value = false; // 항상 꺼지도록
-    }
+    } 
   };
 
   // 3) 가맹점명 단일 검색
@@ -495,7 +788,9 @@ export function useMap(mapDiv) {
         image: card.cardImageUrl,
         requiredAmount: card.requiredMonthlyAmount,
         storeCategories: [
-          ...new Set((card.storeBenefitList || []).map((b) => b.storeCategory)),
+          ...new Set(
+            (card.storeBenefitList || []).map((b) => toCanon(b.storeCategory))
+          ),
         ],
       }));
 
@@ -565,6 +860,7 @@ export function useMap(mapDiv) {
     noBenefitAlert,
     selectedStoreName,
     isSearching,
+    categoriesForUI,
 
     // methods
     initMap,
@@ -576,5 +872,6 @@ export function useMap(mapDiv) {
     searchByStoreName,
     moveToCurrentLocation,
     showNoBenefitMessage,
+    clearMarkers,
   };
 }

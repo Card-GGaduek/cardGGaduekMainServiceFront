@@ -3,10 +3,10 @@
     <div class="mission-header">
       <img src="@/assets/lab/mission_icon.png" class="mission-icon" />
       <div>
-        <h3 class="mt-3 mx-3">
+        <h4 class="mt-3 mx-3">
           시즌별 미션 <span class="end-date">~{{ endDate }}</span>
-        </h3>
-        <p class="description mx-3">미션 성공 시 관련 쿠폰이 까득</p>
+        </h4>
+        <p class="mission-sub mx-3">미션 성공 시 관련 쿠폰이 까득 !</p>
       </div>
     </div>
 
@@ -21,7 +21,7 @@
         class="mission-item"
         :class="{ success: mission.isSuccess }"
       >
-        <!-- 미션 성공시 기존 스타일 유지 -->
+        <!-- 미션 성공시 -->
         <template v-if="mission.isSuccess">
           <span class="mission-title">{{ mission.missionTitle }}</span>
           <span class="mission-status">미션 성공</span>
@@ -57,7 +57,7 @@ const props = defineProps({
   },
 });
 
-// 모든 미션의 종료일은 동일하다고 가정 → 첫 번째 미션에서 가져오기
+// 모든 미션의 종료일은 동일 → 첫 번째 미션에서 가져오기
 const endDate = computed(() => {
   if (!props.missions.length) return '';
   const raw = props.missions[0].endAt;
@@ -89,21 +89,32 @@ const getProgressPercentage = (mission) => {
   align-items: center;
   margin-bottom: 12px;
 }
+
 .mission-icon {
-  width: 50px;
+  width: 35px;
   height: auto;
-  margin-right: 8px;
+  margin-top: -7px;
+  margin-right: -2px;
   margin-left: 8px;
 }
+
 .end-date {
   font-size: 14px;
   color: #888;
   margin-left: 8px;
 }
-.description {
+
+.mission-sub {
   margin: 4px 0 0;
   font-size: 14px;
   color: #999;
+}
+
+.empty-message {
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+  padding: 12px;
 }
 
 .mission-list {
@@ -115,8 +126,7 @@ const getProgressPercentage = (mission) => {
 
 .mission-item {
   border-radius: 12px;
-  font-size: 17px;
-  font-weight: 600;
+  font-size: 16px;
   overflow: hidden;
 }
 
@@ -128,6 +138,7 @@ const getProgressPercentage = (mission) => {
   color: white;
   padding: 12px 16px;
 }
+
 /* 진행중인 미션의 프로그레스 바 컨테이너 */
 .progress-container {
   position: relative;
@@ -167,17 +178,9 @@ const getProgressPercentage = (mission) => {
 .mission-title {
   flex: 1;
   font-size: 17px;
-  font-weight: 600;
 }
 
 .mission-status {
-  font-weight: bold;
   white-space: nowrap;
-}
-.empty-message {
-  text-align: center;
-  color: #999;
-  font-size: 14px;
-  padding: 12px;
 }
 </style>

@@ -1,6 +1,7 @@
 <!-- App.vue -->
 <template>
   <div class="app-wrapper">
+    <!-- 타이틀 문구 -->
     <div class="title-section">
       <h3 class="title-line">카드가 가득</h3>
       <h2 class="subtitle-line">혜택이 까득</h2>
@@ -21,6 +22,7 @@
       </div>
     </div>
 
+    <!-- 노션 이동 버튼 -->
     <a
       href="https://www.notion.so/PJT_13_WeFin-22c014feab4d805e952ae019598b7895"
       target="_blank"
@@ -31,6 +33,8 @@
       <span>카드까득의<br />정보가 까득!</span>
       <div class="arrow">›</div>
     </a>
+
+    <!-- 앱 화면 -->
     <div class="app-container">
       <!-- ✅ 스크롤 가능한 콘텐츠 영역 -->
       <div
@@ -54,7 +58,8 @@ import { useAuthStore } from './stores/auth';
 
 const route = useRoute();
 const router = useRouter();
-const hideNavbar = computed(() => route.path === '/lab/fortune');
+const hiddenPaths = ['/lab/fortune', '/login', '/join','/payment/qr','/card/select','/card/connectlogin','/payment/completepage','/payment','/booking/confirm'];
+const hideNavbar = computed(() => hiddenPaths.includes(route.path));
 
 // 검색
 const keyword = ref('');
@@ -98,6 +103,7 @@ body {
   justify-content: center;
   align-items: flex-start;
   overflow: hidden;
+  position: relative;
 }
 
 .app-container {
@@ -123,15 +129,15 @@ body {
 
 .title-section {
   position: absolute;
-  top: 60px;
+  top: clamp(32px, 8vh, 84px);
   left: 50%;
-  transform: translateX(-650px);
+  transform: translateX(-43vw);
   text-align: left;
   z-index: 10;
 }
 
 .title-section h3 {
-  font-size: 40px;
+  font-size: 2.5rem;
   font-weight: 600;
   color: #cc5500;
   margin: 0;
@@ -140,7 +146,7 @@ body {
 }
 
 .title-section h2 {
-  font-size: 52px;
+  font-size: 3.25rem;
   font-weight: 800;
   background: linear-gradient(90deg, #ff7f50, #d62828);
   -webkit-background-clip: text;
@@ -150,60 +156,68 @@ body {
   letter-spacing: -1px;
 }
 
-/* ✅ 검색창 스타일 추가 */
+/* 검색창 스타일 */
 .search-section {
   position: absolute;
-  top: 195px;
-  transform: translateX(-480px);
+  top: calc(clamp(32px, 8vh, 84px) + clamp(120px, 12vh, 120px));
+  transform: translateX(-34vw);
   z-index: 10;
   width: 350px;
 }
 
 .search-bar {
-  display: flex;
-  align-items: center;
+  position: relative;
   height: 70px;
   border: 4px solid #ff7f50;
   border-radius: 50px;
   overflow: hidden;
-  background-color: white;
+  background-color: #fff;
   box-shadow: 0 2px 8px rgba(255, 127, 80, 0.1);
 }
 
+/* 인풋이 버튼 밑으로 들어가지 않게 오른쪽 여백 확보 */
 .search-input {
-  flex: 1;
+  width: 100%;
+  height: 100%;
   padding: 0 16px;
-  border: none;
+  padding-right: 92px;
   font-size: 20px;
-  outline: none;
-  background-color: transparent;
+  background: transparent;
   color: #333;
-  box-shadow: none;
 }
 
 .search-input::placeholder {
   color: #aaa;
 }
 
+.search-input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
 .search-button {
-  width: 65px;
-  height: 65px;
-  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  width: 62px;
+  height: 62px;
   border: none;
   border-radius: 50%;
   background: linear-gradient(135deg, #ff7f50, #d62828);
-  color: white;
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   font-size: 30px;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease;
 }
 
 .search-button:hover {
   background: linear-gradient(135deg, #ff9060, #f04747);
   transform: scale(1.05);
+  transform: translateY(-50%);
 }
 
 /* ✨ Animation Effects */
@@ -235,7 +249,6 @@ body {
 
 .notion-button {
   position: absolute;
-  /* left: calc(50% -550px); */
   bottom: 40px;
   z-index: 10;
 

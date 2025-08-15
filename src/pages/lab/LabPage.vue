@@ -8,14 +8,16 @@
           <h1 class="lab-title mt-4">실험실</h1>
         </header>
 
+        <!-- 1. 시즌별 미션 -->
         <MissionCard :missions="missions" />
 
+        <!-- 2. 오늘의 소비 운세 -->
         <div class="fortune-section">
           <div class="fortune-title">
             <img src="@/assets/lab/fortune_icon.png" class="fortune-icon" />
             <div>
-              <h3 class="mt-3 mx-1">오늘의 소비 운세</h3>
-              <p class="description fortune-sub">지름신으로부터 지켜줄게요 !</p>
+              <h4 class="mt-3 mx-1">오늘의 소비 운세</h4>
+              <p class="fortune-sub">지름신으로부터 지켜줄게요 !</p>
             </div>
           </div>
 
@@ -38,6 +40,8 @@
             />
           </div>
         </div>
+
+        <!-- 3. 이달의 소비 성향 분석 -->
         <AnalysisCard :analysis="analysis" />
       </div>
     </div>
@@ -47,8 +51,6 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-
-import { useAuthStore } from '@/stores/auth';
 import labApi from '@/api/labApi';
 
 import MissionCard from '@/pages/lab/MissionCard.vue';
@@ -56,7 +58,6 @@ import AnalysisCard from '@/pages/lab/AnalysisCard.vue';
 import SubHeader from '@/layout/SubHeader.vue';
 
 const router = useRouter();
-const authStore = useAuthStore();
 
 const isLoading = ref(false);
 const goToFortune = () => {
@@ -82,11 +83,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.lab-icon {
-  width: 60px;
-  height: auto;
-  /* margin-right: 8px; */
-}
 .lab-page-wrapper {
   height: 100vh;
   display: flex;
@@ -101,8 +97,6 @@ onMounted(async () => {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  /* NavBar 높이만큼 하단 여백 확보 */
-  padding-bottom: 80px;
 }
 
 .lab-page {
@@ -119,8 +113,12 @@ onMounted(async () => {
   align-items: center;
   margin-bottom: 16px;
 }
+.lab-icon {
+  width: 45px;
+  height: auto;
+}
 .lab-title {
-  font-size: 35px;
+  font-size: 25px;
   font-weight: 600;
   margin-left: 8px;
 }
@@ -140,15 +138,16 @@ onMounted(async () => {
   margin-bottom: 12px;
 }
 .fortune-icon {
-  width: 60px;
+  width: 45px;
   height: auto;
-  margin-right: 8px;
+  margin-top: -10px;
+  margin-right: 5px;
   margin-left: 8px;
 }
 .fortune-sub {
-  margin-top: 4px;
+  margin: 4px 0 0 5px;
   font-size: 14px;
-  color: #666;
+  color: #999;
 }
 .fortune-content {
   display: flex;
@@ -156,7 +155,7 @@ onMounted(async () => {
   align-items: center;
 }
 .fortune-image {
-  width: 250px;
+  width: 180px;
   margin: 5px auto 14px auto;
 }
 .fortune-button {
@@ -165,7 +164,6 @@ onMounted(async () => {
   font-weight: 600;
   background-color: #ffd559;
   color: #5e514d;
-  /* color: white; */
   border: none;
   border-radius: 10px;
   cursor: pointer;
@@ -187,11 +185,6 @@ onMounted(async () => {
 .fortune-loading-gif {
   width: 320px;
   max-width: 90%;
-}
-.description {
-  margin: 4px 0 0 5px;
-  font-size: 14px;
-  color: #999;
 }
 
 /* 스크롤바 완전히 숨기기 */

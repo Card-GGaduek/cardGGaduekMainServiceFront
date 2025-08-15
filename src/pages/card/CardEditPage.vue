@@ -306,16 +306,19 @@ onMounted(async () => {
 .card-list {
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 25px;
 }
 
 .card-item {
+  width: 350px;
   background: white;
   border-radius: 16px;
-  padding: 20px;
+  padding: 15px 20px 5px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid #e6e2dd;
   transition: all 0.3s ease;
+  margin: 0 auto;
+  display: block;
 }
 
 .card-item:hover {
@@ -332,7 +335,7 @@ onMounted(async () => {
   position: relative;
   display: flex;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .card-image {
@@ -364,20 +367,21 @@ onMounted(async () => {
 
 .change-image-btn,
 .delete-btn {
-  width: 100%;
+  width: 90%;
   padding: 6px;
   border-radius: 8px;
-  font-weight: 500;
+  font-weight: 400;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-bottom: 8px;
+  margin: 0 auto 8px;
+  display: block;
 }
 
 .change-image-btn {
-  border: 2px solid #5e514d;
-  background: white;
+  border: 2px solid rgba(255, 213, 89, 0.8);
+  background: rgba(255, 213, 89, 0.8);
   color: #5e514d;
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .change-image-btn:hover:not(:disabled) {
