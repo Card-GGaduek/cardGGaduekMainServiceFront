@@ -132,7 +132,7 @@ body {
 .app-wrapper {
   width: 100vw;
   height: 100vh;
-  background-color: rgb(255, 240, 179);
+  background-color: white;
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -430,7 +430,7 @@ body {
 
   .app-wrapper {
     background-image: none;
-    background-color: rgb(255, 240, 179);
+    background-color: rgb(228, 193, 47);
   }
 }
 

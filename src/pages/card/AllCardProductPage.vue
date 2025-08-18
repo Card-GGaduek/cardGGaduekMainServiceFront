@@ -45,7 +45,7 @@ function goBack() { router.back(); }
       <button class="back-button" @click="goBack">
         <i class="bi bi-arrow-left"></i>
       </button>
-      <h1 class="page-title"><i class="bi bi-gem"></i>혜택 좋은 카드 전체 보기</h1>
+      <h1 class="page-title">혜택 좋은 카드 전체 보기</h1>
     </header>
 
     <main class="content-area">
@@ -101,7 +101,7 @@ function goBack() { router.back(); }
   align-items: center;
   
   /* 그라데이션 텍스트 효과 */
-  background: linear-gradient(45deg, #F9D423, #F7971E); /* 밝은 레몬(#F9D423)에서 부드러운 골드(#F7971E)로 */
+  background:black;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

@@ -252,7 +252,7 @@ function increaseGuests() {
         <h5 class="fw-bold m-0 flex-grow-1 text-center">예약하기</h5>
       </header> -->
       <SubHeader title="예약하기" class="fw-bold"/>
-      <main class="scrollable-content p-3">
+      <main class="scrollable-content p-2">
         <section class="card summary-card mb-4">
           <div class="card-body">
             <h5 class="card-title fw-bold">{{ roomName }}</h5>
