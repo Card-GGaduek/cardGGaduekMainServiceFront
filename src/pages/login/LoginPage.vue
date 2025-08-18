@@ -1,6 +1,6 @@
 <template>
   <div
-    class="container min-vh-100 d-flex flex-column justify-content-center align-items-center bg-white py-4"
+    class="container min-vh-100% d-flex flex-column justify-content-center align-items-center bg-white py-4"
   >
     <!-- 로고 및 문구 -->
     <div class="logo">
@@ -120,8 +120,8 @@ const goNaver = () => {
 
 <style scoped>
 .login-logo {
-  margin: 50px auto;
-  width: 280px;
+  margin: 100px auto;
+  width: 250px;
   height: auto;
 }
 
@@ -198,8 +198,6 @@ const goNaver = () => {
 .naver-icon {
   width: 40px;
   height: auto;
-  margin-bottom: 3px;
-  margin-right: -5px;
 }
 
 .btn-naver {
