@@ -101,7 +101,7 @@ onMounted(() => {
 }
 .benefit-page-container {
   background-color: white;
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
 }

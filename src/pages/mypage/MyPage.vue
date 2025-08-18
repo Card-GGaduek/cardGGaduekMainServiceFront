@@ -223,6 +223,8 @@ const goToMyCards = () => {
 .list-group-item {
   display: flex;
   align-items: center;
+  cursor: pointer; /* 👈 추가 */
+
 }
 .list-group-item i {
   color: #6c757d;
