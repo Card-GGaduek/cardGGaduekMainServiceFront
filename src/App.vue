@@ -132,7 +132,7 @@ body {
 .app-wrapper {
   width: 100vw;
   height: 100vh;
-  background-color: white;
+  background-color: #feefc5; /* 0.6 = 60% 불투명 */
   display: flex;
   justify-content: center;
   align-items: flex-start;
