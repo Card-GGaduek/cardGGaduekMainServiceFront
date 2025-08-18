@@ -2,8 +2,7 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import memberApi from '@/api/memberApi'; // 실제 API 경로에 맞게 수정해주세요.
-import MainHeader from "@/layout/MainHeader.vue";
-
+import SubHeader from "@/layout/SubHeader.vue";
 const router = useRouter();
 
 // 카드 목록을 저장할 반응형 변수
@@ -29,6 +28,12 @@ onMounted(async () => {
     isLoading.value = false; // 로딩 상태 종료
   }
 });
+
+
+// ✅ 카드 편집 페이지 이동 함수
+const goToCardEdit = () => {
+  router.push({ path: '/card' });
+};
 </script>
 
 <template>
@@ -42,7 +47,7 @@ onMounted(async () => {
       <div class="placeholder"></div>
     </header> -->
 
-    <MainHeader/>
+    <SubHeader title="내 카드" />
     <main class="content-area">
       <div v-if="isLoading" class="feedback-view">
         <div class="spinner-border" role="status"></div>
@@ -62,12 +67,14 @@ onMounted(async () => {
           <img :src="card.cardImageUrl" :alt="card.cardProductName" class="card-thumbnail" />
           <span class="card-item-name">{{ card.cardProductName }}</span>
         </div>
+
+        <!-- ✅ 카드 편집하기 (회색 글자) -->
+        <div style="display: flex; justify-content: center; margin-top: 20px;">
+          <span class="card-edit-text" @click="goToCardEdit">카드 편집하기</span>
+        </div>
+
       </div>
     </main>
-      <div class="add-card-group">
-        <input type="text" placeholder="카드 추가하기" class="add-card-input" />
-        <button class="add-card-button">인증하기</button>
-      </div>
     
   </div>
 </template>
@@ -88,7 +95,7 @@ onMounted(async () => {
   margin: 0 auto;
   background-color: white;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  min-height: 100vh;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -171,7 +178,6 @@ onMounted(async () => {
 
 .add-card-group {
   display: flex;
-  margin-bottom: 10px;
 }
 
 .add-card-input {
@@ -191,5 +197,21 @@ onMounted(async () => {
   font-weight: 500;
   cursor: pointer;
 }
+
+.card-edit-text {
+  font-size: 16px;        /* 글자 크기 작게 */
+  font-weight: 400;       /* 일반 두께 */
+  color: #adb5bd;         /* 연한 회색 */
+  cursor: pointer;
+  transition: color 0.2s ease;
+  text-decoration: underline; /* 항상 밑줄 표시 */
+
+}
+
+.card-edit-text:hover {
+  color: #868e96;         /* hover 시 조금 더 진한 회색 */
+  text-decoration: underline;
+}
+
 
 </style>

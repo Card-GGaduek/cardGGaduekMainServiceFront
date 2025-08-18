@@ -112,7 +112,7 @@ function onDragEnd() {
               :value="selectedCardId || ''"
               @change="onChangeCard"
               >
-                <option value="">카드를 선택하기</option>
+                <option value="">카드 선택하기</option>
                 <option v-for="c in myCards" :key="c.cardId" :value="c.cardId">
                   {{ c.cardProductName }}
                 </option>
