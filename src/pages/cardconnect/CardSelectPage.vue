@@ -52,14 +52,14 @@ import SubHeader from "@/layout/SubHeader.vue";
 const router = useRouter()
 
 const issuers = [
-  { id: 'KB', name: 'KB국민카드', logo: KB },
-  { id: 'HYUNDAI', name: '현대카드', logo: HYUNDAI },
-  { id: 'SAMSUNG', name: '삼성카드', logo: SAMSUNG },
-  { id: 'NH', name: 'NH농협카드', logo: NH },
-  { id: 'SHINHAN', name: '신한카드', logo: SHINHAN },
-  { id: 'WOORI', name: '우리카드', logo: WOORI },
-  { id: 'LOTTE', name: '롯데카드', logo: LOTTE },
-  { id: 'HANA', name: '하나카드', logo: HANA },
+  { id: 'KB', name: 'KB국민카드', logo: KB, organization: "0301" },
+  { id: 'HYUNDAI', name: '현대카드', logo: HYUNDAI, organization: "0302" },
+  { id: 'SAMSUNG', name: '삼성카드', logo: SAMSUNG, organization: "0303" },
+  { id: 'NH', name: 'NH농협카드', logo: NH, organization: "0304" },
+  { id: 'SHINHAN', name: '신한카드', logo: SHINHAN, organization: "0306" },
+  { id: 'WOORI', name: '우리카드', logo: WOORI, organization: "0309" },
+  { id: 'LOTTE', name: '롯데카드', logo: LOTTE, organization: "0311" },
+  { id: 'HANA', name: '하나카드', logo: HANA, organization: "0313" },
 ]
 
 const selected = ref(null)
@@ -70,10 +70,15 @@ function select(id) {
 
 function submit() {
   if (selected.value) {
-    router.push({
-      name: 'ConnectLoginPage',
-      query: { issuerId: selected.value } // 카드사 id를 쿼리로 전달
-    })
+    const issuer = issuers.find(i => i.id === selected.value)
+    if (issuer) {
+      router.push({
+        name: 'ConnectLoginPage',
+        query: { issuerId: issuer.id, organization: issuer.organization } // 카드사 id를 쿼리로 전달
+      })
+    }
+  } else {
+    alert('카드사를 선택해주세요.')
   }
 }
 </script>
