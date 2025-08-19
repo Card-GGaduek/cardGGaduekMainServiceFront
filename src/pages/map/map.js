@@ -478,7 +478,7 @@ function buildBrandMarkerHTML(imgUrl) {
 
     try {
       const response = await axios.post(
-        'http://localhost:8080/api/place',
+        '/api/place',
         requestBody
       );
       const places = response.data?.data?.places || [];
@@ -561,7 +561,7 @@ function buildBrandMarkerHTML(imgUrl) {
           },
         },
       };
-      return axios.post('http://localhost:8080/api/place', requestBody)
+      return axios.post('/api/place', requestBody)
       .then(res => ({ brand, places: res.data?.data?.places || [] }))
       .catch(() => ({ brand, places: [] }));
       });
@@ -706,7 +706,7 @@ function buildBrandMarkerHTML(imgUrl) {
     try {
       // 1) 장소 후보
       const resp = await axios.post(
-        'http://localhost:8080/api/place',
+        '/api/place',
         requestBody
       );
       const places = resp.data?.data?.places || [];

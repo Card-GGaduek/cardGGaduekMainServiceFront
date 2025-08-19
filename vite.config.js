@@ -16,7 +16,7 @@ export default defineConfig({
       // '/api'로 시작하는 요청을 대상 서버로 전달
       // '/api'로 시작하는 요청을 대상 서버로 전달
       '/api': {
-        target: 'http://localhost:8080', // 백엔드 주소
+        target: 'http://backend:8080', // 백엔드 주소
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '/api'), // /api 유지
       },
