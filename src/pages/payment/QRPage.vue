@@ -33,7 +33,7 @@ import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import SubHeader from '@/layout/SubHeader.vue';
 import memberApi from '@/api/memberApi';
-import axios from 'axios';
+import paymentApi from '@/api/paymentApi'; // 새로 생성한 paymentApi import
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -77,6 +77,32 @@ const loadSelectedCard = async () => {
   }
 };
 
+// 사용자 ID 가져오기 헬퍼 함수
+const getUserId = () => {
+  // 방법 1: authStore에서 가져오기
+  if (authStore.user?.id) {
+    console.log('authStore에서 사용자 ID 가져옴:', authStore.user.id);
+    return authStore.user.id;
+  }
+
+  // 방법 2: JWT 토큰에서 추출
+  try {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const memberId = parseInt(payload.sub);
+      console.log('JWT에서 사용자 ID 추출:', memberId);
+      return memberId;
+    }
+  } catch (jwtError) {
+    console.error('JWT 파싱 실패:', jwtError);
+  }
+
+  // 방법 3: 개발용 임시 값 (최후 수단)
+  console.log('사용자 ID를 가져올 수 없어 임시 값 사용');
+  return 7; // 로그에서 확인된 사용자 ID
+};
+
 const generateQRCode = async () => {
   if (!selectedCard.value) {
     console.error('선택된 카드가 없습니다.');
@@ -84,66 +110,30 @@ const generateQRCode = async () => {
   }
 
   try {
-    // authStore 또는 여러 방법으로 사용자 ID 가져오기
-    let memberId = null;
+    const memberId = getUserId();
 
-    // 방법 1: authStore에서 가져오기
-    if (authStore.user?.id) {
-      memberId = authStore.user.id;
-      console.log('authStore에서 사용자 ID 가져옴:', memberId);
-    }
-    // 방법 2: JWT 토큰에서 추출
-    else {
-      try {
-        const token = localStorage.getItem('token');
-        if (token) {
-          const payload = JSON.parse(atob(token.split('.')[1]));
-          memberId = parseInt(payload.sub);
-          console.log('JWT에서 사용자 ID 추출:', memberId);
-        }
-      } catch (jwtError) {
-        console.error('JWT 파싱 실패:', jwtError);
-      }
-    }
-
-    // 방법 3: 개발용 임시 값 (최후 수단)
-    if (!memberId) {
-      console.log('사용자 ID를 가져올 수 없어 임시 값 사용');
-      memberId = 7; // 로그에서 확인된 사용자 ID
-    }
-
-    const requestData = {
-      memberId: memberId,
-      cardId: selectedCard.value.cardId
-      // timestamp는 백엔드에서 자동 생성
-    };
-
-    console.log('QR 코드 생성 요청:', requestData);
+    console.log('QR 코드 생성 시작');
     console.log('선택된 카드:', selectedCard.value.cardProductName);
 
-    const response = await axios.post(
-        'http://localhost:8080/api/payment/qr',
-        requestData,
-        { headers: { 'Content-Type': 'application/json' } }
-    );
-
-    console.log('QR 코드 생성 응답:', response.data);
+    // paymentApi 사용
+    const response = await paymentApi.generateQRCode(memberId, selectedCard.value.cardId);
 
     // ApiResponse 구조에 맞게 데이터 추출
-    if (response.data.success && response.data.data) {
-      qrImage.value = response.data.data;
+    if (response.success && response.data) {
+      qrImage.value = response.data;
       console.log('QR 코드 이미지 설정 완료');
     } else {
-      console.error('QR 코드 생성 실패:', response.data.message);
-      alert('QR 코드 생성에 실패했습니다.');
+      console.error('QR 코드 생성 실패:', response.message);
+      alert(`QR 코드 생성에 실패했습니다: ${response.message || '알 수 없는 오류'}`);
     }
   } catch (error) {
     console.error('QR 생성 실패:', error);
     if (error.response) {
       console.error('서버 응답:', error.response.data);
-      alert(`QR 코드 생성에 실패했습니다: ${error.response.data.message || '서버 오류'}`);
+      const errorMessage = error.response.data.message || '서버 오류';
+      alert(`QR 코드 생성에 실패했습니다: ${errorMessage}`);
     } else {
-      alert('QR 코드 생성에 실패했습니다.');
+      alert('QR 코드 생성에 실패했습니다. 네트워크를 확인해주세요.');
     }
   }
 };
