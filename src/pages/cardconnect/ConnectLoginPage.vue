@@ -35,7 +35,7 @@
 
         <button
             class="login-button"
-            @click="handleLogin"
+            @click="handleLogin()"
             :disabled="!userId || !password"
         >
           로그인
@@ -51,47 +51,56 @@
   </div>
 </template>
 
-<script>
-import SubHeader from "@/layout/SubHeader.vue";
+<script setup>
+import { ref } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import authApi from '@/api/authApi'
+import SubHeader from "@/layout/SubHeader.vue"
 
-export default {
-  name: 'ConnectLoginPage',
-  components: {
-    SubHeader
-  },
-  data() {
-    return {
-      userId: '',
-      password: '',
-      showPassword: false
-    }
-  },
-  methods: {
-    handleLogin() {
-      if (!this.userId || !this.password) {
-        return;
-      }
+const router = useRouter()
+const route = useRoute();
 
-      // 로그인 로직 구현
-      console.log('Login attempt:', {
-        userId: this.userId,
-        password: this.password
-      });
+const userId = ref('')
+const password = ref('')
+const showPassword = ref(false)
 
-      // API 호출 또는 다음 페이지로 이동
-      // this.$router.push('/card-connect-next');
-    },
-    findId() {
-      // 아이디 찾기 로직
-      console.log('Find ID clicked');
-    },
-    resetPassword() {
-      // 비밀번호 재설정 로직
-      console.log('Reset password clicked');
-    }
+
+const handleLogin = async () => {
+  if (!userId.value || !password.value) {
+    return
   }
+
+  const organization = route.query.organization  
+
+  // 로그인 로직 구현
+  console.log('Login attempt:', {
+    userId: userId.value,
+    password: password.value
+  })
+
+  try {
+    const result = await authApi.connectOrganization(organization, userId.value, password.value)
+    router.push('/')
+
+  } catch (e) {
+    alert(e.message)
+  }
+
+  // API 호출 또는 다음 페이지로 이동
+  // router.push('/card-connect-next')
+}
+
+function findId() {
+  // 아이디 찾기 로직
+  console.log('Find ID clicked')
+}
+
+function resetPassword() {
+  // 비밀번호 재설정 로직
+  console.log('Reset password clicked')
 }
 </script>
+
 
 <style scoped>
 .connect-login-container {

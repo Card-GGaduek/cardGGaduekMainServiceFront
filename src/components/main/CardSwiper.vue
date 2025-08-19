@@ -1,29 +1,28 @@
 <template>
   <div class="card-swiper-container">
-    <!-- 카드가 없을 때 메시지 -->
-    <div v-if="cards.length === 0" class="no-cards-message">
-      <p class="no-cards-text">등록된 카드가 없습니다</p>
-      <button class="link-card-button" @click="goToCardLink">
-        카드 연동하기
-      </button>
+    <!-- 안내 메시지 (선택 사항): 카드가 없을 때만 노출 -->
+<!--    <div v-if="cards.length === 0" class="no-cards-message">-->
+<!--      <p class="no-cards-text">등록된 카드가 없습니다</p>-->
+<!--      <button class="link-card-button" @click="goToCardLink">-->
+<!--        카드 연동하기-->
+<!--      </button>-->
+<!--    </div>-->
 
-    </div>
-
-    <!-- 카드가 있을 때만 스와이퍼 표시 -->
-    <div v-else class="swiper-container">
+    <!-- 스와이퍼: 카드가 없더라도 항상 렌더링 -->
+    <div class="swiper-container">
       <Swiper
           :slides-per-view="'auto'"
           :centered-slides="true"
           :space-between="16"
           :loop="false"
-          :initial-slide="1"
+          :initial-slide="cards.length > 0 ? 1 : 0"
           @slideChange="onSlideChange"
           class="card-swiper"
       >
-        <!-- 기존 카드들 -->
+        <!-- 카드 목록 슬라이드 (카드가 있을 때만 렌더링) -->
         <SwiperSlide
             v-for="(card, index) in cards"
-            :key="card.cardId"
+            :key="card.cardId ?? index"
             class="swiper-slide-custom"
         >
           <div class="card-container">
@@ -45,6 +44,7 @@
                       class="card-image"
                   />
                 </div>
+
                 <div class="card-back">
                   <div class="card-back-content">
                     <div class="card-back-header">
@@ -63,71 +63,48 @@
                           :class="{ expanded: expandedCards.has(index) }"
                       >
                         <div
-                            v-for="(benefit, benefitIndex) in getDisplayBenefits(
-                            card.storeBenefitList,
-                            index
-                          )"
+                            v-for="(benefit, benefitIndex) in getDisplayBenefits(card.storeBenefitList, index)"
                             :key="benefitIndex"
                             class="benefit-item"
                         >
                           <div class="benefit-icon">
                             <span
-                                v-if="
-                                benefit.storeCategory === 'CONVENIENCE_STORE'
-                              "
+                                v-if="benefit.storeCategory === 'CONVENIENCE_STORE'"
                                 class="category-emoji"
-                            >🏪</span
-                            >
+                            >🏪</span>
                             <span
-                                v-else-if="
-                                benefit.storeCategory === 'COFFEE_SHOP'
-                              "
+                                v-else-if="benefit.storeCategory === 'COFFEE_SHOP'"
                                 class="category-emoji"
-                            >☕</span
-                            >
+                            >☕</span>
                             <span
-                                v-else-if="
-                                benefit.storeCategory === 'MOVIE_THEATER'
-                              "
+                                v-else-if="benefit.storeCategory === 'MOVIE_THEATER'"
                                 class="category-emoji"
-                            >🎬</span
-                            >
+                            >🎬</span>
                             <span
-                                v-else-if="
-                                benefit.storeCategory === 'GAS_STATION'
-                              "
+                                v-else-if="benefit.storeCategory === 'GAS_STATION'"
                                 class="category-emoji"
-                            >⛽</span
-                            >
+                            >⛽</span>
                             <span
                                 v-else-if="benefit.storeCategory === 'RESTAURANT'"
                                 class="category-emoji"
-                            >🍽️</span
-                            >
+                            >🍽️</span>
                             <span
                                 v-else-if="benefit.storeCategory === 'HOTEL'"
                                 class="category-emoji"
-                            >🏨</span
-                            >
+                            >🏨</span>
                             <span
                                 v-else-if="benefit.storeCategory === 'THEME_PARK'"
                                 class="category-emoji"
-                            >🎡</span
-                            >
+                            >🎡</span>
                             <span v-else class="category-emoji">💳</span>
                           </div>
-                          <span class="benefit-text">{{
-                              benefit.description
-                            }}</span>
+                          <span class="benefit-text">{{ benefit.description }}</span>
                         </div>
                       </div>
 
                       <!-- 더보기/접기 버튼 -->
                       <div
-                          v-if="
-                          card.storeBenefitList &&
-                          card.storeBenefitList.length > 2
-                        "
+                          v-if="card.storeBenefitList && card.storeBenefitList.length > 2"
                           class="more-benefits-button"
                           @click.stop="toggleBenefitsExpand(index)"
                       >
@@ -158,28 +135,27 @@
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
+              </div> <!-- /.card-inner -->
+            </div> <!-- /.card -->
+          </div> <!-- /.card-container -->
         </SwiperSlide>
 
-        <!-- 카드 연동하기 슬라이드 -->
+        <!-- 카드 연동하기 (항상 마지막 슬라이드로 존재) -->
         <SwiperSlide class="swiper-slide-custom">
           <div class="card-container">
             <div
                 class="card add-card"
                 :class="{
-    active: activeIndex === cards.length,
-    inactive: activeIndex !== cards.length,
-  }"
+                active: activeIndex === cards.length,
+                inactive: activeIndex !== cards.length,
+              }"
                 @click="goToCardLink"
             >
-
-            <div class="add-card-content">
+              <div class="add-card-content">
                 <div class="add-card-icon">
                   <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-                    <circle cx="20" cy="20" r="20" fill="white"/>
-                    <path d="M20 12V28M12 20H28" stroke="#999" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="20" cy="20" r="20" fill="white" />
+                    <path d="M20 12V28M12 20H28" stroke="#999" stroke-width="2" stroke-linecap="round" />
                   </svg>
                 </div>
                 <p class="add-card-text">카드 연동하기</p>
@@ -189,13 +165,13 @@
         </SwiperSlide>
       </Swiper>
 
-      <!-- 카드 편집 -->
-      <div style="display: flex; justify-content: center">
+      <!-- 카드 편집: 카드가 있을 때만 노출(원 코드 유지) -->
+      <div v-if="cards.length > 0" style="display: flex; justify-content: center">
         <button class="card-edit-text" @click="goToCardEdit">카드 편집</button>
       </div>
     </div>
 
-    <!-- 버튼들을 Swiper 밖으로 이동하여 고정 -->
+    <!-- 하단 고정 버튼: 카드가 있을 때만 노출(원 코드 유지) -->
     <div v-if="cards.length > 0" class="fixed-card-buttons">
       <button class="card-button usage-history-btn" @click="goToAnalysis">
         이용내역 조회
@@ -214,21 +190,24 @@ import 'swiper/css';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import memberApi from '@/api/memberApi';
 
-const cards = ref([]);
-const activeIndex = ref(1); // 두 번째 카드부터 시작
-const flippedCards = ref(new Set()); // 뒤집힌 카드들의 인덱스를 저장
-const isSliding = ref(false); // 슬라이딩 중인지 확인
-const expandedCards = ref(new Set()); // 혜택이 확장된 카드들
+const cards = ref([1]);
+const activeIndex = ref(0);               // 기본 0 (카드 없을 때 '연동하기'가 첫 슬라이드)
+const flippedCards = ref(new Set());      // 뒤집힌 카드 인덱스 저장
+const isSliding = ref(false);             // 슬라이딩 중 여부
+const expandedCards = ref(new Set());     // 혜택 확장 카드 인덱스 저장
 
 const router = useRouter();
-
-// 카드가 있는지 확인하는 computed
 const hasCards = computed(() => cards.value.length > 0);
 
-// 이용내역 조회 페이지로 이동
-// 이용내역 조회 페이지로 이동
+// 이용내역 조회: 현재 슬라이드가 실제 카드일 때만 동작
 const goToAnalysis = () => {
-  const current = cards.value[activeIndex.value];
+  const idx = activeIndex.value;
+  if (idx >= cards.value.length) {
+    // 현재 선택이 '카드 연동하기' 슬라이드인 경우
+    alert('먼저 카드를 연동해 주세요.');
+    return;
+  }
+  const current = cards.value[idx];
   if (!current) return;
 
   router.push({
@@ -237,34 +216,25 @@ const goToAnalysis = () => {
   });
 };
 
-// 결제 페이지로 이동
+// 결제 페이지로 이동(항상 가능)
 const goToPayment = () => {
   router.push('/payment/qr');
 };
 
 const goToStoreList = (cardId) => {
-  console.log('카드 ID:', cardId);
   if (!cardId) {
     console.error('카드 ID가 없습니다.');
     return;
   }
-
-  try {
-    router.push({
-      name: 'MapPage',
-      query: { cardId: cardId },
-    });
-  } catch (error) {
-    console.error('페이지 이동 실패:', error);
-  }
+  router.push({
+    name: 'MapPage',
+    query: { cardId },
+  });
 };
 
 const goToCardLink = () => {
-  router.push({ name: 'CardSelectPage' }); // name으로 이동
-  // 또는 path로 이동 가능
-  // router.push('/card/select');
+  router.push({ name: 'CardSelectPage' });
 };
-
 
 const goToCardEdit = () => {
   router.push({ path: '/card' });
@@ -273,32 +243,42 @@ const goToCardEdit = () => {
 const loadCards = async () => {
   try {
     const result = await memberApi.getMyCard();
-    cards.value = result;
-    console.log('로드된 카드 데이터:', cards.value);
+
+    // API 응답 형태 대응: 배열 또는 {data:{data:[...]}}
+    const list =
+        Array.isArray(result) ? result :
+            (Array.isArray(result?.data?.data) ? result.data.data :
+                (Array.isArray(result?.data) ? result.data : []));
+
+    cards.value = list.filter(Boolean);
+
+    // 카드가 있으면 두 번째 카드부터 시작(디자인 의도 유지), 없으면 0
+    activeIndex.value = cards.value.length > 1 ? 1 : 0;
+
+    // 상태 초기화
+    flippedCards.value.clear();
+    expandedCards.value.clear();
   } catch (err) {
     const userMessage =
-        err.userMessage ||
-        (err.code === 'ECONNABORTED'
+        err?.userMessage ||
+        (err?.code === 'ECONNABORTED'
             ? '서버 응답이 지연되고 있습니다. 잠시 후 다시 시도해주세요.'
             : '카드 정보를 불러오는데 실패했습니다.');
-
     alert(userMessage);
     console.error('카드 리스트 로드 실패:', err);
-
-    // 임시 해결책: 빈 배열로 설정하여 UI 깨짐 방지
     cards.value = [];
+    activeIndex.value = 0;
   }
 };
 
-// 혜택 표시 개수 제어 함수
+// 혜택 표시 개수 제어
 const getDisplayBenefits = (benefits, cardIndex) => {
-  if (!benefits) return [];
-
+  if (!Array.isArray(benefits)) return [];
   const isExpanded = expandedCards.value.has(cardIndex);
   return isExpanded ? benefits : benefits.slice(0, 2);
 };
 
-// 혜택 더보기/접기 토글 함수
+// 혜택 더보기/접기
 const toggleBenefitsExpand = (cardIndex) => {
   if (expandedCards.value.has(cardIndex)) {
     expandedCards.value.delete(cardIndex);
@@ -308,38 +288,35 @@ const toggleBenefitsExpand = (cardIndex) => {
 };
 
 const onSlideChange = (swiper) => {
-  // 슬라이딩 시작 시 애니메이션 비활성화
   isSliding.value = true;
 
-  // 즉시 모든 카드를 앞면으로 되돌리기 (애니메이션 없이)
+  // 모든 카드 앞면으로
   flippedCards.value.clear();
-
-  // 혜택 확장 상태도 초기화
+  // 혜택 확장 초기화
   expandedCards.value.clear();
 
   activeIndex.value = swiper.activeIndex;
 
-  // 약간의 딜레이 후 애니메이션 다시 활성화
   setTimeout(() => {
     isSliding.value = false;
   }, 100);
 };
 
-// 카드 뒤집기 함수 - API 호출 없이 바로 뒤집기
+// 카드 뒤집기: 활성 카드이면서 실제 카드 인덱스일 때만
 const toggleCardFlip = (index) => {
-  // 활성 카드(가운데 카드)만 뒤집기 가능
-  if (index === activeIndex.value) {
-    if (flippedCards.value.has(index)) {
-      flippedCards.value.delete(index);
-    } else {
-      flippedCards.value.add(index);
-    }
+  if (index !== activeIndex.value) return;
+  if (index >= cards.value.length) return; // '카드 연동하기' 슬라이드 방지
+
+  if (flippedCards.value.has(index)) {
+    flippedCards.value.delete(index);
+  } else {
+    flippedCards.value.add(index);
   }
 };
 
 onMounted(() => {
   loadCards();
-})
+});
 </script>
 
 <style scoped>
@@ -472,7 +449,7 @@ onMounted(() => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  margin: 12px 0; /* 마진 조금 줄임 */
+  margin: 12px 0;
   min-height: 0;
 }
 
@@ -480,13 +457,13 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 5px;
-  max-height: 100px; /* 2개 아이템이 완전히 보이도록 높이 증가 */
+  max-height: 100px;
   overflow: hidden;
   transition: max-height 0.3s ease;
 }
 
 .benefits-container.expanded {
-  max-height: 180px; /* 확장 시 높이 */
+  max-height: 180px;
   overflow-y: auto;
 }
 
@@ -515,8 +492,8 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 5px;
-  padding: 4px 0; /* 패딩을 줄여서 공간 확보 */
-  min-height: 32px; /* 최소 높이 보장 */
+  padding: 4px 0;
+  min-height: 32px;
 }
 
 .benefit-icon {
@@ -692,7 +669,6 @@ onMounted(() => {
   background-color: #f4c025;
 }
 
-/* 카드 연동하기 스타일 추가 */
 /* 카드 연동하기 전용 스타일 */
 .add-card {
   background-color: #D0D0D0;

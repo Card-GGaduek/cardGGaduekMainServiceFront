@@ -36,6 +36,14 @@ const authApi = {
       state: state,
     });
   },
+
+  connectOrganization: async (organization, id, password) => {
+    return await axiosInstance.post('/codef/account/register', {
+      organization: organization,
+      id: id,
+      password: password
+    })
+  },
 };
 
 export default authApi;

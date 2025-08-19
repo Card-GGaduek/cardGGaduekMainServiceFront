@@ -131,6 +131,7 @@
           type="tel"
           class="input"
           placeholder="전화번호 입력"
+          v-model="joinForm.phone"
           autocomplete="tel"
         />
       </div>
