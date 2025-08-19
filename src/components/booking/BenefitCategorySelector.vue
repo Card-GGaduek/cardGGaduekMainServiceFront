@@ -64,6 +64,8 @@ function selectCategory(category) {
 }
 .icon-wrapper i {
   font-size: 2rem;
+  font-style: normal;  /* 기본 italic 제거 */
+
 }
 .icon-wrapper.active {
   box-shadow: 0 0 0 5px #FFCD39;

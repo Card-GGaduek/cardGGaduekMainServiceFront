@@ -411,7 +411,7 @@ onMounted(async () => {
 <style scoped>
 .payment-card-page {
   background-color: #f8f9fa;
-  min-height: 100vh;
+  min-height: 100%;
 }
 
 .page-container {

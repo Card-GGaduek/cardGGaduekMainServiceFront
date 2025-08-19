@@ -1,7 +1,7 @@
 <script setup>
-import { ref, onMounted, computed } from "vue"; // 💡 computed 추가
-import { useRoute, useRouter } from "vue-router";
-import api from "@/api/index.js";
+import { ref, onMounted, computed } from 'vue'; // 💡 computed 추가
+import { useRoute, useRouter } from 'vue-router';
+import api from '@/api/index.js';
 
 const route = useRoute();
 const router = useRouter();
@@ -10,22 +10,23 @@ const isLoading = ref(true);
 const error = ref(null); // 💡 에러 상태를 관리하기 위한 ref 추가
 
 const categoryIcons = {
-  COFFEE_SHOP: "☕️",
-  RESTAURANT: "🍔",
-  HOTEL: "🧳",
-  MOVIE_THEATER: "🎡",
-  GAS_STATION: "⛽️", // 🚀 아이콘을 ⛽️로 변경했습니다.
-  CONVENIENCE_STORE: "🏪", // 🏥 아이콘을 🏪로 변경했습니다.
+  COFFEE_SHOP: '☕️',
+  RESTAURANT: '🍔',
+  HOTEL: '🧳',
+  MOVIE_THEATER: '🎡',
+  GAS_STATION: '⛽️', // 🚀 아이콘을 ⛽️로 변경했습니다.
+  CONVENIENCE_STORE: '🏪', // 🏥 아이콘을 🏪로 변경했습니다.
   // 필요한 다른 카테고리도 여기에 추가할 수 있습니다.
 };
 
 const categoryNamesKo = {
-  COFFEE_SHOP: "커피전문점",
-  RESTAURANT: "음식점",
-  HOTEL: "호텔/숙박",
-  MOVIE_THEATER: "영화/문화",
-  GAS_STATION: "주유",
-  CONVENIENCE_STORE: "편의점",
+  COFFEE_SHOP: '커피전문점',
+  RESTAURANT: '음식점',
+  HOTEL: '호텔/숙박',
+  MOVIE_THEATER: '영화/문화',
+  GAS_STATION: '주유',
+  CONVENIENCE_STORE: '편의점',
+  THEME_PARK: '놀이공원',
   // 필요한 다른 카테고리도 여기에 추가할 수 있습니다.
 };
 
@@ -37,8 +38,8 @@ async function fetchCardDetail() {
     const response = await api.get(`api/card-products/${productId}`);
     cardDetail.value = response.data.data || response.data;
   } catch (err) {
-    console.error("카드 상세 정보 실패:", err);
-    error.value = "카드 정보를 불러오는 데 실패했습니다."; // 💡 에러 메시지 설정
+    console.error('카드 상세 정보 실패:', err);
+    error.value = '카드 정보를 불러오는 데 실패했습니다.'; // 💡 에러 메시지 설정
   } finally {
     isLoading.value = false;
   }
@@ -68,14 +69,14 @@ function goBack() {
 function applyForCard() {
   if (cardDetail.value && cardDetail.value.cardApplyUrl) {
     alert(`${cardDetail.value.cardProductName} 신청 페이지로 이동합니다.`);
-    window.open(cardDetail.value.cardApplyUrl, "_blank");
+    window.open(cardDetail.value.cardApplyUrl, '_blank');
   } else {
-    alert("카드 신청 링크가 준비되지 않았습니다.");
+    alert('카드 신청 링크가 준비되지 않았습니다.');
   }
 }
 function formatPrice(price) {
-    if(price === null || price === undefined) return "";
-    return price.toLocaleString("ko-KR");
+  if (price === null || price === undefined) return '';
+  return price.toLocaleString('ko-KR');
 }
 </script>
 
@@ -108,7 +109,9 @@ function formatPrice(price) {
           <div class="info-item">
             <div class="info-icon">💰</div>
             <div class="info-label">연회비</div>
-            <div class="info-value">{{ formatPrice(cardDetail.annualFee) }}원</div>
+            <div class="info-value">
+              {{ formatPrice(cardDetail.annualFee) }}원
+            </div>
           </div>
           <div class="info-item">
             <div class="info-icon">📅</div>
@@ -127,7 +130,7 @@ function formatPrice(price) {
           >
             <div class="category-header">
               <span class="category-icon">{{
-                categoryIcons[category] || "⭐️"
+                categoryIcons[category] || '⭐️'
               }}</span>
               <h3 class="section-title">
                 {{ categoryNamesKo[category] || category }}
@@ -138,10 +141,8 @@ function formatPrice(price) {
               <p class="benefit-text-list">
                 {{
                   benefitsInGroup
-                    .map(
-                      (benefit) => `${benefit.description}`
-                    )
-                    .join(" // ")
+                    .map((benefit) => `${benefit.description}`)
+                    .join(' // ')
                 }}
               </p>
             </div>
