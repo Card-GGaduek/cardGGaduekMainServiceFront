@@ -102,10 +102,10 @@
             <!-- 카드 혜택 안내 -->
             <div class="card-benefit-notice">
               <p v-if="selectedCard && isSelectedCardFromBooking(selectedCard)" class="benefit-text benefit-active">
-                혜택이 적용되는 카드입니다. 할인 금액이 반영되었습니다.
+                예약 시 선택한 카드입니다. 혜택 적용 여부를 확인해 주세요.
               </p>
               <p v-else class="benefit-text">
-                해당 카드는 예약 시 확인한 혜택이 제공되지 않습니다.
+                예약 시 선택한 카드가 아닙니다. 혜택 적용 여부를 확인해 주세요.
               </p>
             </div>
           </div>
@@ -315,7 +315,7 @@ const requestPayment = () => {
       qs.append('bookingId', String(bookingData.value.bookingId));
     }
     paymentData.m_redirect_url =
-        `${window.location.origin}/payment/complete` +
+        `${window.location.origin}/payment/completepage` +
         (qs.toString() ? `?${qs.toString()}` : '');
   }
 
