@@ -1,11 +1,16 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import vueDevTools from 'vite-plugin-vue-devtools';
 import { fileURLToPath, URL } from 'node:url';
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [vue(), vueDevTools()],
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  const target = env.VITE_API_PROXY_TARGET
+
+  return {
+
+    plugins: [vue(), vueDevTools()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
@@ -16,10 +21,14 @@ export default defineConfig({
       // '/api'로 시작하는 요청을 대상 서버로 전달
       // '/api'로 시작하는 요청을 대상 서버로 전달
       '/api': {
-        target: 'http://localhost:8080', // 백엔드 주소
+        target: target, // 백엔드 주소
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '/api'), // /api 유지
       },
     },
   },
+
+  }
+
+  
 });

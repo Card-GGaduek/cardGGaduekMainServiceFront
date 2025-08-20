@@ -64,6 +64,7 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 
 const clientId = import.meta.env.VITE_NAVER_API_CLIENT_ID;
+const callbackURL = import.meta.env.VITE_NAVER_LOGIN_CALLBACK_URL
 const authStore = useAuthStore();
 
 const loginForm = reactive({
@@ -107,7 +108,7 @@ const generateState = () => {
 const state = generateState();
 sessionStorage.setItem('naver_oauth_state', state);
 
-const redirectUri = encodeURIComponent('http://localhost:5173/naver/callback'); // 로그인 완료 후 돌아올 URI
+const redirectUri = encodeURIComponent(callbackURL); // 로그인 완료 후 돌아올 URI
 
 // 로그인 URL 생성
 const naverLoginUrl = ref(
