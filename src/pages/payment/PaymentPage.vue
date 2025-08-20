@@ -309,13 +309,15 @@ const requestPayment = () => {
     buyer_postcode: '12345'
   };
 
+  const redirectUrl = import.meta.env.VITE_PG_REDIRECT_URL;
+
   if (isMobile) {
     const qs = new URLSearchParams();
     if (bookingData.value.bookingId != null) {
       qs.append('bookingId', String(bookingData.value.bookingId));
     }
     paymentData.m_redirect_url =
-        `/payment/completepage` +
+        redirectUrl +
         (qs.toString() ? `?${qs.toString()}` : '');
   }
 
