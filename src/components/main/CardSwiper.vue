@@ -38,10 +38,15 @@
             >
               <div class="card-inner">
                 <div class="card-front">
-                  <img
+                  <img v-if="card.customCardImageUrl === null"
                       :src="card.cardImageUrl"
                       alt="카드 이미지"
                       class="card-image"
+                  />
+                  <img v-else
+                    :src="card.customCardImageUrl"
+                    alt="카드 이미지"
+                    class="card-image"
                   />
                 </div>
 
