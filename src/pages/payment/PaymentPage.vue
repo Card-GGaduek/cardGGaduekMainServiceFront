@@ -317,8 +317,7 @@ const requestPayment = () => {
       qs.append('bookingId', String(bookingData.value.bookingId));
     }
     paymentData.m_redirect_url =
-        redirectUrl +
-        (qs.toString() ? `?${qs.toString()}` : '');
+        redirectUrl;
   }
 
 
